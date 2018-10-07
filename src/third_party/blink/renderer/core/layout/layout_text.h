@@ -233,6 +233,7 @@ class CORE_EXPORT LayoutText : public LayoutObject {
                          unsigned offset,
                          unsigned len);
   void SetTextInternal(scoped_refptr<StringImpl>);
+  void UpdateTextIfNeeded();
 
   virtual void TransformText();
 
@@ -581,6 +582,7 @@ class CORE_EXPORT LayoutText : public LayoutObject {
   float last_line_line_min_width_;
 
   String text_;
+  String previous_text_;
 
   // This is mutable for paint invalidation.
   mutable LogicalOffset previous_logical_starting_point_ =
