@@ -244,6 +244,15 @@ Node* AXLayoutObject::GetNodeOrContainingBlockNode() const {
   return GetNode();
 }
 
+void AXLayoutObject::Init(AXObject* parent_if_known) {
+  AXNodeObject::Init(parent_if_known);
+
+  // Notify if the layoutObject has the alert role.
+  if (RoleValue() == ax::mojom::Role::kAlert ||
+      RoleValue() == ax::mojom::Role::kAlertDialog)
+    AXObjectCache().PostNotification(this, ax::mojom::Event::kAlert);
+}
+
 void AXLayoutObject::Detach() {
   AXNodeObject::Detach();
 

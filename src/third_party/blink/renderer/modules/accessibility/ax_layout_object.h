@@ -66,6 +66,7 @@ class MODULES_EXPORT AXLayoutObject : public AXNodeObject {
   // Overridden from AXObject.
   //
 
+  void Init(AXObject* parent) override;
   void Detach() override;
   bool IsAXLayoutObject() const final;
 
