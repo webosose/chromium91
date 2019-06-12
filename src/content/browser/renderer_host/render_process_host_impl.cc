@@ -3477,8 +3477,8 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
 #if defined(USE_NEVA_APPRUNTIME)
     switches::kEnableSampleInjection,
     switches::kDecodedImageWorkingSetBudgetMB,
-    switches::kMemPressureGPUCacheSizeReductionFactor,
-    switches::kTileManagerLowMemPolicyBytesLimitReductionFactor,
+    cc::switches::kMemPressureGPUCacheSizeReductionFactor,
+    cc::switches::kTileManagerLowMemPolicyBytesLimitReductionFactor,
     blink::switches::kAllowScriptsToCloseWindows,
     blink::switches::kMinTimeToPurgeAfterBackgroundedInSeconds,
     blink::switches::kMaxTimeToPurgeAfterBackgroundedInSeconds,

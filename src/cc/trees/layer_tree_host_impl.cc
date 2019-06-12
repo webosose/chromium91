@@ -138,9 +138,9 @@
 
 #if defined(USE_NEVA_APPRUNTIME)
 #include "base/command_line.h"
-#include "base/neva/base_switches.h"
 #include "base/strings/string_number_conversions.h"
-#endif
+#include "cc/base/switches_neva.h"
+#endif // defined(USE_NEVA_APPRUNTIME)
 
 using ScrollThread = cc::InputHandler::ScrollThread;
 
@@ -440,8 +440,9 @@ LayerTreeHostImpl::LayerTreeHostImpl(
       rendering_stats_instrumentation_(rendering_stats_instrumentation),
       micro_benchmark_controller_(this),
 #if defined(USE_NEVA_APPRUNTIME)
-      low_memory_policy_(cached_managed_memory_policy_),
-#endif
+      memory_pressure_level_(
+          base::MemoryPressureListener::MEMORY_PRESSURE_LEVEL_NONE),
+#endif // defined(USE_NEVA_APPRUNTIME)
       task_graph_runner_(task_graph_runner),
       id_(id),
       consecutive_frame_with_damage_count_(settings.damaged_frame_limit),
@@ -488,17 +489,16 @@ LayerTreeHostImpl::LayerTreeHostImpl(
 #if defined(USE_NEVA_APPRUNTIME)
   base::CommandLine& cmd_line = *base::CommandLine::ForCurrentProcess();
   if (cmd_line.HasSwitch(
-          ::switches::kTileManagerLowMemPolicyBytesLimitReductionFactor)) {
+          cc::switches::kTileManagerLowMemPolicyBytesLimitReductionFactor)) {
     size_t bytes_limit_reduction_factor;
     if (base::StringToSizeT(
             cmd_line.GetSwitchValueASCII(
-                ::switches::kTileManagerLowMemPolicyBytesLimitReductionFactor),
+                cc::switches::
+                    kTileManagerLowMemPolicyBytesLimitReductionFactor),
             &bytes_limit_reduction_factor))
       bytes_limit_reduction_factor_ = bytes_limit_reduction_factor;
-    low_memory_policy_.bytes_limit_when_visible /=
-        bytes_limit_reduction_factor_;
   }
-#endif
+#endif // defined(USE_NEVA_APPRUNTIME)
 
   SetDebugState(settings.initial_debug_state);
   compositor_frame_reporting_controller_->SetDroppedFrameCounter(
@@ -1727,6 +1727,12 @@ void LayerTreeHostImpl::UpdateTileManagerMemoryPolicy(
         (static_cast<int64_t>(global_tile_state_.hard_memory_limit_in_bytes) *
          settings_.max_memory_for_prepaint_percentage) /
         100;
+#if defined(USE_NEVA_APPRUNTIME)
+    if (memory_pressure_level_ !=
+        base::MemoryPressureListener::MEMORY_PRESSURE_LEVEL_NONE) {
+      global_tile_state_.soft_memory_limit_in_bytes = 0;
+    }
+#endif // defined(USE_NEVA_APPRUNTIME)
   }
   global_tile_state_.memory_limit_policy =
       ManagedMemoryPolicy::PriorityCutoffToTileMemoryLimitPolicy(
@@ -2019,10 +2025,6 @@ void LayerTreeHostImpl::SetManagedMemoryPolicy(
 
   ManagedMemoryPolicy old_policy = ActualManagedMemoryPolicy();
   cached_managed_memory_policy_ = policy;
-#if defined(USE_NEVA_APPRUNTIME)
-  low_memory_policy_ = cached_managed_memory_policy_;
-  low_memory_policy_.bytes_limit_when_visible /= bytes_limit_reduction_factor_;
-#endif
   ManagedMemoryPolicy actual_policy = ActualManagedMemoryPolicy();
 
   if (old_policy == actual_policy)
@@ -3347,12 +3349,24 @@ void LayerTreeHostImpl::ActivateStateForImages() {
 
 void LayerTreeHostImpl::OnMemoryPressure(
     base::MemoryPressureListener::MemoryPressureLevel level) {
+#if defined(USE_NEVA_APPRUNTIME)
+  memory_pressure_level_ = level;
+#endif // defined(USE_NEVA_APPRUNTIME)
+
+#if defined(OS_WEBOS)
+  if (level == base::MemoryPressureListener::MEMORY_PRESSURE_LEVEL_NONE) {
+    if (visible_)
+      UpdateTileManagerMemoryPolicy(ActualManagedMemoryPolicy());
+    return;
+  }
+#else
   // Only work for low-end devices for now.
   if (!base::SysInfo::IsLowEndDevice())
     return;
 
   if (level != base::MemoryPressureListener::MEMORY_PRESSURE_LEVEL_CRITICAL)
     return;
+#endif // defined(OS_WEBOS)
 
     // TODO(crbug.com/1189208): Unlocking decoded-image-tracker images causes
     // flickering in visible trees if Out-Of-Process rasterization is enabled.
@@ -3378,12 +3392,12 @@ void LayerTreeHostImpl::OnMemoryPressure(
 
   tile_manager_.decoded_image_tracker().UnlockAllImages();
 #if defined(USE_NEVA_APPRUNTIME)
-  if (visible_ && bytes_limit_reduction_factor_ > 1) {
-    UpdateTileManagerMemoryPolicy(low_memory_policy_);
+  if (visible_) {
+    UpdateTileManagerMemoryPolicy(ActualManagedMemoryPolicy());
     SetFullViewportDamage();
     SetNeedsRedraw();
   }
-#endif
+#endif // defined(USE_NEVA_APPRUNTIME)
 }
 
 void LayerTreeHostImpl::SetVisible(bool visible) {
@@ -3462,6 +3476,13 @@ ManagedMemoryPolicy LayerTreeHostImpl::ActualManagedMemoryPolicy() const {
     actual.priority_cutoff_when_visible =
         gpu::MemoryAllocation::CUTOFF_ALLOW_NICE_TO_HAVE;
   }
+#if defined(USE_NEVA_APPRUNTIME)
+  if (memory_pressure_level_ !=
+          base::MemoryPressureListener::MEMORY_PRESSURE_LEVEL_NONE &&
+      bytes_limit_reduction_factor_ > 1) {
+    actual.bytes_limit_when_visible /= bytes_limit_reduction_factor_;
+  }
+#endif // defined(USE_NEVA_APPRUNTIME)
   return actual;
 }
 

@@ -50,6 +50,12 @@
 #include "ui/gfx/skia_util.h"
 #include "ui/gl/trace_util.h"
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "base/command_line.h"
+#include "base/strings/string_number_conversions.h"
+#include "cc/base/switches_neva.h"
+#endif // defined(USE_NEVA_APPRUNTIME)
+
 namespace cc {
 namespace {
 // The number or entries to keep in the cache, depending on the memory state of
@@ -57,6 +63,9 @@ namespace {
 // be deleted.
 static const int kNormalMaxItemsInCacheForGpu = 2000;
 static const int kSuspendedMaxItemsInCacheForGpu = 0;
+#if defined(OS_WEBOS)
+static const int kThrottledMaxItemsInCacheForGpu = 100;
+#endif
 
 // The maximum number of images that we can lock simultaneously in our working
 // set. This is separate from the memory limit, as keeping very large numbers
@@ -973,6 +982,19 @@ GpuImageDecodeCache::GpuImageDecodeCache(
     }
   }
 
+#if defined(USE_NEVA_APPRUNTIME)
+  base::CommandLine& cmd_line = *base::CommandLine::ForCurrentProcess();
+  if (cmd_line.HasSwitch(
+          cc::switches::kMemPressureGPUCacheSizeReductionFactor)) {
+    size_t cache_size_reduction_factor;
+    if (base::StringToSizeT(
+            cmd_line.GetSwitchValueASCII(
+                cc::switches::kMemPressureGPUCacheSizeReductionFactor),
+            &cache_size_reduction_factor))
+      mem_pressure_cache_size_reduction_factor_ = cache_size_reduction_factor;
+  }
+#endif // defined(USE_NEVA_APPRUNTIME)
+
   // In certain cases, ThreadTaskRunnerHandle isn't set (Android Webview).
   // Don't register a dump provider in these cases.
   if (base::ThreadTaskRunnerHandle::IsSet()) {
@@ -1831,12 +1853,25 @@ bool GpuImageDecodeCache::EnsureCapacity(size_t required_size) {
 bool GpuImageDecodeCache::CanFitInWorkingSet(size_t size) const {
   lock_.AssertAcquired();
 
+#if defined(USE_NEVA_APPRUNTIME)
+  size_t bytes_limit = max_working_set_bytes_;
+  if (memory_pressure_level_ !=
+      base::MemoryPressureListener::MEMORY_PRESSURE_LEVEL_NONE) {
+    bytes_limit =
+        max_working_set_bytes_ / mem_pressure_cache_size_reduction_factor_;
+  }
+#endif // defined(USE_NEVA_APPRUNTIME)
+
   if (working_set_items_ >= max_working_set_items_)
     return false;
 
   base::CheckedNumeric<uint32_t> new_size(working_set_bytes_);
   new_size += size;
+#if defined(USE_NEVA_APPRUNTIME)
+  if (!new_size.IsValid() || new_size.ValueOrDie() > bytes_limit)
+#else
   if (!new_size.IsValid() || new_size.ValueOrDie() > max_working_set_bytes_)
+#endif // defined(USE_NEVA_APPRUNTIME)
     return false;
 
   return true;
@@ -1851,6 +1886,15 @@ bool GpuImageDecodeCache::ExceedsPreferredCount() const {
   } else {
     items_limit = kNormalMaxItemsInCacheForGpu;
   }
+
+#if defined(USE_NEVA_APPRUNTIME) && defined(OS_WEBOS)
+  if (memory_pressure_level_ !=
+          base::MemoryPressureListener::MEMORY_PRESSURE_LEVEL_NONE &&
+      items_limit > kThrottledMaxItemsInCacheForGpu) {
+    items_limit = kThrottledMaxItemsInCacheForGpu;
+  }
+#endif // defined(USE_NEVA_APPRUNTIME) && defined(OS_WEBOS)
+
 
   return persistent_cache_.size() > items_limit;
 }
@@ -2888,6 +2932,9 @@ bool GpuImageDecodeCache::NeedsDarkModeFilterForTesting(
 void GpuImageDecodeCache::OnMemoryPressure(
     base::MemoryPressureListener::MemoryPressureLevel level) {
   base::AutoLock lock(lock_);
+#if defined(USE_NEVA_APPRUNTIME)
+  memory_pressure_level_ = level;
+#endif // defined(USE_NEVA_APPRUNTIME)
   switch (level) {
     case base::MemoryPressureListener::MEMORY_PRESSURE_LEVEL_NONE:
     case base::MemoryPressureListener::MEMORY_PRESSURE_LEVEL_MODERATE:

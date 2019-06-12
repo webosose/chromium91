@@ -788,8 +788,7 @@ void WebView::SetViewportSize(int width, int height) {
 void WebView::NotifyMemoryPressure(
     base::MemoryPressureListener::MemoryPressureLevel level) {
   LOG(INFO) << "[MemoryPressure] " << __FUNCTION__ << " => Level: " << level;
-  if (level != base::MemoryPressureListener::MEMORY_PRESSURE_LEVEL_NONE)
-    base::MemoryPressureListener::NotifyMemoryPressure(level);
+  base::MemoryPressureListener::NotifyMemoryPressure(level);
 }
 
 void WebView::SetVisible(bool visible) {
