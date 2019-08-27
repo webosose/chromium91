@@ -326,6 +326,7 @@ class AX_EXPORT AXEventGenerator : public AXTreeObserver {
 
   AXTree* tree_ = nullptr;  // Not owned.
   std::map<AXNode*, std::set<EventParams>> tree_events_;
+  std::map<int32_t, std::set<EventParams>> reparenting_node_events_;
 
   // Valid between the call to OnIntAttributeChanged and the call to
   // OnAtomicUpdateFinished. List of nodes whose active descendant changed.
