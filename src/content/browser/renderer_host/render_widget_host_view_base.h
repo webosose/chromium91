@@ -500,6 +500,7 @@ class CONTENT_EXPORT RenderWidgetHostViewBase : public RenderWidgetHostView {
   }
 
 #if defined(USE_NEVA_MEDIA)
+  void SetAdditionalContentsScale(float scale_x, float scale_y);
   virtual gfx::AcceleratedWidget GetAcceleratedWidget();
 #endif  // defined(USE_NEVA_MEDIA)
 
@@ -629,6 +630,10 @@ class CONTENT_EXPORT RenderWidgetHostViewBase : public RenderWidgetHostView {
   display::Display current_display_;
   bool current_display_is_extended_ = false;
   bool current_display_is_primary_ = false;
+
+#if defined(USE_NEVA_MEDIA)
+  gfx::PointF additional_contents_scale_;
+#endif
 
   base::ObserverList<RenderWidgetHostViewBaseObserver>::Unchecked observers_;
 

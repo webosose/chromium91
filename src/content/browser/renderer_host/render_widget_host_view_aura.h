@@ -346,6 +346,7 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   bool SystemKeyboardDisabled() const override;
   gfx::Rect GetInputPanelRectangle() const override;
   gfx::Rect GetTextInputBounds() const override;
+  gfx::Size GetCompositorViewportPixelSize() override;
 #endif
 
 #if defined(USE_NEVA_MEDIA)
@@ -685,6 +686,7 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
 
 #if defined(USE_NEVA_APPRUNTIME)
   bool enable_html_systemkeyboard_attr_ = false;
+  float window_scale_ratio_ = 1.0f;
 #endif
 
   // The last selection bounds reported to the view.

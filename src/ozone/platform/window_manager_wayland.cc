@@ -218,6 +218,9 @@ void WindowManagerWayland::OnWindowResized(unsigned handle,
     return;
   }
 
+  if (!window->GetResizeEnabled())
+    return;
+
   const gfx::Rect& current_bounds = window->GetBounds();
   window->SetBounds(gfx::Rect(current_bounds.x(),
                               current_bounds.y(),

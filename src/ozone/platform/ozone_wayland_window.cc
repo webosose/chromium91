@@ -270,6 +270,17 @@ void OzoneWaylandWindow::ToggleFullscreen() {
   SendWidgetState();
 }
 
+void OzoneWaylandWindow::ToggleFullscreenWithSize(const gfx::Size& size) {
+  if (size.width() == 0 || size.height() == 0) {
+    ToggleFullscreen();
+    return;
+  }
+  VLOG(1) << __PRETTY_FUNCTION__;
+  SetBounds(gfx::Rect(size.width(), size.height()));
+  state_ = WidgetState::FULLSCREEN;
+  SendWidgetState();
+}
+
 void OzoneWaylandWindow::Maximize() {
   display::Screen *screen = display::Screen::GetScreen();
   if (!screen)
@@ -536,6 +547,10 @@ void OzoneWaylandWindow::SetSurroundingText(const std::string& text,
                                             size_t anchor_position) {
   sender_->Send(new WaylandDisplay_SetSurroundingText(text, cursor_position,
                                                       anchor_position));
+}
+
+void OzoneWaylandWindow::SetResizeEnabled(bool enabled) {
+  resize_enabled_ = enabled;
 }
 
 void OzoneWaylandWindow::XInputActivate(const std::string& type) {

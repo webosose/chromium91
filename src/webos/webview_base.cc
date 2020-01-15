@@ -423,7 +423,7 @@ bool WebViewBase::IsInputMethodActive() {
 }
 
 void WebViewBase::SetAdditionalContentsScale(float scale_x, float scale_y) {
-  NOTIMPLEMENTED();
+  webview_->SetAdditionalContentsScale(scale_x, scale_y);
 }
 
 void WebViewBase::GoBack() {
