@@ -3865,6 +3865,18 @@ void RenderFrameHostImpl::UpdateTargetURL(
 }
 
 void RenderFrameHostImpl::RequestClose() {
+#if defined(USE_NEVA_APPRUNTIME)
+  if (render_view_host_->GetDelegate() && render_view_host_->GetDelegate()
+                                              ->GetOrCreateWebPreferences()
+                                              .keep_alive_webapp) {
+    // this is keepAlive app, window.close() should't close this app.
+    // Just notify about this 'trying close' without any setting for real view
+    // closing
+    render_view_host_->GetDelegate()->Close(render_view_host());
+    return;
+  }
+#endif
+
   // If the renderer is telling us to close, it has already run the unload
   // events, and we can take the fast path.
   render_view_host_->ClosePageIgnoringUnloadEvents();

@@ -39,6 +39,7 @@
 #include "third_party/blink/public/mojom/webpreferences/web_preferences.mojom-forward.h"
 #include "third_party/blink/public/platform/web_common.h"
 #include "third_party/blink/public/platform/web_effective_connection_type.h"
+#include "third_party/blink/public/web/neva/web_settings_neva.h"
 
 namespace blink {
 
@@ -48,7 +49,7 @@ class WebString;
 // for the WebView's page without any knowledge of WebCore itself.  For the most
 // part, these functions have a 1:1 mapping with the methods in
 // WebCore/page/Settings.h.
-class WebSettings {
+class WebSettings : public WebSettingsNeva {
  public:
   // Selection strategy defines how the selection granularity changes when the
   // selection extent is moved.

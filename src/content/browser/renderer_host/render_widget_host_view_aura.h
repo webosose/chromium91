@@ -347,6 +347,7 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   gfx::Rect GetInputPanelRectangle() const override;
   gfx::Rect GetTextInputBounds() const override;
   gfx::Size GetCompositorViewportPixelSize() override;
+  bool IsKeepAliveWebApp() const;
 #endif
 
 #if defined(USE_NEVA_MEDIA)

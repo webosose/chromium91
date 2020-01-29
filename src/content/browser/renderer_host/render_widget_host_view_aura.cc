@@ -121,6 +121,7 @@
 #endif
 
 #if defined(USE_NEVA_APPRUNTIME)
+#include "content/browser/renderer_host/delegated_frame_host_client_neva.h"
 #include "third_party/blink/public/platform/web_text_input_type.h"
 #endif
 
@@ -2040,7 +2041,11 @@ void RenderWidgetHostViewAura::CreateAuraWindow(aura::client::WindowType type) {
 
 void RenderWidgetHostViewAura::CreateDelegatedFrameHostClient() {
   delegated_frame_host_client_ =
+#if defined(USE_NEVA_APPRUNTIME)
+      std::make_unique<DelegatedFrameHostClientNeva>(this);
+#else
       std::make_unique<DelegatedFrameHostClientAura>(this);
+#endif
   delegated_frame_host_ = std::make_unique<DelegatedFrameHost>(
       frame_sink_id_, delegated_frame_host_client_.get(),
       false /* should_register_frame_sink_id */);
@@ -2567,6 +2572,13 @@ gfx::Rect RenderWidgetHostViewAura::GetTextInputBounds() const {
 gfx::Size RenderWidgetHostViewAura::GetCompositorViewportPixelSize() {
   return gfx::ScaleToCeiledSize(GetRequestedRendererSize(),
                                 GetDeviceScaleFactor() * window_scale_ratio_);
+}
+
+bool RenderWidgetHostViewAura::IsKeepAliveWebApp() const {
+  RenderWidgetHostOwnerDelegate* owner_delegate = host()->owner_delegate();
+  if (owner_delegate)
+    return owner_delegate->GetWebkitPreferencesForWidget().keep_alive_webapp;
+  return false;
 }
 #endif
 

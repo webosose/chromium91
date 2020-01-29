@@ -1642,6 +1642,9 @@ void WebView::ApplyWebPreferences(const web_pref::WebPreferences& prefs,
 #endif  // defined(OS_ANDROID)
   settings->SetForceDarkModeEnabled(prefs.force_dark_mode_enabled);
 
+#if defined(USE_NEVA_APPRUNTIME)
+  settings->SetKeepAliveWebApp(prefs.keep_alive_webapp);
+#endif
 #if defined(USE_NEVA_MEDIA)
   settings->SetMaxTimeupdateEventFrequency(prefs.max_timeupdate_event_frequency);
 #endif
@@ -3246,6 +3249,14 @@ void WebViewImpl::SetWebPreferences(
 const web_pref::WebPreferences& WebViewImpl::GetWebPreferences() {
   return web_preferences_;
 }
+
+#if defined(USE_NEVA_APPRUNTIME)
+void WebViewImpl::SetKeepAliveWebApp(bool keep_alive) {
+  web_preferences_.keep_alive_webapp = keep_alive;
+  if (GetSettings())
+    GetSettings()->SetKeepAliveWebApp(keep_alive);
+}
+#endif
 
 void WebViewImpl::UpdateWebPreferences(
     const blink::web_pref::WebPreferences& preferences) {

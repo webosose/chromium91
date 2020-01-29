@@ -289,6 +289,10 @@ struct BLINK_COMMON_EXPORT WebPreferences {
   // TODO(changwan): remove this once we no longer support Android N.
   bool do_not_update_selection_on_mutating_selection_range;
 
+#if defined(USE_NEVA_APPRUNTIME)
+  bool keep_alive_webapp;
+#endif
+
 #if defined(USE_NEVA_MEDIA)
   // The spec says to fire periodic timeupdate events (those sent while playing)
   // every "15 to 250ms"
