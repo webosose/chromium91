@@ -35,6 +35,7 @@
     <output filename="webos_network_error_strings_hr.pak" type="data_package" lang="hr" />
     <output filename="webos_network_error_strings_hu.pak" type="data_package" lang="hu" />
     <output filename="webos_network_error_strings_id.pak" type="data_package" lang="id" />
+    <output filename="webos_network_error_strings_is.pak" type="data_package" lang="is" />
     <output filename="webos_network_error_strings_it.pak" type="data_package" lang="it" />
     <output filename="webos_network_error_strings_ja.pak" type="data_package" lang="ja" />
     <output filename="webos_network_error_strings_kk.pak" type="data_package" lang="kk" />
@@ -59,11 +60,13 @@
     <output filename="webos_network_error_strings_pt-PT.pak" type="data_package" lang="pt-PT" />
     <output filename="webos_network_error_strings_ro.pak" type="data_package" lang="ro" />
     <output filename="webos_network_error_strings_ru.pak" type="data_package" lang="ru" />
+    <output filename="webos_network_error_strings_si.pak" type="data_package" lang="si" />
     <output filename="webos_network_error_strings_sk.pak" type="data_package" lang="sk" />
     <output filename="webos_network_error_strings_sl.pak" type="data_package" lang="sl" />
     <output filename="webos_network_error_strings_sq.pak" type="data_package" lang="sq" />
     <output filename="webos_network_error_strings_sr.pak" type="data_package" lang="sr" />
     <output filename="webos_network_error_strings_sv.pak" type="data_package" lang="sv" />
+    <output filename="webos_network_error_strings_sw.pak" type="data_package" lang="sw" />
     <output filename="webos_network_error_strings_ta.pak" type="data_package" lang="ta" />
     <output filename="webos_network_error_strings_te.pak" type="data_package" lang="te" />
     <output filename="webos_network_error_strings_th.pak" type="data_package" lang="th" />
@@ -107,6 +110,7 @@
     <file path="network_error_strings/network_error_strings_hr.xtb" lang="hr" />
     <file path="network_error_strings/network_error_strings_hu.xtb" lang="hu" />
     <file path="network_error_strings/network_error_strings_id.xtb" lang="id" />
+    <file path="network_error_strings/network_error_strings_is.xtb" lang="is" />
     <file path="network_error_strings/network_error_strings_it.xtb" lang="it" />
     <file path="network_error_strings/network_error_strings_ja.xtb" lang="ja" />
     <file path="network_error_strings/network_error_strings_kk.xtb" lang="kk" />
@@ -131,11 +135,13 @@
     <file path="network_error_strings/network_error_strings_pt-PT.xtb" lang="pt-PT" />
     <file path="network_error_strings/network_error_strings_ro.xtb" lang="ro" />
     <file path="network_error_strings/network_error_strings_ru.xtb" lang="ru" />
+    <file path="network_error_strings/network_error_strings_si.xtb" lang="si" />
     <file path="network_error_strings/network_error_strings_sk.xtb" lang="sk" />
     <file path="network_error_strings/network_error_strings_sl.xtb" lang="sl" />
     <file path="network_error_strings/network_error_strings_sq.xtb" lang="sq" />
     <file path="network_error_strings/network_error_strings_sr.xtb" lang="sr" />
     <file path="network_error_strings/network_error_strings_sv.xtb" lang="sv" />
+    <file path="network_error_strings/network_error_strings_sw.xtb" lang="sw" />
     <file path="network_error_strings/network_error_strings_ta.xtb" lang="ta" />
     <file path="network_error_strings/network_error_strings_te.xtb" lang="te" />
     <file path="network_error_strings/network_error_strings_th.xtb" lang="th" />

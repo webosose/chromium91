@@ -135,6 +135,8 @@ static StringPair g_language_pair[] = {
     std::make_pair("id-ID", "id"),
     // Irish Gaelic
     std::make_pair("ga-IE", "ga"),
+    // Icelandic
+    std::make_pair("is-IS", "is"),
     // Italian
     std::make_pair("it-IT", "it"), std::make_pair("it-CH", "it"),
     // Japanese
@@ -171,6 +173,8 @@ static StringPair g_language_pair[] = {
     std::make_pair("ru-RU", "ru"), std::make_pair("ru-BY", "ru"),
     std::make_pair("ru-GE", "ru"), std::make_pair("ru-KZ", "ru"),
     std::make_pair("ru-KG", "ru"), std::make_pair("ru-UA", "ru"),
+    // Sinhala
+    std::make_pair("si-LK", "si"),
     // Serbian
     std::make_pair("sr-RS-Latn", "sr"), std::make_pair("sr-Latn-RS", "sr"),
     std::make_pair("sr-ME-Latn", "sr"), std::make_pair("sr-Latn-ME", "sr"),
@@ -192,6 +196,8 @@ static StringPair g_language_pair[] = {
     std::make_pair("es-VE", "es"),
     // Swedish
     std::make_pair("sv-SE", "sv"), std::make_pair("sv-FI", "sv"),
+    // Swahili
+    std::make_pair("sw-Latn-KE", "sw"), std::make_pair("sw-KE-Latn", "sw"),
     // Thai
     std::make_pair("th-TH", "th"),
     // Turkish
