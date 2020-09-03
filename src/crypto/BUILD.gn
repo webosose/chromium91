@@ -4,6 +4,7 @@
 
 import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/crypto.gni")
+import("//neva/neva.gni")
 import("//testing/test.gni")
 
 component("crypto") {
@@ -136,6 +137,10 @@ component("crypto") {
 
   if (is_nacl) {
     deps += [ "//native_client_sdk/src/libraries/nacl_io" ]
+  }
+
+  if (is_webos && use_nss_certs) {
+    defines += [ "USE_READ_ONLY_NSSDB" ]
   }
 }
 

@@ -41,7 +41,14 @@ namespace {
 static const base::FilePath::CharType kReadOnlyCertDB[] =
     FILE_PATH_LITERAL("/etc/fake_root_ca/nssdb");
 
-#else
+#elif defined(OS_WEBOS) && defined(USE_READ_ONLY_NSSDB)
+static const base::FilePath::CharType kReadOnlyCertDB[] =
+    FILE_PATH_LITERAL("/etc/pki/nssdb");
+
+#endif // BUILDFLAG(IS_CHROMEOS_ASH) || BUILDFLAG(IS_CHROMEOS_LACROS)
+
+
+#if !BUILDFLAG(IS_CHROMEOS_ASH) && !BUILDFLAG(IS_CHROMEOS_LACROS)
 
 base::FilePath GetDefaultConfigDirectory() {
   base::FilePath dir;
@@ -59,7 +66,7 @@ base::FilePath GetDefaultConfigDirectory() {
   return dir;
 }
 
-#endif  // BUILDFLAG(IS_CHROMEOS_ASH) || BUILDFLAG(IS_CHROMEOS_LACROS)
+#endif  // !BUILDFLAG(IS_CHROMEOS_ASH) && !BUILDFLAG(IS_CHROMEOS_LACROS)
 
 // On non-Chrome OS platforms, return the default config directory. On Chrome OS
 // test images, return a read-only directory with fake root CA certs (which are
@@ -67,7 +74,7 @@ base::FilePath GetDefaultConfigDirectory() {
 // code). On Chrome OS non-test images (where the read-only directory doesn't
 // exist), return an empty path.
 base::FilePath GetInitialConfigDirectory() {
-#if BUILDFLAG(IS_CHROMEOS_ASH) || BUILDFLAG(IS_CHROMEOS_LACROS)
+#if BUILDFLAG(IS_CHROMEOS_ASH) || BUILDFLAG(IS_CHROMEOS_LACROS) || (defined(OS_WEBOS) && defined(USE_READ_ONLY_NSSDB))
   base::FilePath database_dir = base::FilePath(kReadOnlyCertDB);
   if (!base::PathExists(database_dir))
     database_dir.clear();
@@ -160,7 +167,8 @@ class NSSInitSingleton {
       // Use "sql:" which can be shared by multiple processes safely.
       std::string nss_config_dir =
           base::StringPrintf("sql:%s", database_dir.value().c_str());
-#if BUILDFLAG(IS_CHROMEOS_ASH) || BUILDFLAG(IS_CHROMEOS_LACROS)
+#if BUILDFLAG(IS_CHROMEOS_ASH) || BUILDFLAG(IS_CHROMEOS_LACROS) || \
+  (defined(OS_WEBOS) && defined(USE_READ_ONLY_NSSDB))
       status = NSS_Init(nss_config_dir.c_str());
 #else
       status = NSS_InitReadWrite(nss_config_dir.c_str());
