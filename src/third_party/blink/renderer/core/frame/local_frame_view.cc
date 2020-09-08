@@ -4812,8 +4812,13 @@ void LocalFrameView::MapLocalToRemoteMainFrame(
 }
 
 LayoutUnit LocalFrameView::CaretWidth() const {
+  float frame_caret_width = 1.f;
+  if (frame_)
+    frame_caret_width = frame_->Selection().GetFrameCaretWidth();
+
   return LayoutUnit(std::max<float>(
-      1.0f, GetChromeClient()->WindowToViewportScalar(&GetFrame(), 1.0f)));
+      frame_caret_width,
+      GetChromeClient()->WindowToViewportScalar(&GetFrame(), 1.0f)));
 }
 
 void LocalFrameView::DidChangeMobileFriendliness(

@@ -752,6 +752,7 @@ enum CSSSampleId {
     kNavUp = 699,
     kNavDown = 700,
     kNavIndex = 701,
+    kCaretWidth = 702,
     // 1. Add new features above this line (don't change the assigned numbers of
     //    the existing items).
     // 2. Run the src/tools/metrics/histograms/update_use_counter_css.py script

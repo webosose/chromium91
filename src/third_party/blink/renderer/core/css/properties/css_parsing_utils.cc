@@ -4994,5 +4994,17 @@ CSSValue* ConsumeNavigationIndex(CSSParserTokenRange& range,
   return css_parsing_utils::ConsumeInteger(range, context);
 }
 
+CSSValue* ConsumeCaretWidth(CSSParserTokenRange& range,
+                            const CSSParserContext& context) {
+  if (range.Peek().Id() == CSSValueID::kAuto)
+    return css_parsing_utils::ConsumeIdent(range);
+  CSSParserContext::ParserModeOverridingScope scope(context, kHTMLStandardMode);
+  CSSPrimitiveValue* caret_width = css_parsing_utils::ConsumeLength(
+      range, context, kValueRangeNonNegative);
+  if (!caret_width)
+    return nullptr;
+  return caret_width;
+}
+
 }  // namespace css_parsing_utils
 }  // namespace blink

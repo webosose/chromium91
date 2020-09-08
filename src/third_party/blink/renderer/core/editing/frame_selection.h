@@ -226,6 +226,7 @@ class CORE_EXPORT FrameSelection final
   void LayoutBlockWillBeDestroyed(const LayoutBlock&);
   void UpdateStyleAndLayoutIfNeeded();
   void InvalidatePaint(const LayoutBlock&, const PaintInvalidatorContext&);
+  float GetFrameCaretWidth() const;
 
   void PaintCaret(GraphicsContext&, const PhysicalOffset&);
 

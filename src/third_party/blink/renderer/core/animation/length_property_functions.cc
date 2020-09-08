@@ -39,6 +39,7 @@ ValueRange LengthPropertyFunctions::GetValueRange(const CSSProperty& property) {
     case CSSPropertyID::kColumnWidth:
     case CSSPropertyID::kWidth:
     case CSSPropertyID::kTabSize:
+    case CSSPropertyID::kCaretWidth:
       return kValueRangeNonNegative;
     default:
       return kValueRangeAll;
@@ -313,6 +314,11 @@ bool LengthPropertyFunctions::GetLength(const CSSProperty& property,
         return false;
       result = Length::Fixed(style.ColumnWidth());
       return true;
+    case CSSPropertyID::kCaretWidth:
+      if (style.HasAutoCaretWidth())
+        return false;
+      result = Length::Fixed(style.CaretWidth());
+      return true;
     default:
       return false;
   }
@@ -455,8 +461,7 @@ bool LengthPropertyFunctions::SetLength(const CSSProperty& property,
     case CSSPropertyID::kWebkitTransformOriginZ:
     case CSSPropertyID::kWordSpacing:
     case CSSPropertyID::kTabSize:
-      return false;
-
+    case CSSPropertyID::kCaretWidth:
       return false;
 
     default:
