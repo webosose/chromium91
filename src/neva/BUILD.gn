@@ -144,4 +144,8 @@ config("config") {
            "use_neva_webrtc is turned on without use_neva_media.")
     defines += [ "USE_NEVA_WEBRTC=1" ]
   }
+
+  if (webos_submission_number >= 0) {
+    defines += [ "WEBOS_SUBMISSION_NUMBER=$webos_submission_number" ]
+  }
 }

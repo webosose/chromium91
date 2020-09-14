@@ -98,6 +98,9 @@ declare_args() {
 
   # Use Neva V4L2 codec
   use_neva_v4l2_codec = false
+
+  # For updating v8 version number with webos submission number
+  webos_submission_number = 0
 }
 
 declare_args() {
