@@ -261,6 +261,9 @@ NET_EXPORT CookieOptions::SamePartyCookieContextType ComputeSamePartyContext(
 NET_EXPORT CookieSamePartyStatus
 GetSamePartyStatus(const CanonicalCookie& cookie, const CookieOptions& options);
 
+// Returns whether aggressive flushing is enabled.
+NET_EXPORT bool IsAggressiveFlushingEnabled();
+
 // Takes a callback accepting a CookieAccessResult and returns a callback
 // that accepts a bool, setting the bool to true if the CookieInclusionStatus
 // in CookieAccessResult was set to "include", else sending false.
