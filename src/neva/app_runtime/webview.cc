@@ -1108,7 +1108,8 @@ void WebView::DidFinishNavigation(
     return;
 
   if (navigation_handle->GetNetErrorCode() != net::OK) {
-    DidFailLoad(nullptr, navigation_handle->GetURL(),
+    DidFailLoad(navigation_handle->GetRenderFrameHost(),
+                navigation_handle->GetURL(),
                 navigation_handle->GetNetErrorCode());
     if (navigation_handle->IsErrorPage())
       webview_delegate_->DidErrorPageLoadedFromNetErrorHelper();
@@ -1130,7 +1131,11 @@ void WebView::DidFailLoad(content::RenderFrameHost* render_frame_host,
                           const GURL& validated_url,
                           int error_code) {
   std::string url = validated_url.spec();
-  if (webview_delegate_) {
+  if (webview_delegate_ &&
+      (!render_frame_host ||
+       static_cast<content::RenderFrameHostImpl*>(render_frame_host)
+           ->frame_tree_node()
+           ->IsMainFrame())) {
     if (error_code == net::ERR_ABORTED)
       webview_delegate_->LoadAborted(url);
     else
