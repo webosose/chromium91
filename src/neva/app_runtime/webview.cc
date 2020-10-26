@@ -17,6 +17,7 @@
 #include "neva/app_runtime/webview.h"
 
 #include "base/files/file_path.h"
+#include "base/logging_category.h"
 #include "base/memory/memory_pressure_listener.h"
 #include "base/strings/utf_string_conversions.h"
 #include "browser/app_runtime_browser_context_adapter.h"
@@ -57,6 +58,7 @@
 #include "neva/logging.h"
 #include "services/network/public/mojom/cookie_manager.mojom.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
+#include "third_party/blink/public/common/logging/logging_utils.h"
 #include "third_party/blink/public/common/page/page_zoom.h"
 #include "third_party/blink/public/common/web_preferences/web_preferences.h"
 #include "ui/aura/client/screen_position_client.h"
@@ -441,6 +443,34 @@ bool WebView::ShouldSuppressDialogs(content::WebContents* source) {
   return should_suppress_dialogs_;
 }
 
+bool WebView::DidAddMessageToConsole(
+    content::WebContents* source,
+    blink::mojom::ConsoleMessageLevel log_level,
+    const std::u16string& message,
+    int32_t line_no,
+    const std::u16string& source_id) {
+  logging::LogSeverity resolved_level =
+      blink::ConsoleMessageLevelToLogSeverity(log_level);
+
+  if (::logging::GetMinLogLevel() > resolved_level)
+    return false;
+
+  blink::RendererPreferences* renderer_prefs =
+      web_contents_->GetMutableRendererPrefs();
+
+  std::string app_id;
+  if (renderer_prefs)
+    app_id = renderer_prefs->application_id;
+
+  logging::CategoryLogMessage("CONSOLE", line_no, resolved_level,
+                              logging::LOG_CATEGORY_JSCONSOLE)
+          .stream()
+      << app_id << (app_id.empty() ? "" : " ") << "\"" << message
+      << "\", source: " << source_id << " (" << line_no << ")";
+
+  return true;
+}
+
 void WebView::SetShouldSuppressDialogs(bool suppress) {
   should_suppress_dialogs_ = suppress;
 }
@@ -754,7 +784,7 @@ void WebView::SetViewportSize(int width, int height) {
 
 void WebView::NotifyMemoryPressure(
     base::MemoryPressureListener::MemoryPressureLevel level) {
-  LOG(ERROR) << "[MemoryPressure] " << __FUNCTION__ <<" => Level: " << level;
+  LOG(INFO) << "[MemoryPressure] " << __FUNCTION__ << " => Level: " << level;
   if (level != base::MemoryPressureListener::MEMORY_PRESSURE_LEVEL_NONE)
     base::MemoryPressureListener::NotifyMemoryPressure(level);
 }

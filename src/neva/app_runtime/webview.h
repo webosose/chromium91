@@ -190,6 +190,11 @@ class WebView : public content::WebContentsDelegate,
   void CloseContents(content::WebContents* source) override;
 
   bool ShouldSuppressDialogs(content::WebContents* source) override;
+  bool DidAddMessageToConsole(content::WebContents* source,
+                              blink::mojom::ConsoleMessageLevel log_level,
+                              const std::u16string& message,
+                              int32_t line_no,
+                              const std::u16string& source_id) override;
   gfx::Size GetSizeForNewRenderView(
       content::WebContents* web_contents) override;
 

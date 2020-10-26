@@ -16,6 +16,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "ozone/wayland/input/keyboard.h"
+
+#include "base/logging.h"
 #include "base/memory/unsafe_shared_memory_region.h"
 #include "ozone/wayland/seat.h"
 #include "ozone/wayland/window.h"
@@ -56,13 +58,16 @@ void WaylandKeyboard::OnKeyNotify(void* data,
                                   uint32_t time,
                                   uint32_t key,
                                   uint32_t state) {
+  VLOG(1) << __func__ << " key:" << key << " type:"
+          << (state == WL_KEYBOARD_KEY_STATE_RELEASED ? "KeyRelease"
+                                                      : "KeyPress");
   WaylandKeyboard* device = static_cast<WaylandKeyboard*>(data);
   ui::EventType type = ui::ET_KEY_PRESSED;
   WaylandDisplay::GetInstance()->SetSerial(serial);
   if (state == WL_KEYBOARD_KEY_STATE_RELEASED)
     type = ui::ET_KEY_RELEASED;
-  const uint32_t device_id = wl_proxy_get_id(
-      reinterpret_cast<wl_proxy*>(input_keyboard));
+  const uint32_t device_id =
+      wl_proxy_get_id(reinterpret_cast<wl_proxy*>(input_keyboard));
   device->dispatcher_->KeyNotify(type, key, device_id);
 }
 
@@ -109,6 +114,7 @@ void WaylandKeyboard::OnKeyboardEnter(void* data,
   WaylandWindow* window =
     static_cast<WaylandWindow*>(wl_surface_get_user_data(surface));
   seat->SetFocusWindowHandle(window->Handle());
+  VLOG(1) << __func__ << " handle=" << (window ? window->Handle() : -1);
   device->dispatcher_->KeyboardEnter(window->Handle());
 }
 
@@ -125,6 +131,7 @@ void WaylandKeyboard::OnKeyboardLeave(void* data,
   WaylandKeyboard* device = static_cast<WaylandKeyboard*>(data);
   WaylandWindow* window =
     static_cast<WaylandWindow*>(wl_surface_get_user_data(surface));
+  VLOG(1) << __func__ << " handle=" << (window ? window->Handle() : -1);
   device->dispatcher_->KeyboardLeave(window->Handle());
   seat->SetFocusWindowHandle(0);
 }

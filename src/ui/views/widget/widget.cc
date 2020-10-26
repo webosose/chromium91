@@ -10,6 +10,7 @@
 #include "base/auto_reset.h"
 #include "base/check_op.h"
 #include "base/containers/adapters.h"
+#include "base/logging.h"
 #include "base/macros.h"
 #include "base/notreached.h"
 #include "base/strings/utf_string_conversions.h"
@@ -733,14 +734,17 @@ bool Widget::IsVisibleOnAllWorkspaces() const {
 }
 
 void Widget::Maximize() {
+  VLOG(1) << __PRETTY_FUNCTION__;
   native_widget_->Maximize();
 }
 
 void Widget::Minimize() {
+  VLOG(1) << __PRETTY_FUNCTION__;
   native_widget_->Minimize();
 }
 
 void Widget::Restore() {
+  VLOG(1) << __PRETTY_FUNCTION__;
   native_widget_->Restore();
 }
 
@@ -753,9 +757,13 @@ bool Widget::IsMinimized() const {
 }
 
 void Widget::SetFullscreen(bool fullscreen) {
-  if (IsFullscreen() == fullscreen)
+  if (IsFullscreen() == fullscreen) {
+    LOG(INFO) << __PRETTY_FUNCTION__ << ": fullscreen=" << fullscreen
+              << ", skip";
     return;
+  }
 
+  VLOG(1) << __PRETTY_FUNCTION__ << ": fullscreen=" << fullscreen;
   auto weak_ptr = GetWeakPtr();
   native_widget_->SetFullscreen(fullscreen);
   if (!weak_ptr)

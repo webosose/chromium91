@@ -238,6 +238,10 @@ wl_egl_window* WaylandDisplay::GetEglWindow(
     widget = CreateAcceleratedSurface(window_handle);
 
   widget->RealizeAcceleratedWidget();
+
+  VLOG(1) << __func__ << " id=" << window_handle << " widget=" << widget
+          << " egl=" << (widget ? widget->egl_window() : 0);
+
   return widget->egl_window();
 }
 
@@ -362,6 +366,8 @@ void WaylandDisplay::InitializeDisplay() {
 WaylandWindow* WaylandDisplay::CreateAcceleratedSurface(unsigned w) {
   WaylandWindow* window = new WaylandWindow(w);
   widget_map_[w].reset(window);
+
+  VLOG(1) << __func__ << " id=" << w << " widget=" << window;
 
   return window;
 }

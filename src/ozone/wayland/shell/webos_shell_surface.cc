@@ -16,6 +16,7 @@
 
 #include "ozone/wayland/shell/webos_shell_surface.h"
 
+#include "base/logging.h"
 #include "base/strings/utf_string_conversions.h"
 #include "ozone/wayland/display.h"
 #include "ozone/wayland/seat.h"
@@ -23,6 +24,19 @@
 
 namespace ozonewayland {
 namespace {
+
+char* StateToString(uint32_t state) {
+  switch (state) {
+    case WL_WEBOS_SHELL_SURFACE_STATE_MINIMIZED:
+      return "MINIMIZED";
+    case WL_WEBOS_SHELL_SURFACE_STATE_MAXIMIZED:
+      return "MAXIMIZED";
+    case WL_WEBOS_SHELL_SURFACE_STATE_FULLSCREEN:
+      return "FULLSCREEN";
+    default:
+      return "UNINITIALIZED";
+  }
+}
 
 ui::WidgetState ToWidgetState(uint32_t state) {
   switch (state) {
@@ -80,11 +94,14 @@ void WebosShellSurface::UpdateShellSurface(WaylandWindow::ShellType type,
                                            int x,
                                            int y) {
   switch (type) {
-    case WaylandWindow::FULLSCREEN:
+    case WaylandWindow::FULLSCREEN: {
+      VLOG(1) << __PRETTY_FUNCTION__
+              << " Request state change(FULLSCREEN) to LSM";
       wl_webos_shell_surface_set_state(webos_shell_surface_,
                                        WL_WEBOS_SHELL_SURFACE_STATE_FULLSCREEN);
       minimized_ = false;
       break;
+    }
     default:
       break;
   }
@@ -93,6 +110,8 @@ void WebosShellSurface::UpdateShellSurface(WaylandWindow::ShellType type,
 }
 
 void WebosShellSurface::Maximize() {
+  VLOG(1) << __PRETTY_FUNCTION__ << " Request state change(MAXIMIZED) to LSM";
+
   wl_webos_shell_surface_set_state(webos_shell_surface_,
                                    WL_WEBOS_SHELL_SURFACE_STATE_MAXIMIZED);
   WLShellSurface::Maximize();
@@ -100,6 +119,7 @@ void WebosShellSurface::Maximize() {
 }
 
 void WebosShellSurface::Minimize() {
+  VLOG(1) << __PRETTY_FUNCTION__ << " Request state change(MINIMIZED) to LSM";
   wl_webos_shell_surface_set_state(webos_shell_surface_,
                                    WL_WEBOS_SHELL_SURFACE_STATE_MINIMIZED);
   WLShellSurface::Minimize();
@@ -172,6 +192,8 @@ void WebosShellSurface::HandleStateChanged(
     void* data,
     struct wl_webos_shell_surface* webos_shell_surface,
     uint32_t state) {
+  VLOG(1) << __PRETTY_FUNCTION__ << " State changed(" << StateToString(state)
+          << ") from LSM";
   WaylandWindow* window = static_cast<WaylandWindow*>(data);
   if (window) {
     WaylandDisplay::GetInstance()->NativeWindowStateChanged(
@@ -179,8 +201,15 @@ void WebosShellSurface::HandleStateChanged(
 
     WebosShellSurface* shell_surface =
         static_cast<WebosShellSurface*>(window->ShellSurface());
-    if (shell_surface)
+    if (shell_surface) {
+      VLOG(1) << __PRETTY_FUNCTION__ << ": state=" << state;
       shell_surface->OnStateChanged(ToWidgetState(state));
+    } else {
+      LOG(INFO) << __PRETTY_FUNCTION__ << ": state=" << state
+                << ", but no shell surface";
+    }
+  } else {
+    LOG(INFO) << __PRETTY_FUNCTION__ << ": window is 0";
   }
 }
 

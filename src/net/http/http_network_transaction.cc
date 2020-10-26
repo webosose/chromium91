@@ -14,6 +14,7 @@
 #include "base/compiler_specific.h"
 #include "base/feature_list.h"
 #include "base/format_macros.h"
+#include "base/logging.h"
 #include "base/metrics/field_trial.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
@@ -1069,6 +1070,17 @@ int HttpNetworkTransaction::DoSendRequest() {
   send_start_time_ = base::TimeTicks::Now();
   next_state_ = STATE_SEND_REQUEST_COMPLETE;
 
+  if (VLOG_IS_ON(2)) {
+    VLOG(2) << "> " << request_->method << " " << request_->url.spec();
+    if (!request_headers_.IsEmpty()) {
+      HttpRequestHeaders::Iterator ite(request_headers_);
+      do {
+        VLOG(2) << "> " << ite.name() << ": " << ite.value();
+      } while (ite.GetNext());
+    }
+    VLOG(2) << "< ";
+  }
+
   stream_->SetRequestIdempotency(request_->idempotency);
   return stream_->SendRequest(request_headers_, &response_, io_callback_);
 }
@@ -1161,6 +1173,17 @@ int HttpNetworkTransaction::DoReadHeadersComplete(int result) {
 
   if (!ContentEncodingsValid())
     return ERR_CONTENT_DECODING_FAILED;
+
+  if (VLOG_IS_ON(2)) {
+    VLOG(2) << "< " << response_.headers->GetStatusLine();
+    size_t iter = 0;
+    std::string name;
+    std::string value;
+    while (response_.headers->EnumerateHeaderLines(&iter, &name, &value)) {
+      VLOG(2) << "< " << name << ": " << value;
+    }
+    VLOG(2) << "< ";
+  }
 
   // On a 408 response from the server ("Request Timeout") on a stale socket,
   // retry the request for HTTP/1.1 but not HTTP/2 or QUIC because those
