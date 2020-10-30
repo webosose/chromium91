@@ -16,6 +16,7 @@
 
 #include "webos/webview_base.h"
 
+#include "base/command_line.h"
 #include "base/task/post_task.h"
 #include "base/unguessable_token.h"
 #include "components/viz/common/switches.h"
@@ -25,6 +26,7 @@
 #include "content/public/browser/render_view_host.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_observer.h"
+#include "content/public/common/content_switches.h"
 #include "net/http/http_util.h"
 #include "neva/app_runtime/common/app_runtime_user_agent.h"
 #include "neva/app_runtime/public/app_runtime_event.h"
@@ -554,6 +556,13 @@ void WebViewBase::SetLocalStorageEnabled(bool enable) {
 }
 
 void WebViewBase::SetWebSecurityEnabled(bool enable) {
+  // Ignore setting if disabled by command-line
+  if (base::CommandLine::ForCurrentProcess() &&
+      base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kDisableWebSecurity)) {
+    return;
+  }
+
   webview_->UpdatePreferencesAttribute(
       neva_app_runtime::WebView::Attribute::WebSecurityEnabled,
       enable);

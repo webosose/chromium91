@@ -283,6 +283,7 @@ class WebView : public content::WebContentsDelegate,
   void UpdateViewportScaleFactor();
   void SetDisallowScrollbarsInMainFrame(bool disallow);
   void GrantLoadLocalResources();
+  void PushCorsCorbDisabledToIOThread(bool disabled);
   void FinishLoadCallback(const std::string& url);
   void DispatchNetError(const GURL& url, int error_code);
 #if defined(USE_NEVA_EXTENSIONS)

@@ -20,6 +20,7 @@
 #include "services/network/public/cpp/constants.h"
 #include "services/network/public/cpp/cors/cors.h"
 #include "services/network/public/cpp/cors/cors_error_status.h"
+#include "services/network/public/cpp/neva/cors_corb_exception.h"
 #include "services/network/public/cpp/resource_request.h"
 #include "services/network/public/cpp/simple_url_loader.h"
 #include "services/network/public/mojom/network_service.mojom.h"
@@ -154,7 +155,8 @@ std::unique_ptr<PreflightResult> CreatePreflightResult(
     const mojom::URLResponseHead& head,
     const ResourceRequest& original_request,
     bool tainted,
-    base::Optional<CorsErrorStatus>* detected_error_status) {
+    base::Optional<CorsErrorStatus>* detected_error_status,
+    bool non_strict_mode = false) {
   DCHECK(detected_error_status);
 
   *detected_error_status = CheckPreflightAccess(
@@ -163,7 +165,8 @@ std::unique_ptr<PreflightResult> CreatePreflightResult(
       GetHeaderString(head.headers,
                       header_names::kAccessControlAllowCredentials),
       original_request.credentials_mode,
-      tainted ? url::Origin() : *original_request.request_initiator);
+      tainted ? url::Origin() : *original_request.request_initiator,
+      non_strict_mode);
   if (*detected_error_status)
     return nullptr;
 
@@ -216,7 +219,8 @@ class PreflightController::PreflightLoader final {
       bool tainted,
       const net::NetworkTrafficAnnotationTag& annotation_tag,
       const net::NetworkIsolationKey& network_isolation_key,
-      mojo::PendingRemote<mojom::DevToolsObserver> devtools_observer)
+      mojo::PendingRemote<mojom::DevToolsObserver> devtools_observer,
+      uint32_t process_id)
       : controller_(controller),
         completion_callback_(std::move(completion_callback)),
         original_request_(request),
@@ -224,7 +228,8 @@ class PreflightController::PreflightLoader final {
             with_non_wildcard_request_headers_support),
         tainted_(tainted),
         network_isolation_key_(network_isolation_key),
-        devtools_observer_(std::move(devtools_observer)) {
+        devtools_observer_(std::move(devtools_observer)),
+        process_id_(process_id) {
     if (devtools_observer_)
       devtools_request_id_ = base::UnguessableToken::Create();
     auto preflight_request =
@@ -298,7 +303,8 @@ class PreflightController::PreflightLoader final {
     base::Optional<CorsErrorStatus> detected_error_status;
     bool has_authorization_covered_by_wildcard = false;
     std::unique_ptr<PreflightResult> result = CreatePreflightResult(
-        final_url, head, original_request_, tainted_, &detected_error_status);
+        final_url, head, original_request_, tainted_, &detected_error_status,
+        neva::CorsCorbException::ShouldAllowExceptionForProcess(process_id_));
 
     if (result) {
       // Preflight succeeded. Check |original_request_| with |result|.
@@ -306,6 +312,11 @@ class PreflightController::PreflightLoader final {
       detected_error_status =
           CheckPreflightResult(result.get(), original_request_,
                                with_non_wildcard_request_headers_support_);
+      if (detected_error_status &&
+          neva::CorsCorbException::ShouldAllowExceptionForProcess(
+              process_id_)) {
+        neva::CorsCorbException::ApplyException(detected_error_status);
+      }
       has_authorization_covered_by_wildcard =
           result->HasAuthorizationCoveredByWildcard(original_request_.headers);
     }
@@ -368,6 +379,7 @@ class PreflightController::PreflightLoader final {
   base::Optional<base::UnguessableToken> devtools_request_id_;
   const net::NetworkIsolationKey network_isolation_key_;
   mojo::Remote<mojom::DevToolsObserver> devtools_observer_;
+  uint32_t process_id_;
 
   DISALLOW_COPY_AND_ASSIGN(PreflightLoader);
 };
@@ -407,7 +419,8 @@ void PreflightController::PerformPreflightCheck(
     const net::NetworkTrafficAnnotationTag& annotation_tag,
     mojom::URLLoaderFactory* loader_factory,
     const net::IsolationInfo& isolation_info,
-    mojo::PendingRemote<mojom::DevToolsObserver> devtools_observer) {
+    mojo::PendingRemote<mojom::DevToolsObserver> devtools_observer,
+    uint32_t process_id) {
   DCHECK(request.request_initiator);
 
   const net::NetworkIsolationKey& network_isolation_key =
@@ -428,7 +441,7 @@ void PreflightController::PerformPreflightCheck(
   auto emplaced_pair = loaders_.emplace(std::make_unique<PreflightLoader>(
       this, std::move(callback), request, with_trusted_header_client,
       with_non_wildcard_request_headers_support, tainted, annotation_tag,
-      network_isolation_key, std::move(devtools_observer)));
+      network_isolation_key, std::move(devtools_observer), process_id));
   (*emplaced_pair.first)->Request(loader_factory);
 }
 

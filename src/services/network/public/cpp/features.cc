@@ -161,7 +161,11 @@ const base::Feature kDisableKeepaliveFetch{"DisableKeepaliveFetch",
 // See also https://crbug.com/920634
 const base::Feature kRequestInitiatorSiteLockEnfocement = {
     "RequestInitiatorSiteLockEnfocement",
+#if defined(OS_WEBOS)
+    base::FEATURE_DISABLED_BY_DEFAULT};
+#else
     base::FEATURE_ENABLED_BY_DEFAULT};
+#endif
 
 // Enables preprocessing requests with the Trust Tokens API Fetch flags set,
 // and handling their responses, according to the protocol.

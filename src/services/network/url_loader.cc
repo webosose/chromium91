@@ -61,6 +61,7 @@
 #include "services/network/public/cpp/ip_address_space_util.h"
 #include "services/network/public/cpp/net_adapters.h"
 #include "services/network/public/cpp/network_switches.h"
+#include "services/network/public/cpp/neva/cors_corb_exception.h"
 #include "services/network/public/cpp/opaque_response_blocking.h"
 #include "services/network/public/cpp/origin_policy.h"
 #include "services/network/public/cpp/parsed_headers.h"
@@ -615,6 +616,10 @@ URLLoader::URLLoader(
                             std::make_unique<UnownedPointer>(this));
   url_request_->set_accepted_stream_types(
       request.devtools_accepted_stream_types);
+
+  if (neva::CorsCorbException::ShouldAllowExceptionForProcess(GetProcessId())) {
+    is_nocors_corb_excluded_request_ = true;
+  }
 
   if (request.trusted_params) {
     has_user_activation_ = request.trusted_params->has_user_activation;
@@ -1424,7 +1429,7 @@ void URLLoader::ContinueOnResponseStarted() {
   LogUmaForOpaqueResponseBlocking(url_request_->url(),
                                   url_request_->initiator(), request_mode_,
                                   request_destination_, *response_);
-  if (factory_params_->is_corb_enabled) {
+  if (factory_params_->is_corb_enabled && !is_nocors_corb_excluded_request_) {
     CrossOriginReadBlocking::LogAction(
         CrossOriginReadBlocking::Action::kResponseStarted);
 

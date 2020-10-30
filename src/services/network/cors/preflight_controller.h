@@ -70,7 +70,8 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) PreflightController final {
       const net::NetworkTrafficAnnotationTag& traffic_annotation,
       mojom::URLLoaderFactory* loader_factory,
       const net::IsolationInfo& isolation_info,
-      mojo::PendingRemote<mojom::DevToolsObserver> devtools_observer);
+      mojo::PendingRemote<mojom::DevToolsObserver> devtools_observer,
+      uint32_t process_id);
 
  private:
   class PreflightLoader;

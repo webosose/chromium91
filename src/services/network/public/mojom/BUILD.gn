@@ -825,6 +825,10 @@ mojom("mojom") {
     enabled_features += [ "needs_crypt_config" ]
   }
 
+  if (is_webos) {
+    enabled_features += [ "is_webos" ]
+  }
+
   # Typemaps which apply to both Blink and non-Blink bindings.
   shared_cpp_typemaps = []
 

@@ -153,9 +153,16 @@ WebView::WebView(int width, int height, WebViewProfile* profile)
           web_contents_->GetOrCreateWebPreferences()));
 
   web_contents_->SetInspectablePage(false);
+
+  if (base::CommandLine::ForCurrentProcess() &&
+      base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kDisableWebSecurity)) {
+    UpdatePreferencesAttribute(Attribute::WebSecurityEnabled, false);
+  }
 }
 
 WebView::~WebView() {
+  PushCorsCorbDisabledToIOThread(false);
   web_contents_->SetDelegate(nullptr);
 }
 
@@ -663,8 +670,10 @@ void WebView::UpdatePreferencesAttributeForPrefs(
       break;
     case Attribute::WebSecurityEnabled:
       preferences->web_security_enabled = enable;
-      if (!preferences->web_security_enabled)
+      if (!preferences->web_security_enabled) {
         GrantLoadLocalResources();
+        PushCorsCorbDisabledToIOThread(!preferences->web_security_enabled);
+      }
       break;
     case Attribute::KeepAliveWebApp:
       preferences->keep_alive_webapp = enable;
@@ -713,6 +722,14 @@ void WebView::GrantLoadLocalResources() {
     frame_host->GetRemoteAssociatedInterfaces()->GetInterface(&client);
     if (client)
       client->GrantLoadLocalResources();
+  }
+}
+
+void WebView::PushCorsCorbDisabledToIOThread(bool disabled) {
+  if (web_contents_->GetMainFrame() &&
+      web_contents_->GetMainFrame()->GetProcess()) {
+    GetAppRuntimeContentBrowserClient()->PushCorsCorbDisabledToIOThread(
+        web_contents_->GetMainFrame()->GetProcess()->GetID(), disabled);
   }
 }
 
