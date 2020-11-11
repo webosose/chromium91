@@ -13,6 +13,7 @@
 #include "base/command_line.h"
 #include "base/files/file_path.h"
 #include "base/i18n/base_i18n_switches.h"
+#include "base/neva/base_switches.h"
 #include "base/sequenced_task_runner.h"
 #include "base/stl_util.h"
 #include "base/strings/utf_string_conversions.h"
@@ -305,6 +306,7 @@ bool UtilityProcessHost::StartProcess() {
 #if BUILDFLAG(IS_CHROMEOS_ASH) || BUILDFLAG(IS_CHROMEOS_LACROS)
       switches::kSchedulerBoostUrgent,
 #endif
+      switches::kNevaCertificatesPath,
     };
     cmd_line->CopySwitchesFrom(browser_command_line, kSwitchNames,
                                base::size(kSwitchNames));
