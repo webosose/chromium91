@@ -17,6 +17,9 @@
 #ifndef NEVA_APP_RUNTIME_RENDERER_APP_RUNTIME_CONTENT_RENDERER_CLIENT_H_
 #define NEVA_APP_RUNTIME_RENDERER_APP_RUNTIME_CONTENT_RENDERER_CLIENT_H_
 
+#include <memory>
+
+#include "components/watchdog/watchdog.h"
 #include "content/public/renderer/content_renderer_client.h"
 #include "content/public/renderer/render_thread_observer.h"
 #include "neva/app_runtime/public/webview_info.h"
@@ -41,6 +44,7 @@ class AppRuntimeContentRendererClient : public content::ContentRendererClient {
       const AppRuntimeContentRendererClient&) = delete;
 
   void RenderFrameCreated(content::RenderFrame* render_frame) override;
+  void RenderThreadStarted() override;
 
   void PrepareErrorPage(content::RenderFrame* render_frame,
                         const blink::WebURLError& error,
@@ -66,7 +70,6 @@ class AppRuntimeContentRendererClient : public content::ContentRendererClient {
 #endif
 
 #if defined(USE_NEVA_EXTENSIONS)
-  void RenderThreadStarted() override;
   void RunScriptsAtDocumentStart(content::RenderFrame* render_frame) override;
   void RunScriptsAtDocumentEnd(content::RenderFrame* render_frame) override;
 #endif
@@ -74,7 +77,9 @@ class AppRuntimeContentRendererClient : public content::ContentRendererClient {
  private:
   class AppRuntimeRenderThreadObserver;
   void OnNetworkAppear();
+  void ArmWatchdog();
   std::unique_ptr<content::RenderThreadObserver> render_thread_observer_;
+  std::unique_ptr<watchdog::Watchdog> watchdog_;
 
   WebViewInfo webview_info_;
 

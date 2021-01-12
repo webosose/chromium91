@@ -142,6 +142,7 @@ static_library("app_runtime") {
     "//components/os_crypt",
     "//components/services/heap_profiling/public/cpp",
     "//components/version_info",
+    "//components/watchdog:watchdog",
     "//components/web_cache/browser",
     "//components/web_cache/public/mojom",
     "//content",
