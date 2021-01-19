@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "neva/pal_service/dummy/platform_system_delegate_dummy.h"
+#include "neva/pal_service/os_crypt_delegate.h"
 #include "neva/pal_service/public/application_registrator_delegate.h"
 #include "neva/pal_service/public/language_tracker_delegate.h"
 #include "neva/pal_service/public/memorymanager_delegate.h"
@@ -43,6 +44,10 @@ PlatformFactory::CreateLanguageTrackerDelegate(
 std::unique_ptr<MemoryManagerDelegate>
 PlatformFactory::CreateMemoryManagerDelegate() {
   return std::unique_ptr<MemoryManagerDelegate>();
+}
+
+std::unique_ptr<OSCryptDelegate> PlatformFactory::CreateOSCryptDelegate() {
+  return std::unique_ptr<OSCryptDelegate>();
 }
 
 std::unique_ptr<SystemServiceBridgeDelegate>

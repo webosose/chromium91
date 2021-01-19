@@ -90,6 +90,9 @@ class AppRuntimeContentBrowserClient : public content::ContentBrowserClient {
   void GetAdditionalAllowedSchemesForFileSystem(
       std::vector<std::string>* additional_schemes) override;
 
+  void OnNetworkServiceCreated(
+      network::mojom::NetworkService* network_service) override;
+
   std::unique_ptr<content::LoginDelegate> CreateLoginDelegate(
       const net::AuthChallengeInfo& auth_info,
       content::WebContents* web_contents,

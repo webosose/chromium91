@@ -925,14 +925,17 @@ bool SQLitePersistentCookieStore::Backend::MakeCookiesFromSQLStatement(
     std::string value;
     std::string encrypted_value = smt.ColumnString(12);
     if (!encrypted_value.empty() && crypto_) {
+      VLOG(1) << "v7 Read Decrypt Cookie String started";
       bool decrypt_ok = crypto_->DecryptString(encrypted_value, &value);
       if (!decrypt_ok) {
         RecordCookieLoadProblem(COOKIE_LOAD_PROBLEM_DECRYPT_FAILED);
         ok = false;
         continue;
       }
+      VLOG(1) << "v7 Read Decrypt Cookie String completed";
     } else {
       value = smt.ColumnString(3);
+      VLOG(1) << "v6 Read Decrypt Cookie String completed";
     }
     // Returns nullptr if the resulting cookie is not canonical.
     std::unique_ptr<net::CanonicalCookie> cc = CanonicalCookie::FromStorage(
@@ -1314,12 +1317,14 @@ void SQLitePersistentCookieStore::Backend::DoCommit() {
           add_statement.BindString(1, po->cc().Domain());
           add_statement.BindString(2, po->cc().Name());
           if (crypto_ && crypto_->ShouldEncrypt()) {
+            VLOG(1) << "v7 Write Encrypt Cookie String started";
             std::string encrypted_value;
             if (!crypto_->EncryptString(po->cc().Value(), &encrypted_value)) {
               DLOG(WARNING) << "Could not encrypt a cookie, skipping add.";
               RecordCookieCommitProblem(COOKIE_COMMIT_PROBLEM_ENCRYPT_FAILED);
               continue;
             }
+            VLOG(1) << "v7 Write Encrypt Cookie String completed";
             add_statement.BindCString(3, "");  // value
             // BindBlob() immediately makes an internal copy of the data.
             add_statement.BindBlob(12, encrypted_value.data(),
@@ -1327,6 +1332,7 @@ void SQLitePersistentCookieStore::Backend::DoCommit() {
           } else {
             add_statement.BindString(3, po->cc().Value());
             add_statement.BindBlob(12, "", 0);  // encrypted_value
+            VLOG(1) << "v6 Write Non-encrypt Cookie String completed";
           }
           add_statement.BindString(4, po->cc().Path());
           add_statement.BindInt64(5, po->cc().ExpiryDate().ToInternalValue());

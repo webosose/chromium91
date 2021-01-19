@@ -24,6 +24,7 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
+#include "components/cookie_config/cookie_store_util_neva.h"
 #include "mojo/public/cpp/base/big_buffer.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
@@ -36,6 +37,7 @@
 #include "net/dns/host_resolver.h"
 #include "net/dns/public/dns_config_overrides.h"
 #include "net/http/http_auth_preferences.h"
+#include "neva/pal_service/public/mojom/os_crypt.mojom.h"
 #include "services/network/cors/preflight_controller.h"
 #include "services/network/http_cache_data_counter.h"
 #include "services/network/http_cache_data_remover.h"
@@ -430,6 +432,7 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkContext
 #endif
   void GetOriginPolicyManager(
       mojo::PendingReceiver<mojom::OriginPolicyManager> receiver) override;
+  void SetOSCrypt(mojo::PendingRemote<pal::mojom::OSCrypt> os_crypt) override;
 
   // Destroys |request| when a proxy lookup completes.
   void OnProxyLookupComplete(ProxyLookupRequest* proxy_lookup_request);
@@ -778,6 +781,9 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkContext
   std::set<std::unique_ptr<cors::CorsURLLoaderFactory>,
            base::UniquePtrComparator>
       url_loader_factories_;
+
+  std::unique_ptr<cookie_config::CookieNevaCryptoDelegate>
+      cookie_crypto_delegate_;
 
   base::WeakPtrFactory<NetworkContext> weak_factory_{this};
 

@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "neva/pal_service/os_crypt_delegate.h"
 #include "neva/pal_service/webos/application_registrator_delegate_webos.h"
 #include "neva/pal_service/webos/language_tracker_delegate_webos.h"
 #include "neva/pal_service/webos/memorymanager_delegate_webos.h"
@@ -51,6 +52,10 @@ std::unique_ptr<MemoryManagerDelegate>
 PlatformFactory::CreateMemoryManagerDelegate() {
   return std::unique_ptr<MemoryManagerDelegate>(
       webos::MemoryManagerDelegateWebOS::Create());
+}
+
+std::unique_ptr<OSCryptDelegate> PlatformFactory::CreateOSCryptDelegate() {
+  return std::unique_ptr<OSCryptDelegate>();
 }
 
 std::unique_ptr<SystemServiceBridgeDelegate>

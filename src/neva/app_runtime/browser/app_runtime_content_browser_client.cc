@@ -393,6 +393,12 @@ void AppRuntimeContentBrowserClient::GetAdditionalAllowedSchemesForFileSystem(
     additional_schemes->push_back(url::kFileScheme);
 }
 
+void AppRuntimeContentBrowserClient::OnNetworkServiceCreated(
+    network::mojom::NetworkService* network_service) {
+  network::mojom::CryptConfigPtr config = network::mojom::CryptConfig::New();
+  content::GetNetworkService()->SetCryptConfig(std::move(config));
+}
+
 std::unique_ptr<content::LoginDelegate>
 AppRuntimeContentBrowserClient::CreateLoginDelegate(
     const net::AuthChallengeInfo& auth_info,
@@ -446,7 +452,7 @@ void AppRuntimeContentBrowserClient::ConfigureNetworkContextParams(
   network_context_params->accept_language = "en-us,en";
   network_context_params->cookie_path =
       context->GetPath().Append(kCookieStoreFile);
-  network_context_params->enable_encrypted_cookies = false;
+  network_context_params->enable_encrypted_cookies = true;
   network_context_params->custom_proxy_config_client_receiver =
       custom_proxy_config_client_.BindNewPipeAndPassReceiver();
   network_context_params->network_delegate_request =

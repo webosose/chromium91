@@ -157,6 +157,7 @@ bool OSCrypt::DecryptString16(const std::string& ciphertext,
 // static
 bool OSCrypt::EncryptString(const std::string& plaintext,
                             std::string* ciphertext) {
+  VLOG(1) << __func__;
   if (plaintext.empty()) {
     ciphertext->clear();
     return true;
@@ -191,6 +192,7 @@ bool OSCrypt::EncryptString(const std::string& plaintext,
 // static
 bool OSCrypt::DecryptString(const std::string& ciphertext,
                             std::string* plaintext) {
+  VLOG(1) << __func__;
   if (ciphertext.empty()) {
     plaintext->clear();
     return true;
