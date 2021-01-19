@@ -183,6 +183,10 @@
 #include "ui/gfx/font_render_params.h"
 #endif
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "cc/base/switches_neva.h"
+#endif // defined(USE_NEVA_APPRUNTIME)
+
 #if defined(OS_WIN)
 #include "third_party/blink/public/web/win/web_font_rendering.h"
 #endif
@@ -379,6 +383,13 @@ void ApplyCommandLineToSettings(WebSettings* settings) {
           WebString(pos == kNotFound ? "" : setting.Substring(pos + 1)));
     }
   }
+#if defined(USE_NEVA_APPRUNTIME)
+  // This is for checking condition whether native scroll is enabled
+  // on blink side. In initial phase of this feature, all related changes
+  // are blocked inside this condition.
+  settings->SetWebOSNativeScrollEnabled(
+      command_line.HasSwitch(cc::switches::kEnableWebOSNativeScroll));
+#endif // defined(USE_NEVA_APPRUNTIME)
 }
 
 WebMediaPlayer::SurfaceLayerMode GetVideoSurfaceLayerMode() {

@@ -922,6 +922,11 @@
     },
     ///@}
     {
+      name: "webOSNativeScrollEnabled",
+      initial: "false",
+    },
+    ///@}
+    {
       name: "lowPriorityIframesThreshold",
       initial: "WebEffectiveConnectionType::kTypeUnknown",
       type: "WebEffectiveConnectionType",

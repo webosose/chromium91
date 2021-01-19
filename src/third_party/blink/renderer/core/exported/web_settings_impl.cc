@@ -696,6 +696,10 @@ void WebSettingsImpl::SetMaxTimeupdateEventFrequency(int time) {
 void WebSettingsImpl::SetDisallowScrollbarsInMainFrame(bool disallow) {
   settings_->SetDisallowScrollbarsInMainFrame(disallow);
 }
+
+void WebSettingsImpl::SetWebOSNativeScrollEnabled(bool enabled) {
+  settings_->SetWebOSNativeScrollEnabled(enabled);
+}
 #endif
 
 void WebSettingsImpl::SetLowPriorityIframesThreshold(
