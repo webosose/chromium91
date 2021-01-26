@@ -22,6 +22,7 @@
 #include "base/rand_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/system/sys_info.h"
+#include "components/network_session_configurator/common/network_switches.h"
 #include "content/browser/web_contents/web_contents_impl.h"
 #include "content/public/browser/devtools_manager_delegate.h"
 #include "content/public/browser/login_delegate.h"
@@ -214,6 +215,10 @@ bool AppRuntimeContentBrowserClient::IsFileSchemeNavigationAllowed(
 void AppRuntimeContentBrowserClient::AppendExtraCommandLineSwitches(
     base::CommandLine* command_line,
     int child_process_id) {
+#if defined(OS_WEBOS)
+  command_line->AppendSwitch(switches::kDisableQuic);
+#endif
+
   // Append v8 snapshot path if exists
   auto iter = v8_snapshot_pathes_.find(child_process_id);
   if (iter != v8_snapshot_pathes_.end()) {
@@ -355,6 +360,13 @@ void AppRuntimeContentBrowserClient::SetV8ExtraFlags(int child_process_id,
 
 std::string AppRuntimeContentBrowserClient::GetUserAgent() {
   return neva_app_runtime::GetUserAgent();
+}
+
+void AppRuntimeContentBrowserClient::OnNetworkServiceCreated(
+    network::mojom::NetworkService* network_service) {
+#if defined(OS_WEBOS)
+  network_service->DisableQuic();
+#endif
 }
 
 void AppRuntimeContentBrowserClient::ConfigureNetworkContextParams(
