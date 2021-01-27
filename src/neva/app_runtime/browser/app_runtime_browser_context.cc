@@ -43,7 +43,11 @@ AppRuntimeBrowserContext::AppRuntimeBrowserContext(
     const BrowserContextAdapter* adapter)
     : adapter_(adapter),
       resource_context_(new content::ResourceContext()),
-      path_(InitPath(adapter)) {}
+      path_(InitPath(adapter)) {
+#if defined(USE_LOCAL_STORAGE_TRACKER)
+  local_storage_tracker_ = content::LocalStorageTracker::Create().release();
+#endif
+}
 
 AppRuntimeBrowserContext::~AppRuntimeBrowserContext() {}
 
@@ -139,6 +143,21 @@ AppRuntimeBrowserContext::GetBackgroundSyncController() {
 content::BrowsingDataRemoverDelegate*
 AppRuntimeBrowserContext::GetBrowsingDataRemoverDelegate() {
   return nullptr;
+}
+
+void AppRuntimeBrowserContext::Initialize() {
+#if defined(USE_LOCAL_STORAGE_TRACKER)
+  local_storage_tracker_->Initialize(GetPath());
+#endif
+}
+
+content::LocalStorageTracker*
+AppRuntimeBrowserContext::GetLocalStorageTracker() {
+#if defined(USE_LOCAL_STORAGE_TRACKER)
+  return local_storage_tracker_.get();
+#else
+  return nullptr;
+#endif
 }
 
 void AppRuntimeBrowserContext::FlushCookieStore() {

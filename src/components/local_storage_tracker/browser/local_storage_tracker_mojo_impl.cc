@@ -14,21 +14,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef WEBOS_APPLICATION_INSTALLATION_HANDLER_H_
-#define WEBOS_APPLICATION_INSTALLATION_HANDLER_H_
+#include "components/local_storage_tracker/browser/local_storage_tracker_mojo_impl.h"
 
-#include <string>
+namespace content {
 
-#include "webos/common/webos_export.h"
+void RenderFrameHostImpl::GetLocalStorageTrackerMojoImpl(
+    mojo::PendingReceiver<local_storage::mojom::LocalStorageTracker> receiver) {
+  lst_responder_ =
+      std::make_unique<LocalStorageTrackerMojoImpl>(std::move(receiver));
+}
 
-namespace webos {
-
-class WEBOS_EXPORT ApplicationInstallationHandler {
- public:
-  void OnAppInstalled(const std::string& app_id);
-  void OnAppRemoved(const std::string& app_id);
-  static ApplicationInstallationHandler* GetInstance();
-};
-}  // namespace webos
-
-#endif  // WEBOS_APPLICATION_INSTALLATION_HANDLER_H_
+}  // namespace content

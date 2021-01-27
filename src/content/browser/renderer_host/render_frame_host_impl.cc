@@ -260,6 +260,10 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
+#if defined(USE_LOCAL_STORAGE_TRACKER)
+#include "components/local_storage_tracker/browser/local_storage_tracker_mojo_impl.h"
+#endif
+
 #if defined(OS_ANDROID)
 #include "content/browser/android/content_url_loader_factory.h"
 #include "content/browser/android/java_interfaces_impl.h"

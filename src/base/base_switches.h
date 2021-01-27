@@ -71,6 +71,9 @@ extern const char kEnableCrashpad[];
 extern const char kSchedulerBoostUrgent[];
 #endif
 
+#if defined(USE_LOCAL_STORAGE_TRACKER)
+extern const char kLocalStorageTracker[];
+#endif
 }  // namespace switches
 
 #endif  // BASE_BASE_SWITCHES_H_

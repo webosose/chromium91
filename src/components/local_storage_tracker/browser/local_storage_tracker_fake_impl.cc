@@ -14,21 +14,24 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef WEBOS_APPLICATION_INSTALLATION_HANDLER_H_
-#define WEBOS_APPLICATION_INSTALLATION_HANDLER_H_
+#include "components/local_storage_tracker/browser/local_storage_tracker_fake_impl.h"
 
-#include <string>
+#include "content/public/browser/browser_thread.h"
 
-#include "webos/common/webos_export.h"
+namespace content {
 
-namespace webos {
+void LocalStorageTrackerFakeImpl::OnAccessOrigin(
+    const std::string& app_id,
+    const GURL& origin,
+    base::OnceCallback<void()> callback) {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
 
-class WEBOS_EXPORT ApplicationInstallationHandler {
- public:
-  void OnAppInstalled(const std::string& app_id);
-  void OnAppRemoved(const std::string& app_id);
-  static ApplicationInstallationHandler* GetInstance();
+  NOTREACHED() << "Should never have been reached here";
+  std::move(callback).Run();
+}
+
+base::WeakPtr<LocalStorageTracker> LocalStorageTrackerFakeImpl::GetWeakPtr() {
+  return base::WeakPtr<LocalStorageTracker>();
 };
-}  // namespace webos
 
-#endif  // WEBOS_APPLICATION_INSTALLATION_HANDLER_H_
+}  // namespace content

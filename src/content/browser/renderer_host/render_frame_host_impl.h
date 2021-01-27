@@ -178,6 +178,10 @@
 #include "content/common/pepper_plugin.mojom.h"
 #endif
 
+#if defined(USE_LOCAL_STORAGE_TRACKER)
+#include "components/local_storage_tracker/public/mojom/local_storage_tracker.mojom.h"
+#endif
+
 class GURL;
 
 namespace blink {
@@ -220,6 +224,9 @@ class CrossOriginEmbedderPolicyReporter;
 class FrameTree;
 class FrameTreeNode;
 class GeolocationServiceImpl;
+#if defined(USE_LOCAL_STORAGE_TRACKER)
+class LocalStorageTrackerMojoImpl;
+#endif
 class MediaInterfaceProxy;
 class NavigationEarlyHintsManager;
 class NavigationEntryImpl;
@@ -2008,6 +2015,11 @@ class CONTENT_EXPORT RenderFrameHostImpl
   // network::mojom::CookieAccessObserver:
   void OnCookiesAccessed(
       network::mojom::CookieAccessDetailsPtr details) override;
+#if defined(USE_LOCAL_STORAGE_TRACKER)
+  void GetLocalStorageTrackerMojoImpl(
+      mojo::PendingReceiver<local_storage::mojom::LocalStorageTracker>
+          receiver);
+#endif
 
   void GetSavableResourceLinksFromRenderer();
 
@@ -3652,6 +3664,10 @@ class CONTENT_EXPORT RenderFrameHostImpl
 
   // NOTE: This must be the last member.
   base::WeakPtrFactory<RenderFrameHostImpl> weak_ptr_factory_{this};
+
+#if defined(USE_LOCAL_STORAGE_TRACKER)
+  std::unique_ptr<LocalStorageTrackerMojoImpl> lst_responder_;
+#endif
 
   DISALLOW_COPY_AND_ASSIGN(RenderFrameHostImpl);
 };

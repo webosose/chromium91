@@ -183,4 +183,9 @@ extern const char kEnableCrashpad[] = "enable-crashpad";
 const char kSchedulerBoostUrgent[] = "scheduler-boost-urgent";
 #endif
 
+#if defined(USE_LOCAL_STORAGE_TRACKER)
+// On/Off local storage tracker
+const char kLocalStorageTracker[] = "local-storage-tracker";
+#endif
+
 }  // namespace switches

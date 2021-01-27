@@ -14,21 +14,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef WEBOS_APPLICATION_INSTALLATION_HANDLER_H_
-#define WEBOS_APPLICATION_INSTALLATION_HANDLER_H_
+module local_storage.mojom;
 
-#include <string>
-
-#include "webos/common/webos_export.h"
-
-namespace webos {
-
-class WEBOS_EXPORT ApplicationInstallationHandler {
- public:
-  void OnAppInstalled(const std::string& app_id);
-  void OnAppRemoved(const std::string& app_id);
-  static ApplicationInstallationHandler* GetInstance();
+interface LocalStorageTracker {
+  SaveUrl(string application_id, string url) => ();
 };
-}  // namespace webos
-
-#endif  // WEBOS_APPLICATION_INSTALLATION_HANDLER_H_

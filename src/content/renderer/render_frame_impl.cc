@@ -223,6 +223,10 @@
 #include "url/url_util.h"
 #include "v8/include/v8.h"
 
+#if defined(USE_LOCAL_STORAGE_TRACKER)
+#include "components/local_storage_tracker/public/mojom/local_storage_tracker.mojom.h"
+#endif
+
 #if BUILDFLAG(ENABLE_PLUGINS)
 #include "content/renderer/pepper/pepper_browser_connection.h"
 #include "content/renderer/pepper/pepper_plugin_instance_impl.h"
@@ -4427,6 +4431,16 @@ void RenderFrameImpl::WillSendRequestInternal(
 
   request.SetDownloadToNetworkCacheOnly(is_for_no_state_prefetch &&
                                         !for_main_frame);
+
+#if defined(USE_LOCAL_STORAGE_TRACKER)
+  mojo::Remote<local_storage::mojom::LocalStorageTracker> lst_responder;
+  mojo::PendingReceiver<local_storage::mojom::LocalStorageTracker> receiver =
+      lst_responder.BindNewPipeAndPassReceiver();
+  lst_responder->SaveUrl(
+      render_view_->GetRendererPreferences().file_security_origin,
+      request.Url().GetString().Utf8(), base::BindOnce([] {}));
+  GetBrowserInterfaceBroker()->GetInterface(std::move(receiver));
+#endif
 
   // The RenderThreadImpl or its URLLoaderThrottleProvider member may not be
   // valid in some tests.

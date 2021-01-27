@@ -148,4 +148,8 @@ config("config") {
   if (webos_submission_number >= 0) {
     defines += [ "WEBOS_SUBMISSION_NUMBER=$webos_submission_number" ]
   }
+
+  if (use_local_storage_tracker) {
+    defines += [ "USE_LOCAL_STORAGE_TRACKER=1" ]
+  }
 }
