@@ -1586,6 +1586,9 @@ WebTextInputInfo InputMethodController::TextInputInfo() const {
   if (info.type == kWebTextInputTypeNone)
     return info;
 
+  if (Element* focused_element = GetDocument().FocusedElement())
+    info.bounds = focused_element->BoundsInViewport();
+
   if (!GetFrame().GetEditor().CanEdit())
     return info;
 

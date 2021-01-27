@@ -23,6 +23,10 @@ bool TextInputClient::SystemKeyboardDisabled() const {
 gfx::Rect TextInputClient::GetInputPanelRectangle() const {
   return gfx::Rect();
 }
+
+gfx::Rect TextInputClient::GetTextInputBounds() const {
+  return gfx::Rect();
+}
 ///@}
 
 }  // namespace ui

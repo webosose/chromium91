@@ -85,6 +85,8 @@ struct WebTextInputInfo {
 #endif  // defined(USE_NEVA_APPRUNTIME)
 
   BLINK_PLATFORM_EXPORT bool Equals(const WebTextInputInfo&) const;
+
+  gfx::Rect bounds;
 };
 
 inline bool operator==(const WebTextInputInfo& a, const WebTextInputInfo& b) {

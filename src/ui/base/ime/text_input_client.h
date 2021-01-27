@@ -125,6 +125,7 @@ class COMPONENT_EXPORT(UI_BASE_IME) TextInputClient {
 
 ///@name USE_NEVA_APPRUNTIME
 ///@{
+  virtual gfx::Rect GetTextInputBounds() const;
   virtual bool SystemKeyboardDisabled() const;
   virtual gfx::Rect GetInputPanelRectangle() const;
 ///@}

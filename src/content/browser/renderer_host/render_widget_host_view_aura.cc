@@ -2522,6 +2522,15 @@ gfx::Rect RenderWidgetHostViewAura::GetInputPanelRectangle() const {
     return text_input_manager_->GetTextInputState()->input_panel_rectangle;
   return gfx::Rect();
 }
+
+gfx::Rect RenderWidgetHostViewAura::GetTextInputBounds() const {
+  if (!text_input_manager_ || !text_input_manager_->GetActiveWidget())
+    return gfx::Rect();
+  const ui::mojom::TextInputState* state =
+      text_input_manager_->GetTextInputState();
+
+  return ConvertRectToScreen(state->bounds);
+}
 #endif
 
 #if defined(USE_NEVA_MEDIA)

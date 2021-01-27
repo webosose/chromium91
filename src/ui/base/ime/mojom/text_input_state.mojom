@@ -80,5 +80,8 @@ struct TextInputState {
   // currently focused input element.
   gfx.mojom.Rect input_panel_rectangle;
 ///@}
+
+  // Bounds for text input
+  gfx.mojom.Rect bounds;
 };
 
