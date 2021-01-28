@@ -86,27 +86,25 @@ void WamDemoManager::LaunchApplicationFromCLI(const std::string& appid,
   std::string system_appid = GetSystemAppId(appid);
   neva_app_runtime::WebAppWindowBase::CreateParams params;
   params.web_contents = nullptr;
-  params.type =
-      neva_app_runtime::WebAppWindowBase::CreateParams::WidgetType::kWindow;
+  params.type = neva_app_runtime::WebAppWindowBase::WidgetType::kWindow;
   params.width = kDefaultWindowWidth;
   params.height = kDefaultWindowHeight;
 
   if (fullscreen) {
     params.width = kDefaultFullscreenWidth;
     params.height = kDefaultFullscreenHeight;
-    params.show_state = neva_app_runtime::WebAppWindowBase::CreateParams::
-        WindowShowState::kFullscreen;
+    params.show_state =
+        neva_app_runtime::WebAppWindowBase::WindowShowState::kFullscreen;
 
     // FIXME: fullscreen doesn't imply frameless. This only affects PC thus
     // after removing need to correct related TCs in case of regression
     frameless = true;
   }
 
-  params.type = frameless
-              ? neva_app_runtime::WebAppWindowBase::CreateParams::
-                  WidgetType::kWindowFrameless
-              : neva_app_runtime::WebAppWindowBase::CreateParams::
-                  WidgetType::kWindow;
+  params.type =
+      frameless
+          ? neva_app_runtime::WebAppWindowBase::WidgetType::kWindowFrameless
+          : neva_app_runtime::WebAppWindowBase::WidgetType::kWindow;
 
   std::unique_ptr<neva_app_runtime::WebViewProfile> profile;
   if (!profile_name.empty())
@@ -151,8 +149,7 @@ void WamDemoManager::LaunchApplication(const AppLaunchParams& launch_params) {
     params.width = kDefaultFullscreenWidth;
     params.height = kDefaultFullscreenHeight;
     params.show_state =
-        neva_app_runtime::WebAppWindowBase::
-            CreateParams::WindowShowState::kFullscreen;
+        neva_app_runtime::WebAppWindowBase::WindowShowState::kFullscreen;
   } else {
     params.pos_x = launch_params.layout_x;
     params.pos_y = launch_params.layout_y;
@@ -169,11 +166,10 @@ void WamDemoManager::LaunchApplication(const AppLaunchParams& launch_params) {
 #endif
   }
 
-  params.type = launch_params.frameless
-              ? neva_app_runtime::WebAppWindowBase::CreateParams::
-                    WidgetType::kWindowFrameless
-              : neva_app_runtime::WebAppWindowBase::CreateParams::
-                    WidgetType::kWindow;
+  params.type =
+      launch_params.frameless
+          ? neva_app_runtime::WebAppWindowBase::WidgetType::kWindowFrameless
+          : neva_app_runtime::WebAppWindowBase::WidgetType::kWindow;
 
   std::unique_ptr<neva_app_runtime::WebViewProfile> profile;
   if (!launch_params.profile_name.empty()) {
