@@ -16,12 +16,14 @@
 
 #include "webos_platform.h"
 
+#include "base/i18n/rtl.h"
 #include "neva/app_runtime/browser/net/app_runtime_network_change_notifier.h"
 #include "ozone/wayland/display.h"
 #if defined(OS_WEBOS)
 #include "ozone/wayland/shell/webos_shell_surface.h"
 #endif
 #include "ozone/wayland/window.h"
+#include "ui/base/resource/resource_bundle.h"
 #include "ui/views/widget/desktop_aura/neva/ui_constants.h"
 #include "webos/common/webos_locales_mapping.h"
 #include "webos/common/webos_types_conversion_utils.h"
@@ -56,8 +58,12 @@ void WebOSPlatform::OnNetworkStateChanged(bool is_connected) {
 
 void WebOSPlatform::OnLocaleInfoChanged(std::string language) {
   std::string locale = webos::MapWebOsToChromeLocales(language);
-  NOTIMPLEMENTED() << " webos language: " << language
-                   << ", chrome locale: " << locale;
+  base::i18n::SetICUDefaultLocale(locale);
+
+  if (ui::ResourceBundle::HasSharedInstance()) {
+    ui::ResourceBundle::GetSharedInstance().ReloadLocaleResources(locale);
+    ui::ResourceBundle::GetSharedInstance().ReloadFonts();
+  }
 }
 
 void WebOSPlatform::SetInputPointer(InputPointer* input_pointer) {
