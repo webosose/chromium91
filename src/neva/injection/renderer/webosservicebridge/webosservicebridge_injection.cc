@@ -52,7 +52,7 @@ const char kMethodInvocationAsConstructorOnly[] =
 
 bool IsSubscription(const std::string& param) {
   base::Optional<base::Value> json = base::JSONReader::Read(param);
-  if (!json && !json->is_dict())
+  if (!json || !json->is_dict())
     return false;
 
   const base::Value* subscribe_value =
@@ -116,7 +116,7 @@ void WebOSServiceBridgeInjection::DoCall(std::string uri, std::string payload) {
   if (identifier_.empty())
     return;
 
-  remote_system_bridge_->Call(std::move(uri), std::move(payload));
+  remote_system_bridge_->Call(uri, payload);
   if (WebOSServiceBridgeInjection::is_closing_) {
     VLOG(1) << "WebOSServiceBridge [Call][" << identifier_ << "] uri: " << uri
             << ", payload: " << payload << " while closing";
