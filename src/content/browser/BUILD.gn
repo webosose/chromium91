@@ -2876,6 +2876,15 @@ source_set("browser") {
     }
   }
 
+  if (is_webos &&
+      !(webos_product_type == "signage" || webos_product_type == "tv")) {
+    sources += [
+      "media/session/webos/media_session_observer_webos.cc",
+      "media/session/webos/media_session_observer_webos.h",
+    ]
+    deps += [ "//base/neva/webos" ]
+  }
+
   if ((is_linux || is_chromeos) && use_dbus) {
     deps += [ "//dbus" ]
   }

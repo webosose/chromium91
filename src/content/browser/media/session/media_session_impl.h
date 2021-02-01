@@ -55,6 +55,10 @@ class MediaSessionServiceImplBrowserTest;
 class MediaSessionAndroid;
 #endif  // defined(OS_ANDROID)
 
+#if defined(OS_WEBOS) && !(defined(USE_TV_MEDIA) || defined(USE_SIGNAGE_MEDIA))
+class MediaSessionObserverWebOS;
+#endif  // defined(OS_WEBOS)
+
 // MediaSessionImpl is the implementation of MediaSession. It manages the media
 // session and audio focus for a given WebContents. It is requesting the audio
 // focus, pausing when requested by the system and dropping it on demand. The
@@ -482,6 +486,10 @@ class MediaSessionImpl : public MediaSession,
 #if defined(OS_ANDROID)
   std::unique_ptr<MediaSessionAndroid> session_android_;
 #endif  // defined(OS_ANDROID)
+
+#if defined(OS_WEBOS) && !(defined(USE_TV_MEDIA) || defined(USE_SIGNAGE_MEDIA))
+  std::unique_ptr<MediaSessionObserverWebOS> media_session_observer_;
+#endif  // defined(OS_WEBOS)
 
   // MediaSessionService-related fields
   using ServicesMap = std::map<GlobalFrameRoutingId, MediaSessionServiceImpl*>;

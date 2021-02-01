@@ -71,12 +71,12 @@ UMediaClientImpl::UMediaClientImpl(
     const std::string& app_id)
     : event_listener_(std::move(event_listener)),
       main_task_runner_(main_task_runner),
-#if defined(USE_GST_MEDIA)
-      luna_service_client_(app_id),
-#endif
       app_id_(app_id),
       umediaclient_extension_(
-          UMediaClientExtension::Create(AsWeakPtr(), main_task_runner)) {
+      UMediaClientExtension::Create(AsWeakPtr(), main_task_runner)) {
+#if defined(USE_GST_MEDIA)
+     luna_service_client_ = base::LunaServiceClient::getInstance(app_id_);
+#endif
   // NOTE: AsWeakPtr() will create new valid WeakPtr even after it is
   // invalidated.
   // On our case, UMediaClientImpl will invalidate weakptr on its dtor
@@ -1355,7 +1355,7 @@ void UMediaClientImpl::EnableSubtitle(bool enable) {
       base::LunaServiceClient::URIType::SUBTITLE,
       enable ? "enableSubtitle" : "disableSubtitle");
 
-  luna_service_client_.CallAsync(uri, parameter);
+  luna_service_client_->CallAsync(uri, parameter);
 }
 
 bool UMediaClientImpl::CheckAudioOutput(float playback_rate) {

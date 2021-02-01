@@ -28,6 +28,7 @@ namespace {
 
 const char kURIAudio[] = "luna://com.webos.audio";
 const char kURISetting[] = "luna://com.webos.settingsservice";
+const char kURIMediaController[] = "luna://com.webos.service.mediacontroller";
 
 struct AutoLSError : LSError {
   AutoLSError() { LSErrorInit(this); }
@@ -42,6 +43,15 @@ void LogError(const std::string& message, const AutoLSError& lserror) {
 
 }  // namespace
 
+LunaServiceClient* LunaServiceClient::client_ = nullptr;
+
+LunaServiceClient* LunaServiceClient::getInstance(const std::string& identifier,
+                              bool application_service) {
+  if (!client_)
+      client_ = new LunaServiceClient(identifier, application_service);
+  return client_;
+}
+
 // static
 std::string LunaServiceClient::GetServiceURI(URIType type,
                                              const std::string& action) {
@@ -50,7 +60,8 @@ std::string LunaServiceClient::GetServiceURI(URIType type,
 
   static std::map<URIType, std::string> kURIMap = {
       {URIType::AUDIO, kURIAudio},
-      {URIType::SETTING, kURISetting}};
+      {URIType::SETTING, kURISetting},
+      {URIType::MEDIACONTROLLER, kURIMediaController}};
   auto luna_service_uri = [&kURIMap, &type]() {
     std::map<URIType, std::string>::iterator it;
     it = kURIMap.find(type);
@@ -133,6 +144,7 @@ bool LunaServiceClient::CallAsync(const std::string& uri,
   LOG(INFO) << "[REQ] - " << uri << " " << param;
   if (!LSCallOneReply(handle_, uri.c_str(), param.c_str(), HandleAsync, wrapper,
                       NULL, &error)) {
+    LOG(ERROR) << "[SUB] " << uri << ": fail[" << error.message << "]";
     std::move(wrapper->callback).Run("");
     delete wrapper;
     return false;
@@ -159,10 +171,10 @@ bool LunaServiceClient::Subscribe(const std::string& uri,
     return false;
   }
 
+  VLOG(1) << "[REQ] - " << uri << " " << param;
   if (!LSCall(handle_, uri.c_str(), param.c_str(), HandleSubscribe, wrapper,
               subscribeKey, &error)) {
-    LOG(INFO) << "[SUB] " << uri << ":[" << param << "] fail[" << error.message
-              << "]";
+    LOG(ERROR) << "[SUB] " << uri << ": fail[" << error.message << "]";
     delete wrapper;
     return false;
   }
@@ -228,12 +240,12 @@ bool LunaServiceClient::RegisterApplicationService(const std::string& appid) {
 bool LunaServiceClient::RegisterService(const std::string& appid) {
   std::string name = appid;
   if (!name.empty() && *name.rbegin() != '.' && *name.rbegin() != '-')
-    name += ".";
+    name += "-";
 
   // Some clients may have connection with empty identifier.
   // So append random number only for non empty identifier.
   if (!name.empty())
-    name += std::to_string(base::RandInt(10000, 99999));
+    name += std::to_string(getpid());
 
   AutoLSError error;
   if (!LSRegister(name.c_str(), &handle_, &error)) {

@@ -324,12 +324,14 @@ void WebMediaPlayerNeva::UpdatePlayingState(bool is_playing) {
 
   if (delegate_) {
     if (is_playing) {
+      client_->DidPlayerStartPlaying();
       delegate_->DidPlay(delegate_id_);
     } else {
       // TODO(neva, sync-to-87): Even if OnPlaybackComplete() has not been
       // called yet, Blink may have already fired the ended event based on
       // current time relative to duration -- so we need to check both
       // possibilities here.
+      client_->DidPlayerPaused(IsEnded());
       delegate_->DidPause(delegate_id_, IsEnded());
     }
   }
@@ -426,7 +428,7 @@ void WebMediaPlayerNeva::Play() {
   has_first_frame_ = true;
 
   media_log_->AddEvent<MediaLogEvent::kPlay>();
-
+  client_->DidPlayerStartPlaying();
   if (delegate_)
     delegate_->DidPlay(delegate_id_);
 }
@@ -441,6 +443,7 @@ void WebMediaPlayerNeva::Pause() {
   paused_time_ = base::TimeDelta::FromSecondsD(CurrentTime());
 
   media_log_->AddEvent<MediaLogEvent::kPause>();
+  client_->DidPlayerPaused(IsEnded());
 
   if (delegate_) {
     delegate_->DidPause(delegate_id_, IsEnded());
@@ -534,6 +537,14 @@ void WebMediaPlayerNeva::SetVolume(double volume) {
 
   volume_ = volume;
   player_api_->SetVolume(volume_);
+
+  client_->DidMediaMetadataChange(HasAudio(), HasVideo(),
+                                  DurationToMediaContentType(base::TimeDelta::FromSecondsD(Duration())));
+
+  if (delegate_)
+    delegate_->DidMediaMetadataChange(
+        delegate_id_, HasAudio(), HasVideo(),
+        DurationToMediaContentType(base::TimeDelta::FromSecondsD(Duration())));
 }
 
 void WebMediaPlayerNeva::SetLatencyHint(double seconds) {
@@ -811,6 +822,14 @@ void WebMediaPlayerNeva::OnMediaMetadataChanged(base::TimeDelta duration,
 
   if (need_to_signal_duration_changed)
     client_->DurationChanged();
+
+  client_->DidMediaMetadataChange(HasAudio(), HasVideo(),
+                                  DurationToMediaContentType(base::TimeDelta::FromSecondsD(Duration())));
+
+  if (delegate_)
+    delegate_->DidMediaMetadataChange(
+        delegate_id_, HasAudio(), HasVideo(),
+        DurationToMediaContentType(base::TimeDelta::FromSecondsD(Duration())));
 }
 
 void WebMediaPlayerNeva::OnLoadComplete() {
@@ -952,8 +971,10 @@ void WebMediaPlayerNeva::OnVideoSizeChanged(const gfx::Size& coded_size,
     // If we're paused after we receive metadata for the first time, tell the
     // delegate we can now be safely suspended due to inactivity if a subsequent
     // play event does not occur.
-    if (Paused() && delegate_)
+    if (Paused() && delegate_) {
+        client_->DidPlayerPaused(IsEnded());
       delegate_->DidPause(delegate_id_, IsEnded());
+    }
   }
 }
 
@@ -1241,6 +1262,7 @@ void WebMediaPlayerNeva::Resume() {
 
   if (status_on_suspended_ == PlayingStatus) {
     client_->ResumePlayback();
+    client_->DidPlayerStartPlaying();
     status_on_suspended_ = UnknownStatus;
   }
 
