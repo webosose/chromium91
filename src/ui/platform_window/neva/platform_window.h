@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "neva/app_runtime/public/app_runtime_constants.h"
+#include "ui/base/ime/neva/input_method_common.h"
 #include "ui/base/ime/text_input_type.h"
 #include "ui/gfx/geometry/rect.h"
 #include "ui/gfx/native_widget_types.h"
@@ -83,7 +84,7 @@ class PlatformWindow
   virtual void SetWindowProperty(const std::string& name,
                                  const std::string& value) {}
   virtual void ShowInputPanel() {}
-  virtual void HideInputPanel() {}
+  virtual void HideInputPanel(ImeHiddenType) {}
   virtual void SetTextInputInfo(const ui::TextInputInfo& text_input_info) {}
   virtual void SetSurroundingText(const std::string& text,
                                   size_t cursor_position,

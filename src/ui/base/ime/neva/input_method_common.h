@@ -44,6 +44,13 @@ COMPONENT_EXPORT(UI_BASE_IME)
 InputContentType GetInputContentTypeFromTextInputType(
     TextInputType text_input_type);
 
+enum class COMPONENT_EXPORT(UI_BASE_IME) ImeHiddenType {
+  // Only hide ime without deactivating
+  kHide,
+  // Deactivate ime
+  kDeactivate
+};
+
 }  // namespace ui
 
 #endif  // UI_BASE_IME_NEVA_INPUT_METHOD_COMMON_H_

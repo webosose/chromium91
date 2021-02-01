@@ -237,7 +237,7 @@ class VIEWS_EXPORT DesktopWindowTreeHostOzone
 
   // Overridden from ui::InputMethodNevaObserver:
   void OnShowIme() override;
-  void OnHideIme() override;
+  void OnHideIme(ui::ImeHiddenType) override;
   void OnTextInputInfoChanged(
       const ui::TextInputInfo& text_input_info) override;
   void SetSurroundingText(const std::string& text,

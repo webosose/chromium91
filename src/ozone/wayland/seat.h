@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "third_party/skia/include/core/SkBitmap.h"
+#include "ui/base/ime/neva/input_method_common.h"
 #include "ui/gfx/geometry/rect.h"
 
 namespace ui {
@@ -64,7 +65,7 @@ class WaylandSeat {
   void ResetIme();
   void ImeCaretBoundsChanged(gfx::Rect rect);
   void ShowInputPanel(unsigned handle);
-  void HideInputPanel();
+  void HideInputPanel(ui::ImeHiddenType);
   void SetTextInputInfo(const ui::TextInputInfo& text_input_info,
                         unsigned handle);
   void SetSurroundingText(const std::string& text,

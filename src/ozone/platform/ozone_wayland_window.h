@@ -108,7 +108,7 @@ class OzoneWaylandWindow : public PlatformWindow,
   void DetachGroup() override;
 
   void ShowInputPanel() override;
-  void HideInputPanel() override;
+  void HideInputPanel(ImeHiddenType) override;
   void SetTextInputInfo(const ui::TextInputInfo& text_input_info) override;
   void SetSurroundingText(const std::string& text,
                           size_t cursor_position,

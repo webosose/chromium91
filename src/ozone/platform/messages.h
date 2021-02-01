@@ -46,6 +46,7 @@ IPC_ENUM_TRAITS_MAX_VALUE(ui::EventFlags,
                           ui::EF_FORWARD_MOUSE_BUTTON)
 IPC_ENUM_TRAITS_MAX_VALUE(ui::EventType,
                           ui::ET_LAST)
+IPC_ENUM_TRAITS_MAX_VALUE(ui::ImeHiddenType, ui::ImeHiddenType::kDeactivate)
 IPC_ENUM_TRAITS_MAX_VALUE(ui::InputContentType, ui::InputContentType::kMax)
 IPC_ENUM_TRAITS_MAX_VALUE(ui::WidgetState,
                           ui::WidgetState::DESTROYED)
@@ -269,8 +270,8 @@ IPC_MESSAGE_CONTROL0(WaylandDisplay_ImeReset)  // NOLINT(readability/fn_size)
 IPC_MESSAGE_CONTROL1(WaylandDisplay_ShowInputPanel,  // NOLINT(readability/fn_size)
                      unsigned /* window handle */)
 
-IPC_MESSAGE_CONTROL0(WaylandDisplay_HideInputPanel)  // NOLINT(readability/
-                                                     //         fn_size)
+IPC_MESSAGE_CONTROL1(WaylandDisplay_HideInputPanel,  // NOLINT(readability/fn_size)
+                     ui::ImeHiddenType /* hidden_type */)
 
 IPC_MESSAGE_CONTROL2(
     WaylandDisplay_SetTextInputInfo,  // NOLINT(readability/fn_size)
