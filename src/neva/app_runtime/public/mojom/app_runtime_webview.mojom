@@ -51,4 +51,5 @@ interface AppRuntimeWebViewHost {
   DidFirstMeaningfulPaint();
   DidClearWindowObject();
   DidLargestContentfulPaint();
+  DidResumeDOM();
 };
