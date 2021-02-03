@@ -362,6 +362,11 @@ struct BLINK_COMMON_EXPORT WebPreferences {
   // change depending on the enterprise policy if the platform supports it.
   bool webxr_immersive_ar_allowed = true;
 
+  // CSS UI keyboard control properties (‘nav-index’, ‘nav-up’, ‘nav-down’,
+  // ‘nav-right’, ‘nav-left’) support.
+  // See https://www.w3.org/TR/2021/WD-css-ui-4-20210316/#nav-dir
+  bool css_navigation_enabled = false;
+
   // We try to keep the default values the same as the default values in
   // chrome, except for the cases where it would require lots of extra work for
   // the embedder to use the same default value.

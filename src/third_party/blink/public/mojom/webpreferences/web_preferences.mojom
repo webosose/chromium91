@@ -449,4 +449,9 @@ struct WebPreferences {
 
   // Controls whether WebXR's immersive-ar is allowed.
   bool webxr_immersive_ar_allowed;
+
+  // CSS UI keyboard control properties (‘nav-index’, ‘nav-up’, ‘nav-down’,
+  // ‘nav-right’, ‘nav-left’) support.
+  // See https://www.w3.org/TR/2021/WD-css-ui-4-20210316/#nav-dir
+  bool css_navigation_enabled;
 };

@@ -1523,6 +1523,8 @@ void WebView::ApplyWebPreferences(const web_pref::WebPreferences& prefs,
   if (prefs.spatial_navigation_enabled)
     RuntimeEnabledFeatures::SetKeyboardFocusableScrollersEnabled(true);
 
+  WebRuntimeFeatures::EnableCSSNavigation(prefs.css_navigation_enabled);
+
   settings->SetSelectionIncludesAltImageText(true);
 
   RuntimeEnabledFeatures::SetFakeNoAllocDirectCallForTestingEnabled(
