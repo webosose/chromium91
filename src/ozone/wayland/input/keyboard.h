@@ -18,16 +18,18 @@
 #ifndef OZONE_WAYLAND_INPUT_KEYBOARD_H_
 #define OZONE_WAYLAND_INPUT_KEYBOARD_H_
 
-#include "ozone/wayland/display.h"
+#include <wayland-client-protocol.h>
+#include <wayland-util.h>
+
+#include "base/macros.h"
+#include "ozone/wayland/input/hotplug_device.h"
 
 namespace ozonewayland {
 
-class WaylandKeyboard {
+class WaylandKeyboard : public HotplugDevice {
  public:
   WaylandKeyboard();
-  WaylandKeyboard(const WaylandKeyboard&) = delete;
-  WaylandKeyboard& operator=(const WaylandKeyboard&) = delete;
-  ~WaylandKeyboard();
+  ~WaylandKeyboard() override;
 
   void OnSeatCapabilities(wl_seat *seat, uint32_t caps);
 
@@ -65,7 +67,8 @@ class WaylandKeyboard {
                              uint32_t group);
 
   wl_keyboard* input_keyboard_;
-  WaylandDisplay* dispatcher_;
+
+  DISALLOW_COPY_AND_ASSIGN(WaylandKeyboard);
 };
 
 }  // namespace ozonewayland

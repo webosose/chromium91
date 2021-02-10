@@ -60,8 +60,10 @@ class WaylandSeat {
 #if defined(USE_DATA_DEVICE_MANAGER)
   WaylandDataDevice* GetDataDevice() const { return data_device_; }
 #endif
+  std::string GetName() const { return name_; }
   WaylandKeyboard* GetKeyBoard() const { return input_keyboard_; }
   WaylandPointer* GetPointer() const { return input_pointer_; }
+  WaylandTouchscreen* GetTouchscreen() const { return input_touch_; }
   WaylandTextInput* GetTextInput() const { return text_input_; }
   unsigned GetActiveInputWindow() const { return active_input_window_handle_; }
   unsigned GetEnteredWindowHandle(uint32_t device_id) const;
@@ -92,12 +94,14 @@ class WaylandSeat {
   static void OnSeatCapabilities(void *data,
                                  wl_seat *seat,
                                  uint32_t caps);
+  static void OnName(void* data, wl_seat* seat, const char* name);
 
   // Keeps track of current focused window.
   unsigned active_input_window_handle_;
   std::map<uint32_t, unsigned> entered_window_handle_map_;
   std::map<uint32_t, GrabWindowInfo> grab_window_map_;
   struct wl_seat* seat_;
+  std::string name_;
 #if defined(USE_DATA_DEVICE_MANAGER)
   WaylandDataDevice* data_device_;
 #endif

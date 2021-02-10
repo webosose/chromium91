@@ -18,20 +18,21 @@
 #ifndef OZONE_WAYLAND_INPUT_POINTER_H_
 #define OZONE_WAYLAND_INPUT_POINTER_H_
 
-#include "ozone/wayland/display.h"
+#include <wayland-client-protocol.h>
+#include <wayland-util.h>
+
+#include "base/macros.h"
+#include "ozone/wayland/input/hotplug_device.h"
 #include "ui/gfx/geometry/point.h"
 
 namespace ozonewayland {
 
 class WaylandCursor;
-class WaylandWindow;
 
-class WaylandPointer {
+class WaylandPointer : public HotplugDevice {
  public:
   WaylandPointer();
-  WaylandPointer(const WaylandPointer&) = delete;
-  WaylandPointer& operator=(const WaylandPointer&) = delete;
-  ~WaylandPointer();
+  ~WaylandPointer() override;
 
   void OnSeatCapabilities(wl_seat *seat, uint32_t caps);
   WaylandCursor* Cursor() const { return cursor_; }
@@ -74,12 +75,13 @@ class WaylandPointer {
       wl_surface* surface);
 
   WaylandCursor* cursor_;
-  WaylandDisplay* dispatcher_;
   // Keeps track of the last position for the motion event. We want to
   // dispatch this with events such as wheel or button which don't have a
   // position associated on Wayland.
   gfx::Point pointer_position_;
   struct wl_pointer *input_pointer_;
+
+  DISALLOW_COPY_AND_ASSIGN(WaylandPointer);
 };
 
 }  // namespace ozonewayland

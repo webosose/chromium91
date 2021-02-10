@@ -28,6 +28,9 @@
 #include "base/memory/weak_ptr.h"
 #include "ozone/platform/event_param_traits.h"
 #include "ui/base/cursor/cursor.h"
+#include "ui/events/devices/device_hotplug_event_observer.h"
+#include "ui/events/devices/input_device.h"
+#include "ui/events/devices/touchscreen_device.h"
 #include "ui/events/event.h"
 #include "ui/events/event_modifiers.h"
 #include "ui/events/event_source.h"
@@ -92,6 +95,7 @@ class WindowManagerWayland : public PlatformEventSource,
   unsigned TouchButtonGrabber(uint32_t touch_button_id) const;
 
  private:
+  ui::DeviceHotplugEventObserver* GetHotplugEventObserver();
   void OnActivationChanged(unsigned windowhandle, bool active);
   std::list<OzoneWaylandWindow*>& open_windows(const std::string& display_id);
   void clear_open_windows(const std::string& display_id);
@@ -148,6 +152,12 @@ class WindowManagerWayland : public PlatformEventSource,
                      unsigned width,
                      unsigned height,
                      int rotation);
+  void KeyboardAdded(int id, const std::string& name);
+  void KeyboardRemoved(int id);
+  void PointerAdded(int id, const std::string& name);
+  void PointerRemoved(int id);
+  void TouchscreenAdded(int id, const std::string& name);
+  void TouchscreenRemoved(int id);
   void WindowResized(unsigned windowhandle,
                      unsigned width,
                      unsigned height);
@@ -205,6 +215,12 @@ class WindowManagerWayland : public PlatformEventSource,
                            unsigned width,
                            unsigned height,
                            int rotation);
+  void NotifyKeyboardAdded(int id, const std::string& name);
+  void NotifyKeyboardRemoved(int id);
+  void NotifyPointerAdded(int id, const std::string& name);
+  void NotifyPointerRemoved(int id);
+  void NotifyTouchscreenAdded(int id, const std::string& name);
+  void NotifyTouchscreenRemoved(int id);
 
   void NotifyDragEnter(unsigned windowhandle,
                        float x,
@@ -265,6 +281,9 @@ class WindowManagerWayland : public PlatformEventSource,
   EventModifiers modifiers_;
   // Keyboard state.
   std::unique_ptr<KeyboardEvdevNeva> keyboard_;
+  std::vector<ui::InputDevice> keyboard_devices_;
+  std::vector<ui::InputDevice> pointer_devices_;
+  std::vector<ui::TouchscreenDevice> touchscreen_devices_;
   ozonewayland::OzoneWaylandScreen* platform_screen_;
   PlatformCursor platform_cursor_;
   bool dragging_;

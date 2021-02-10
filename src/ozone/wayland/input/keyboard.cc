@@ -19,14 +19,14 @@
 
 #include "base/logging.h"
 #include "base/memory/unsafe_shared_memory_region.h"
+#include "ozone/wayland/display.h"
+#include "ozone/wayland/input/keyboard.h"
 #include "ozone/wayland/seat.h"
 #include "ozone/wayland/window.h"
 
 namespace ozonewayland {
 
-WaylandKeyboard::WaylandKeyboard() : input_keyboard_(NULL),
-    dispatcher_(NULL) {
-}
+WaylandKeyboard::WaylandKeyboard() : input_keyboard_(nullptr) {}
 
 WaylandKeyboard::~WaylandKeyboard() {
   if (input_keyboard_)
@@ -41,9 +41,6 @@ void WaylandKeyboard::OnSeatCapabilities(wl_seat *seat, uint32_t caps) {
     WaylandKeyboard::OnKeyNotify,
     WaylandKeyboard::OnKeyModifiers,
   };
-
-  dispatcher_ =
-      WaylandDisplay::GetInstance();
 
   if ((caps & WL_SEAT_CAPABILITY_KEYBOARD) && !input_keyboard_) {
     input_keyboard_ = wl_seat_get_keyboard(seat);
@@ -68,7 +65,7 @@ void WaylandKeyboard::OnKeyNotify(void* data,
     type = ui::ET_KEY_RELEASED;
   const uint32_t device_id =
       wl_proxy_get_id(reinterpret_cast<wl_proxy*>(input_keyboard));
-  device->dispatcher_->KeyNotify(type, key, device_id);
+  WaylandDisplay::GetInstance()->KeyNotify(type, key, device_id);
 }
 
 void WaylandKeyboard::OnKeyboardKeymap(void* data,
@@ -90,7 +87,7 @@ void WaylandKeyboard::OnKeyboardKeymap(void* data,
       length, base::UnguessableToken::Create());
   auto region = base::UnsafeSharedMemoryRegion::Deserialize(std::move(shmem));
 
-  device->dispatcher_->InitializeXKB(std::move(region));
+  WaylandDisplay::GetInstance()->InitializeXKB(std::move(region));
 }
 
 void WaylandKeyboard::OnKeyboardEnter(void* data,

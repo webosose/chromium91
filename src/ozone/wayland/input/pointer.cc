@@ -20,6 +20,7 @@
 #include <linux/input.h>
 
 #include "base/logging.h"
+#include "ozone/wayland/display.h"
 #include "ozone/wayland/input/cursor.h"
 #include "ozone/wayland/seat.h"
 #include "ozone/wayland/window.h"
@@ -27,12 +28,7 @@
 
 namespace ozonewayland {
 
-WaylandPointer::WaylandPointer()
-  : cursor_(NULL),
-    dispatcher_(NULL),
-    pointer_position_(0, 0),
-    input_pointer_(NULL) {
-}
+WaylandPointer::WaylandPointer() : cursor_(nullptr), input_pointer_(nullptr) {}
 
 WaylandPointer::~WaylandPointer() {
   delete cursor_;
@@ -51,8 +47,6 @@ void WaylandPointer::OnSeatCapabilities(wl_seat *seat, uint32_t caps) {
 
   if (!cursor_)
     cursor_ = new WaylandCursor();
-
-  dispatcher_ = WaylandDisplay::GetInstance();
 
   if ((caps & WL_SEAT_CAPABILITY_POINTER) && !cursor_->GetInputPointer()) {
     input_pointer_ = wl_seat_get_pointer(seat);
@@ -82,7 +76,7 @@ void WaylandPointer::OnMotionNotify(void* data,
     return;
   }
 
-  device->dispatcher_->MotionNotify(sx, sy);
+  WaylandDisplay::GetInstance()->MotionNotify(sx, sy);
 }
 
 void WaylandPointer::OnButtonNotify(void* data,
@@ -122,11 +116,11 @@ void WaylandPointer::OnButtonNotify(void* data,
     else if (button == BTN_MIDDLE)
       flags = ui::EF_MIDDLE_MOUSE_BUTTON;
 
-    device->dispatcher_->ButtonNotify(seat->GetEnteredWindowHandle(device_id),
-                                      type,
-                                      flags,
-                                      device->pointer_position_.x(),
-                                      device->pointer_position_.y());
+    WaylandDisplay::GetInstance()->ButtonNotify(seat->GetEnteredWindowHandle(device_id),
+                                                type,
+                                                flags,
+                                                device->pointer_position_.x(),
+                                                device->pointer_position_.y());
   }
 
   if (seat->GetGrabWindowHandle(device_id) &&
@@ -155,10 +149,10 @@ void WaylandPointer::OnAxisNotify(void* data,
       break;
   }
 
-  device->dispatcher_->AxisNotify(device->pointer_position_.x(),
-                                  device->pointer_position_.y(),
-                                  x_offset,
-                                  y_offset);
+  WaylandDisplay::GetInstance()->AxisNotify(device->pointer_position_.x(),
+                                            device->pointer_position_.y(),
+                                            x_offset,
+                                            y_offset);
 }
 
 void WaylandPointer::OnPointerEnter(void* data,
