@@ -160,7 +160,9 @@ void WaylandPointer::OnPointerEnter(void* data,
   WaylandSeat* seat = WaylandDisplay::GetInstance()->PrimarySeat();
 
   if (!surface) {
+#if !defined(OS_WEBOS)
     seat->SetFocusWindowHandle(0);
+#endif
     return;
   }
 
@@ -173,7 +175,9 @@ void WaylandPointer::OnPointerEnter(void* data,
 
   WaylandDisplay::GetInstance()->SetSerial(serial);
   device->pointer_position_.SetPoint(sx, sy);
+#if !defined(OS_WEBOS)
   seat->SetFocusWindowHandle(handle);
+#endif
   device->dispatcher_->PointerEnter(handle,
                                     device->pointer_position_.x(),
                                     device->pointer_position_.y());
@@ -190,7 +194,9 @@ void WaylandPointer::OnPointerLeave(void* data,
   device->dispatcher_->PointerLeave(seat->GetFocusWindowHandle(),
                                     device->pointer_position_.x(),
                                     device->pointer_position_.y());
+#if !defined(OS_WEBOS)
   seat->SetFocusWindowHandle(0);
+#endif
 }
 
 }  // namespace ozonewayland

@@ -556,7 +556,9 @@ void WindowManagerWayland::NotifyAxis(float x,
 void WindowManagerWayland::NotifyPointerEnter(unsigned handle,
                                                  float x,
                                                  float y) {
+#if !defined(OS_WEBOS)
   OnWindowEnter(handle);
+#endif
 
   gfx::Point position(x, y);
   MouseEvent mouseev(ET_MOUSE_ENTERED,
@@ -572,7 +574,9 @@ void WindowManagerWayland::NotifyPointerEnter(unsigned handle,
 void WindowManagerWayland::NotifyPointerLeave(unsigned handle,
                                               float x,
                                               float y) {
+#if !defined(OS_WEBOS)
   OnWindowLeave(handle);
+#endif
 
   gfx::Point position(x, y);
   MouseEvent mouseev(ET_MOUSE_EXITED,
