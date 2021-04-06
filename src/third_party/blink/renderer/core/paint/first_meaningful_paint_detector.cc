@@ -178,6 +178,7 @@ void FirstMeaningfulPaintDetector::RegisterNotifyPresentationTime(
     PaintEvent event) {
   ++outstanding_presentation_promise_count_;
   paint_timing_->RegisterNotifyPresentationTime(
+      event,
       CrossThreadBindOnce(&FirstMeaningfulPaintDetector::ReportPresentationTime,
                           WrapCrossThreadWeakPersistent(this), event));
 }
@@ -222,6 +223,13 @@ void FirstMeaningfulPaintDetector::ReportPresentationTime(
     DCHECK(!first_meaningful_paint_.is_null());
     SetFirstMeaningfulPaint(provisional_first_meaningful_paint_presentation_);
   }
+#if defined(USE_NEVA_APPRUNTIME)
+  else if (seen_first_meaningful_paint_candidate_) {
+    first_meaningful_paint_ = g_clock->NowTicks();
+    network_quiet_reached_ = true;
+    SetFirstMeaningfulPaint(provisional_first_meaningful_paint_presentation_);
+  }
+#endif
 }
 
 void FirstMeaningfulPaintDetector::NotifyFirstContentfulPaint(
@@ -266,6 +274,13 @@ void FirstMeaningfulPaintDetector::ResetStateToMarkNextPaint() {
   outstanding_presentation_promise_count_ = 0;
   defer_first_meaningful_paint_ = kDoNotDefer;
 
+  paint_timing_->RegisterNotifyPresentationTime(
+      PaintEvent::kFirstContainerResetPaint,
+      CrossThreadBindOnce(
+          &FirstMeaningfulPaintDetector::ReportFirstContainerResetPaint,
+          WrapCrossThreadWeakPersistent(this),
+          PaintEvent::kFirstContainerResetPaint));
+
   if (GetDocument() && GetDocument()->GetFrame() &&
       GetDocument()->GetFrame()->GetIdlenessDetector())
     GetDocument()->GetFrame()->GetIdlenessDetector()->DomContentLoadedEventFired();
@@ -277,6 +292,11 @@ void FirstMeaningfulPaintDetector::NotifyNonFirstMeaningfulPaint() {
   if (GetDocument() && GetDocument()->Loader())
     GetDocument()->Loader()->CommitNonFirstMeaningfulPaintAfterLoad();
 }
+
+void FirstMeaningfulPaintDetector::ReportFirstContainerResetPaint(
+    PaintEvent event,
+    WebSwapResult result,
+    base::TimeTicks timestamp) {}
 #endif
 
 // static

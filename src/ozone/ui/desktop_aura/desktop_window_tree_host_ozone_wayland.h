@@ -195,6 +195,8 @@ class VIEWS_EXPORT DesktopWindowTreeHostOzone
   void FocusGroupOwner() override;
   void FocusGroupLayer() override;
   void DetachGroup() override;
+  void BeginPrepareStackForWebApp() override;
+  void FinishPrepareStackForWebApp() override;
 
   // Overridden from ui::PlatformWindowDelegate:
   void OnBoundsChanged(const BoundsChange& change) override;

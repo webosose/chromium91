@@ -260,25 +260,40 @@ void PaintTiming::SetFirstContentfulPaint(base::TimeTicks stamp) {
 
 void PaintTiming::RegisterNotifyPresentationTime(PaintEvent event) {
   RegisterNotifyPresentationTime(
-      CrossThreadBindOnce(&PaintTiming::ReportPresentationTime,
-                          WrapCrossThreadWeakPersistent(this), event));
+      event, CrossThreadBindOnce(&PaintTiming::ReportPresentationTime,
+                                 WrapCrossThreadWeakPersistent(this), event));
 }
 
 void PaintTiming::
     RegisterNotifyFirstPaintAfterBackForwardCacheRestorePresentationTime(
         size_t index) {
-  RegisterNotifyPresentationTime(CrossThreadBindOnce(
-      &PaintTiming::
-          ReportFirstPaintAfterBackForwardCacheRestorePresentationTime,
-      WrapCrossThreadWeakPersistent(this), index));
+  RegisterNotifyPresentationTime(
+      PaintEvent::kFirstPaint,
+      CrossThreadBindOnce(
+          &PaintTiming::
+              ReportFirstPaintAfterBackForwardCacheRestorePresentationTime,
+          WrapCrossThreadWeakPersistent(this), index));
 }
 
-void PaintTiming::RegisterNotifyPresentationTime(ReportTimeCallback callback) {
+void PaintTiming::RegisterNotifyPresentationTime(PaintEvent event,
+                                                 ReportTimeCallback callback) {
   // ReportPresentationTime will queue a presentation-promise, the callback is
   // called when the compositor submission of the current render frame completes
   // or fails to happen.
   if (!GetFrame() || !GetFrame()->GetPage())
     return;
+
+#if defined(USE_NEVA_APPRUNTIME)
+  bool is_fcp = (event == PaintEvent::kFirstContentfulPaint);
+  bool is_container_reset = (event == PaintEvent::kFirstContainerResetPaint);
+  if (is_fcp || is_container_reset) {
+    if (GetFrame()->GetDocument())
+      GetFrame()->GetDocument()->SetFirstContentfulPaintHappened(is_fcp);
+    GetFrame()->GetPage()->GetChromeClient().NotifyVizFMPSwap(
+        *GetFrame(), is_fcp, is_container_reset);
+  }
+#endif
+
   GetFrame()->GetPage()->GetChromeClient().NotifyPresentationTime(
       *GetFrame(), std::move(callback));
 }

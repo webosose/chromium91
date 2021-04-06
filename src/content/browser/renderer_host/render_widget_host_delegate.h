@@ -314,6 +314,10 @@ class CONTENT_EXPORT RenderWidgetHostDelegate {
   // Notify the delegate that the screen orientation has been changed.
   virtual void DidChangeScreenOrientation() {}
 
+#if defined(USE_NEVA_APPRUNTIME)
+  virtual void DidCompleteSwap() {}
+#endif
+
   // Show the newly created widget with the specified bounds.
   // The widget is identified by the route_id passed to CreateNewWidget.
   virtual void ShowCreatedWidget(int process_id,

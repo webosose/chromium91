@@ -890,6 +890,18 @@ void ChromeClientImpl::NotifyPresentationTime(LocalFrame& frame,
       ConvertToBaseOnceCallback(std::move(callback)));
 }
 
+#if defined(USE_NEVA_APPRUNTIME)
+void ChromeClientImpl::NotifyVizFMPSwap(LocalFrame& frame,
+                                        bool is_first_contentful_paint,
+                                        bool did_reset_container_state) {
+  FrameWidget* widget = frame.GetWidgetForLocalRoot();
+  if (!widget)
+    return;
+  widget->NotifyVizFMPSwap(is_first_contentful_paint,
+                           did_reset_container_state);
+}
+#endif
+
 void ChromeClientImpl::RequestBeginMainFrameNotExpected(LocalFrame& frame,
                                                         bool request) {
   if (!frame.GetWidgetForLocalRoot()) {

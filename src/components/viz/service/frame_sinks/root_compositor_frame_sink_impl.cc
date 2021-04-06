@@ -37,6 +37,10 @@ RootCompositorFrameSinkImpl::Create(
     FrameSinkManagerImpl* frame_sink_manager,
     OutputSurfaceProvider* output_surface_provider,
     uint32_t restart_id,
+#if defined(USE_NEVA_APPRUNTIME)
+    bool use_viz_fmp_with_timeout,
+    uint32_t viz_fmp_timeout,
+#endif
     bool run_all_compositor_stages_before_draw,
     const DebugRendererSettings* debug_settings,
     gfx::RenderingPipeline* gpu_pipeline) {
@@ -128,6 +132,9 @@ RootCompositorFrameSinkImpl::Create(
 
   auto scheduler = std::make_unique<DisplayScheduler>(
       begin_frame_source, task_runner.get(), max_frames_pending,
+#if defined(USE_NEVA_APPRUNTIME)
+      use_viz_fmp_with_timeout, viz_fmp_timeout,
+#endif
       run_all_compositor_stages_before_draw, gpu_pipeline);
 
 #if !defined(OS_APPLE)
@@ -328,6 +335,12 @@ void RootCompositorFrameSinkImpl::SetDelegatedInkPointRenderer(
   }
 }
 
+#if defined(USE_NEVA_APPRUNTIME)
+void RootCompositorFrameSinkImpl::RenderProcessGone() {
+  display_->RenderProcessGone();
+}
+#endif
+
 void RootCompositorFrameSinkImpl::SetNeedsBeginFrame(bool needs_begin_frame) {
   support_->SetNeedsBeginFrame(needs_begin_frame);
 }
@@ -474,6 +487,10 @@ void RootCompositorFrameSinkImpl::DisplayDidReceiveCALayerParams(
 
 void RootCompositorFrameSinkImpl::DisplayDidCompleteSwapWithSize(
     const gfx::Size& pixel_size) {
+#if defined(USE_NEVA_APPRUNTIME)
+  if (display_client_)
+    display_client_->DidCompleteSwap();
+#endif
 #if defined(OS_ANDROID)
   if (display_client_)
     display_client_->DidCompleteSwapWithSize(pixel_size);

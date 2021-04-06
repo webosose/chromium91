@@ -436,6 +436,12 @@ void DelegatedFrameHost::OnCompositingShuttingDown(ui::Compositor* compositor) {
   DCHECK(!compositor_);
 }
 
+#if defined(USE_NEVA_APPRUNTIME)
+void DelegatedFrameHost::OnCompositingCompleteSwap(ui::Compositor* compositor) {
+  client_->OnSwapCompleted();
+}
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // DelegatedFrameHost, private:
 

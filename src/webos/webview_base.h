@@ -216,7 +216,6 @@ class WEBOS_EXPORT WebViewBase
   void SetWebSecurityEnabled(bool enable);
   void SetKeepAliveWebApp(bool enable);
   void SetAdditionalFontFamilyEnabled(bool enable);
-  void SetNotifyFMPDirectly(bool enable);
   void SetNetworkStableTimeout(double timeout);
 
   // FontFamily
@@ -284,7 +283,6 @@ class WEBOS_EXPORT WebViewBase
   neva_app_runtime::WebViewInfo webview_info_;
 
   bool load_visually_committed_called_ = false;
-  bool notify_on_first_paint_ = false;
 };
 
 }  // namespace webos

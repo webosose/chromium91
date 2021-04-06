@@ -191,6 +191,8 @@ class CORE_EXPORT WebFrameWidgetImpl
                      base::OnceCallback<void(bool)>) override;
   void NotifyPresentationTimeInBlink(
       WebReportTimeCallback presentation_callback) final;
+  void NotifyVizFMPSwap(bool is_first_contentful_paint,
+                        bool did_reset_container_state) final;
   void RequestBeginMainFrameNotExpected(bool request) final;
   int GetLayerTreeId() final;
   const cc::LayerTreeSettings& GetLayerTreeSettings() final;

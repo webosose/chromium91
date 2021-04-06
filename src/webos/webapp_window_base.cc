@@ -17,6 +17,7 @@
 #include "webos/webapp_window_base.h"
 
 #include "base/logging.h"
+#include "components/viz/common/switches.h"
 #include "neva/app_runtime/public/app_runtime_constants.h"
 #include "neva/app_runtime/public/window_group_configuration.h"
 #include "ui/display/display.h"
@@ -25,6 +26,10 @@
 #include "webos/common/webos_types_conversion_utils.h"
 #include "webos/webapp_window.h"
 #include "webos/window_group_configuration.h"
+
+#if defined(OS_WEBOS)
+#include "components/viz/common/switches.h"
+#endif
 
 namespace webos {
 namespace {
@@ -128,13 +133,16 @@ void WebAppWindowBase::InitWindow(int width, int height) {
   params.type = views::Widget::InitParams::TYPE_WINDOW_FRAMELESS;
   webapp_window_ = new WebAppWindow(params);
   webapp_window_->SetDelegate(this);
+  webapp_window_->BeginPrepareStackForWebApp();
 
   agl::WebAppWindowBaseAgl::InitWindow();
 }
 
 void WebAppWindowBase::Show() {
-  if (webapp_window_)
+  if (webapp_window_) {
+    webapp_window_->FinishPrepareStackForWebApp();
     webapp_window_->ActivateAndShow();
+  }
 }
 
 void WebAppWindowBase::Hide() {

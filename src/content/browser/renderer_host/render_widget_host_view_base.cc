@@ -610,6 +610,13 @@ void RenderWidgetHostViewBase::OnFrameTokenChangedForView(
     host()->DidProcessFrame(frame_token, activation_time);
 }
 
+#if defined(USE_NEVA_APPRUNTIME)
+void RenderWidgetHostViewBase::OnSwapCompleted() {
+  if (host())
+    host()->DidCompleteSwap();
+}
+#endif
+
 bool RenderWidgetHostViewBase::ScreenRectIsUnstableFor(
     const blink::WebInputEvent& event) {
   return false;

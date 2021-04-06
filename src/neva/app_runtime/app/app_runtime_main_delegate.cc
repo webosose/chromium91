@@ -22,6 +22,7 @@
 #include "base/logging.h"
 #include "base/path_service.h"
 #include "components/services/heap_profiling/public/cpp/profiling_client.h"
+#include "components/viz/common/switches.h"
 #include "content/public/common/content_switches.h"
 #include "neva/app_runtime/browser/app_runtime_content_browser_client.h"
 #include "neva/app_runtime/browser/app_runtime_quota_permission_delegate.h"
@@ -114,6 +115,9 @@ bool AppRuntimeMainDelegate::BasicStartupComplete(int* exit_code) {
   // this causes re-entrancy into the allocator shim, while the TLS object is
   // partially-initialized, which the TLS object is supposed to protect again.
   heap_profiling::InitTLSSlot();
+
+  base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
+      switches::kUseVizFMPWithTimeout, "0");
   return false;
 }
 

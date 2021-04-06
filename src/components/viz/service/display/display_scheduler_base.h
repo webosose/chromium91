@@ -40,6 +40,9 @@ class VIZ_SERVICE_EXPORT DisplaySchedulerBase
   virtual void DidReceiveSwapBuffersAck() = 0;
   virtual void OutputSurfaceLost() = 0;
   virtual void SetGpuLatency(base::TimeDelta gpu_latency) = 0;
+#if defined(USE_NEVA_APPRUNTIME)
+  virtual void RenderProcessGone() = 0;
+#endif
 
  protected:
   DisplaySchedulerClient* client_ = nullptr;

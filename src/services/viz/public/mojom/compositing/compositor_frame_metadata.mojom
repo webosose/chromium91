@@ -66,4 +66,13 @@ struct CompositorFrameMetadata {
   // Transition directives represent a list of directives for animating a
   // transition between different compositor frames / render passes.
   array<CompositorFrameTransitionDirective> transition_directives;
+
+  [EnableIf=use_neva_appruntime]
+  bool is_first_contentful_paint;
+
+  [EnableIf=use_neva_appruntime]
+  bool did_reset_container_state;
+
+  [EnableIf=use_neva_appruntime]
+  bool seen_first_contentful_paint;
 };

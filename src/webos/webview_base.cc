@@ -18,6 +18,7 @@
 
 #include "base/task/post_task.h"
 #include "base/unguessable_token.h"
+#include "components/viz/common/switches.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_process_host.h"
@@ -582,10 +583,6 @@ void WebViewBase::SetBackHistoryAPIDisabled(const bool on) {
       neva_app_runtime::WebView::Attribute::BackHistoryKeyDisabled, on);
 }
 
-void WebViewBase::SetNotifyFMPDirectly(const bool on) {
-  notify_on_first_paint_ = on;
-}
-
 void WebViewBase::SetNetworkStableTimeout(const double timeout) {
   webview_->SetNetworkQuietTimeout(timeout);
 }
@@ -705,15 +702,17 @@ void WebViewBase::SetV8ExtraFlags(const std::string& v8_extra_flags) {
 }
 
 void WebViewBase::DidLoadingEnd() {
-  if (notify_on_first_paint_)
-    CallLoadVisuallyCommitted();
+  VLOG(1) << __func__;
+  CallLoadVisuallyCommitted();
 }
 
 void WebViewBase::DidFirstMeaningfulPaint() {
+  VLOG(1) << __func__;
   CallLoadVisuallyCommitted();
 }
 
 void WebViewBase::DidNonFirstMeaningfulPaint() {
+  VLOG(1) << __func__;
   CallLoadVisuallyCommitted();
 }
 

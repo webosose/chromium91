@@ -66,4 +66,10 @@ void HostDisplayClient::DidCompleteSwapWithNewSize(const gfx::Size& size) {
 }
 #endif
 
+#if defined(USE_NEVA_APPRUNTIME)
+void HostDisplayClient::DidCompleteSwap() {
+  NOTIMPLEMENTED();
+}
+#endif
+
 }  // namespace viz

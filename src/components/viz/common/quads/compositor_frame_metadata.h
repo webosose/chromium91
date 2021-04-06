@@ -169,6 +169,12 @@ class VIZ_COMMON_EXPORT CompositorFrameMetadata {
   // document transitions.
   std::vector<CompositorFrameTransitionDirective> transition_directives;
 
+#if defined(USE_NEVA_APPRUNTIME)
+  bool is_first_contentful_paint = false;
+  bool did_reset_container_state = false;
+  bool seen_first_contentful_paint = false;
+#endif
+
  private:
   CompositorFrameMetadata(const CompositorFrameMetadata& other);
   CompositorFrameMetadata operator=(const CompositorFrameMetadata&) = delete;

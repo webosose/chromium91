@@ -73,6 +73,9 @@ class CORE_EXPORT FirstMeaningfulPaintDetector
 
 #if defined(USE_NEVA_APPRUNTIME)
   void NotifyNonFirstMeaningfulPaint();
+  void ReportFirstContainerResetPaint(PaintEvent event,
+                                      WebSwapResult result,
+                                      base::TimeTicks timestamp);
 #endif
 
   bool next_paint_is_meaningful_ = false;

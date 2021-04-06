@@ -78,6 +78,9 @@ class PLATFORM_EXPORT FrameWidget {
   virtual void NotifyPresentationTimeInBlink(
       WebReportTimeCallback presentation_callback) = 0;
 
+  virtual void NotifyVizFMPSwap(bool is_first_contentful_paint,
+                                bool did_reset_container_state) {}
+
   // Enable or disable BeginMainFrameNotExpected signals from the compositor,
   // which are consumed by the blink scheduler.
   virtual void RequestBeginMainFrameNotExpected(bool request) = 0;
