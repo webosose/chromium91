@@ -128,6 +128,7 @@ class OzoneWaylandWindow : public PlatformWindow,
                        int hotspot_x,
                        int hotspot_y,
                        bool allowed_cursor_overriding) override;
+  void SetCursorVisibility(bool visible) override;
   void SetInputRegion(const std::vector<gfx::Rect>& region) override;
   void SetGroupKeyMask(ui::KeyMask key_mask) override;
   void SetKeyMask(ui::KeyMask key_mask, bool set) override;

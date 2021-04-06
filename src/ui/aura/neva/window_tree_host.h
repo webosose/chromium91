@@ -57,6 +57,7 @@ class AURA_EXPORT WindowTreeHost
                                const std::string& path,
                                int hotspot_x,
                                int hotspot_y) {}
+  virtual void SetCursorVisibility(bool visible) {}
   virtual void SetInputRegion(const std::vector<gfx::Rect>& region) {}
   virtual void SetGroupKeyMask(ui::KeyMask key_mask) {}
   virtual void SetKeyMask(ui::KeyMask key_mask, bool set) {}

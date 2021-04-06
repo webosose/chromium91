@@ -267,6 +267,10 @@ IPC_MESSAGE_CONTROL2(WaylandDisplay_CursorSet,  // NOLINT(readability/fn_size)
 IPC_MESSAGE_CONTROL1(WaylandDisplay_MoveCursor,  // NOLINT(readability/fn_size)
                      gfx::Point)
 
+IPC_MESSAGE_CONTROL1(
+    WaylandDisplay_SetCursorVisibility,  // NOLINT(readability/fn_size)
+    bool /*visibility*/)
+
 IPC_MESSAGE_CONTROL0(WaylandDisplay_ImeReset)  // NOLINT(readability/fn_size)
 
 IPC_MESSAGE_CONTROL1(WaylandDisplay_ShowInputPanel,  // NOLINT(readability/fn_size)

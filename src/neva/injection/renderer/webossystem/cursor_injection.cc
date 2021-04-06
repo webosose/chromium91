@@ -31,7 +31,9 @@ gin::ObjectTemplateBuilder CursorInjection::GetObjectTemplateBuilder(
   return gin::Wrappable<CursorInjection>::GetObjectTemplateBuilder(isolate)
       .SetProperty("visibility", &CursorInjection::GetCursorVisibility)
       .SetMethod("getCursorState", &CursorInjection::GetCursorState)
-      .SetMethod("setCursor", &CursorInjection::SetCursor);
+      .SetMethod("setCursor", &CursorInjection::SetCursor)
+      .SetMethod("hide", &CursorInjection::HideCursor)
+  ;
 }
 
 bool CursorInjection::GetCursorVisibility() {
@@ -41,6 +43,10 @@ bool CursorInjection::GetCursorVisibility() {
 std::string CursorInjection::GetCursorState() {
   return "{ \"visibility\" : " +
          delegate_->CallFunctionName("cursorVisibility") + " }";
+}
+
+bool CursorInjection::HideCursor() {
+  return delegate_->HideCursor();
 }
 
 bool CursorInjection::SetCursor(gin::Arguments* args) {

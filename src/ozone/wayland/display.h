@@ -306,6 +306,7 @@ class WaylandDisplay : public ui::SurfaceFactoryOzone,
   void SetCursorBitmap(const std::vector<SkBitmap>& bitmaps,
                        const gfx::Point& location);
   void MoveCursor(const gfx::Point& location);
+  void SetCursorVisibility(bool visible);
   void ResetIme();
   void ImeCaretBoundsChanged(gfx::Rect rect);
   void ShowInputPanel(unsigned handle);

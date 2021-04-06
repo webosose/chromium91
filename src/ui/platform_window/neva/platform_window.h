@@ -1,4 +1,4 @@
-// Copyright 2017-2020 LG Electronics, Inc.
+// Copyright 2017 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -103,6 +103,7 @@ class PlatformWindow
                                int hotspot_x,
                                int hotspot_y,
                                bool allowed_cursor_overriding) {}
+  virtual void SetCursorVisibility(bool visible) {}
   virtual void ResetCustomCursor() {}
   virtual void CreateGroup(const ui::WindowGroupConfiguration& config) {}
   virtual void AttachToGroup(const std::string& name,

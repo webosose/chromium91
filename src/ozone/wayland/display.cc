@@ -628,6 +628,15 @@ void WaylandDisplay::MoveCursor(const gfx::Point& location) {
   primary_seat_->MoveCursor(location);
 }
 
+void WaylandDisplay::SetCursorVisibility(bool visible) {
+#if defined(OS_WEBOS)
+  if (pointer_visible_ != visible) {
+    wl_webos_input_manager_set_cursor_visibility(webos_input_manager_,
+                                                 visible ? 1 : 0);
+  }
+#endif
+}
+
 void WaylandDisplay::ResetIme() {
   primary_seat_->ResetIme();
 }
@@ -1119,6 +1128,7 @@ bool WaylandDisplay::OnMessageReceived(const IPC::Message& message) {
   IPC_MESSAGE_HANDLER(WaylandDisplay_SubRegion, SubRegion)
   IPC_MESSAGE_HANDLER(WaylandDisplay_CursorSet, SetCursorBitmap)
   IPC_MESSAGE_HANDLER(WaylandDisplay_MoveCursor, MoveCursor)
+  IPC_MESSAGE_HANDLER(WaylandDisplay_SetCursorVisibility, SetCursorVisibility)
   IPC_MESSAGE_HANDLER(WaylandDisplay_ImeReset, ResetIme)
   IPC_MESSAGE_HANDLER(WaylandDisplay_ShowInputPanel, ShowInputPanel)
   IPC_MESSAGE_HANDLER(WaylandDisplay_HideInputPanel, HideInputPanel)

@@ -39,6 +39,7 @@ class CursorInjection : public gin::Wrappable<CursorInjection> {
    public:
     virtual std::string CallFunctionName(const std::string& name) = 0;
     virtual bool SetCursor(gin::Arguments* args) = 0;
+    virtual bool HideCursor() = 0;
   };
 
   explicit CursorInjection(Delegate* delegate);
@@ -53,6 +54,7 @@ class CursorInjection : public gin::Wrappable<CursorInjection> {
 
   bool GetCursorVisibility();
   std::string GetCursorState();
+  bool HideCursor();
   bool SetCursor(gin::Arguments* args);
 
   Delegate* delegate_;

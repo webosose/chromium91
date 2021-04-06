@@ -49,6 +49,7 @@ const char kFolderPath[] = "folderPath";
 const char kGetResource[] = "getResource";
 const char kHighContrast[] = "highContrast";
 const char kHide[] = "hide";
+const char kHideCursor[] = "hideCursor";
 const char kIdentifier[] = "identifier";
 const char kInitialize[] = "initialize";
 const char kIsActivated[] = "highContrast";
@@ -100,6 +101,7 @@ std::set<std::string> unhandled = {
     kFocusOwner,
     kHighContrast,
     kHide,
+    kHideCursor,
     kIsActivated,
     kIsKeyboardVisible,
     kKeepAlive,

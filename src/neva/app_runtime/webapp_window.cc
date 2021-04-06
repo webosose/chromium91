@@ -681,6 +681,13 @@ void WebAppWindow::SetCustomCursor(CustomCursorType type,
   host_->AsWindowTreeHost()->SetCustomCursor(type, path, hotspot_x, hotspot_y);
 }
 
+void WebAppWindow::SetCursorVisibility(bool visible) {
+  if (!host_)
+    return;
+
+  host_->AsWindowTreeHost()->SetCursorVisibility(visible);
+}
+
 void WebAppWindow::SetWindowTitle(const std::u16string& title) {
   title_ = title;
   if (widget_)

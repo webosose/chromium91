@@ -1,4 +1,4 @@
-// Copyright 2016-2018 LG Electronics, Inc.
+// Copyright 2016 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -66,6 +66,7 @@ class WEBOS_EXPORT WebAppWindowBase : public WebAppWindowDelegate,
                        const std::string& path,
                        int hotspot_x,
                        int hotspot_y);
+  void SetCursorVisibility(bool visible);
   int DisplayWidth() const;
   int DisplayHeight() const;
 

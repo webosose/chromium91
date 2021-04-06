@@ -98,6 +98,7 @@ class WebAppWindow : public views::NativeEventDelegate,
                        const std::string& path,
                        int hotspot_x,
                        int hotspot_y);
+  void SetCursorVisibility(bool visible);
   void SetWindowProperty(const std::string& name, const std::string& value);
   void SetLocationHint(gfx::LocationHint value);
   void Show();

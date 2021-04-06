@@ -176,6 +176,7 @@ class VIEWS_EXPORT DesktopWindowTreeHostOzone
                        const std::string& path,
                        int hotspot_x,
                        int hotspot_y) override;
+  void SetCursorVisibility(bool visible) override;
   void SetInputRegion(const std::vector<gfx::Rect>& region) override;
   void SetGroupKeyMask(ui::KeyMask key_mask) override;
   void SetKeyMask(ui::KeyMask key_mask, bool set) override;

@@ -616,6 +616,12 @@ void OzoneWaylandWindow::SetCustomCursor(neva_app_runtime::CustomCursorType type
 #endif
 }
 
+void OzoneWaylandWindow::SetCursorVisibility(bool visible) {
+#if defined(OS_WEBOS)
+  sender_->Send(new WaylandDisplay_SetCursorVisibility(visible));
+#endif
+}
+
 void OzoneWaylandWindow::SetCustomCursorFromBitmap(
     neva_app_runtime::CustomCursorType type,
     SkBitmap* cursor_image,

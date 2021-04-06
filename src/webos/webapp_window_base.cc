@@ -161,6 +161,10 @@ void WebAppWindowBase::SetCustomCursor(CustomCursorType type,
                                   hotspot_x, hotspot_y);
 }
 
+void WebAppWindowBase::SetCursorVisibility(bool visible) {
+  webapp_window_->SetCursorVisibility(visible);
+}
+
 int WebAppWindowBase::DisplayWidth() const {
   if (display::Screen::GetScreen()->GetNumDisplays() > 0)
     return display::Screen::GetScreen()->GetPrimaryDisplay().bounds().width();

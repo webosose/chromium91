@@ -1236,6 +1236,10 @@ void DesktopWindowTreeHostOzone::SetCustomCursor(
   platform_window_->SetCustomCursor(type, path, hotspot_x, hotspot_y, true);
 }
 
+void DesktopWindowTreeHostOzone::SetCursorVisibility(bool visible) {
+  platform_window_->SetCursorVisibility(visible);
+}
+
 void DesktopWindowTreeHostOzone::SetWindowProperty(const std::string& name,
                                                    const std::string& value) {
   platform_window_->SetWindowProperty(name, value);

@@ -1,4 +1,4 @@
-// Copyright 2014-2019 LG Electronics, Inc.
+// Copyright 2014 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -217,6 +217,11 @@ bool WebOSSystemInjection::SetCursor(gin::Arguments* args) {
   std::vector<std::string> arguments = { cursor_arg, x, y };
   SendCommand("setCursor", arguments);
 
+  return true;
+}
+
+bool WebOSSystemInjection::HideCursor() {
+  SendCommand("hideCursor");
   return true;
 }
 
