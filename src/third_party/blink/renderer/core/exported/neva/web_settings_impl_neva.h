@@ -32,6 +32,10 @@ class WebSettingsImplNeva : public WebSettings {
 
   bool KeepAliveWebApp() override { return settings_->KeepAliveWebApp(); }
 
+  void SetFirstFramePolicy(FirstFramePolicy policy) override {
+    settings_->SetFirstFramePolicy(policy);
+  }
+
  private:
   Settings* settings_;
 };

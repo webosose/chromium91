@@ -14,6 +14,17 @@
 
 namespace mojo {
 
+#if defined(USE_NEVA_APPRUNTIME)
+template <>
+struct BLINK_COMMON_EXPORT
+    EnumTraits<blink::mojom::FirstFramePolicy, blink::FirstFramePolicy> {
+  static blink::mojom::FirstFramePolicy ToMojom(blink::FirstFramePolicy policy);
+
+  static bool FromMojom(blink::mojom::FirstFramePolicy input,
+                        blink::FirstFramePolicy* out);
+};
+#endif
+
 template <>
 struct BLINK_COMMON_EXPORT StructTraits<blink::mojom::WebPreferencesDataView,
                                         blink::web_pref::WebPreferences> {
@@ -710,6 +721,11 @@ struct BLINK_COMMON_EXPORT StructTraits<blink::mojom::WebPreferencesDataView,
   static bool keep_alive_webapp(
       const blink::web_pref::WebPreferences& r) {
     return r.keep_alive_webapp;
+  }
+
+  static blink::FirstFramePolicy first_frame_policy(
+      const blink::web_pref::WebPreferences& r) {
+    return r.first_frame_policy;
   }
 #endif
 

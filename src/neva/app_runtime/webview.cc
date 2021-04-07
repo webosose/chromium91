@@ -1417,6 +1417,8 @@ void WebView::OverrideWebkitPrefs(blink::web_pref::WebPreferences* prefs) {
   // Sync scale factor
   prefs->default_minimum_page_scale_factor =
       web_preferences_->default_minimum_page_scale_factor;
+
+  prefs->first_frame_policy = web_preferences_->first_frame_policy;
 }
 
 bool WebView::DecidePolicyForResponse(bool is_main_frame,
@@ -1442,6 +1444,37 @@ void WebView::SetV8ExtraFlags(const std::string& v8_extra_flags) {
 void WebView::SetUseNativeScroll(bool use_native_scroll) {
   GetAppRuntimeContentBrowserClient()->SetUseNativeScroll(
       web_contents_->GetMainFrame()->GetProcess()->GetID(), use_native_scroll);
+}
+
+void WebView::SetFirstFramePolicy(FirstFramePolicy policy) {
+  blink::FirstFramePolicy blink_policy;
+  switch (policy) {
+    case FirstFramePolicy::kImmediate:
+      blink_policy = blink::FirstFramePolicy::kImmediate;
+      break;
+    case FirstFramePolicy::kContents:
+      blink_policy = blink::FirstFramePolicy::kContents;
+      break;
+    default:
+      blink_policy = blink::FirstFramePolicy::kContents;
+      break;
+  }
+
+  if (web_preferences_->first_frame_policy == blink_policy)
+    return;
+
+  web_preferences_->first_frame_policy = blink_policy;
+  web_contents_->SetWebPreferences(*web_preferences_);
+}
+
+WebView::FirstFramePolicy WebView::GetFirstFramePolicy() const {
+  switch (web_preferences_->first_frame_policy) {
+    case blink::FirstFramePolicy::kImmediate:
+      return FirstFramePolicy::kImmediate;
+    case blink::FirstFramePolicy::kContents:
+    default:
+      return FirstFramePolicy::kContents;
+  }
 }
 
 void WebView::ActivateRendererCompositor() {

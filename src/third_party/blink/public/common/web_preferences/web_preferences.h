@@ -19,6 +19,10 @@
 #include "third_party/blink/public/mojom/webpreferences/web_preferences.mojom-shared.h"
 #include "url/gurl.h"
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "third_party/blink/public/common/page/first_frame_policy.h"
+#endif
+
 namespace blink {
 
 class WebView;
@@ -291,6 +295,10 @@ struct BLINK_COMMON_EXPORT WebPreferences {
 
 #if defined(USE_NEVA_APPRUNTIME)
   bool keep_alive_webapp;
+
+  // Policy for when to display the first frame when launching a webapp.
+  blink::FirstFramePolicy first_frame_policy =
+      blink::FirstFramePolicy::kContents;
 #endif
 
 #if defined(USE_NEVA_MEDIA)

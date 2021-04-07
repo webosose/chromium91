@@ -17,6 +17,7 @@
 #ifndef THIRD_PARTY_BLINK_RENDERER_CORE_FRAME_NEVA_SETTINGS_NEVA_H_
 #define THIRD_PARTY_BLINK_RENDERER_CORE_FRAME_NEVA_SETTINGS_NEVA_H_
 
+#include "third_party/blink/public/common/page/first_frame_policy.h"
 #include "third_party/blink/renderer/core/frame/settings_delegate.h"
 
 namespace blink {
@@ -27,9 +28,14 @@ class SettingsNeva {
 
   void SetKeepAliveWebApp(bool keep_alive) { keep_alive_web_app_ = keep_alive; }
   bool KeepAliveWebApp() const { return keep_alive_web_app_; }
+  void SetFirstFramePolicy(FirstFramePolicy policy) {
+    first_frame_policy_ = policy;
+  }
+  FirstFramePolicy GetFirstFramePolicy() { return first_frame_policy_; }
 
  private:
   bool keep_alive_web_app_ : 1;
+  FirstFramePolicy first_frame_policy_ = FirstFramePolicy::kContents;
 };
 
 }  // namespace blink

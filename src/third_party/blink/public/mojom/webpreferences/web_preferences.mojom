@@ -65,6 +65,13 @@ enum AutoplayPolicy {
   kDocumentUserActivationRequired,
 };
 
+// Policy for when to display the first frame when launching a webapp.
+// Should match the class in first_frame_policy.h.
+enum FirstFramePolicy {
+  kImmediate,
+  kContents,
+};
+
 enum EffectiveConnectionType {
   // Effective connection type reported when the network quality is unknown.
   kEffectiveConnectionUnknownType,
@@ -386,6 +393,10 @@ struct WebPreferences {
 
   ///@name USE_NEVA_APPRUNTIME
   ///@{
+  // Policy for when to display the first frame when launching a webapp.
+  [EnableIf=neva_appruntime]
+  FirstFramePolicy first_frame_policy;
+
   // Keep alive webapp.
   [EnableIf=neva_appruntime]
   bool keep_alive_webapp;

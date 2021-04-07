@@ -1640,6 +1640,9 @@ void WebView::ApplyWebPreferences(const web_pref::WebPreferences& prefs,
   RuntimeEnabledFeatures::SetAcceleratedSmallCanvasesEnabled(
       !prefs.disable_accelerated_small_canvases);
 #endif  // defined(OS_ANDROID)
+#if defined(USE_NEVA_APPRUNTIME)
+  settings->SetFirstFramePolicy(prefs.first_frame_policy);
+#endif  // defined(USE_NEVA_APPRUNTIME)
   settings->SetForceDarkModeEnabled(prefs.force_dark_mode_enabled);
 
 #if defined(USE_NEVA_APPRUNTIME)

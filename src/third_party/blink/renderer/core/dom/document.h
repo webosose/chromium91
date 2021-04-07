@@ -1515,7 +1515,7 @@ class CORE_EXPORT Document : public ContainerNode,
   bool IsSlotAssignmentOrLegacyDistributionDirty() const;
   bool AddDeferredBackgroundImage();
   void RemoveDeferredBackgroundImage();
-  void SetFirstContentfulPaintHappened(bool);
+  void SetFirstFramePolicyAccepted(bool);
 
 #if DCHECK_IS_ON()
   unsigned& SlotAssignmentRecalcForbiddenRecursionDepth() {
@@ -2255,6 +2255,8 @@ class CORE_EXPORT Document : public ContainerNode,
   // #includes, add them to blink::DocumentData instead.
 
   bool accessibility_alert_done_ = false;
+
+  bool first_frame_policy_accepted_ = false;
 };
 
 extern template class CORE_EXTERN_TEMPLATE_EXPORT Supplement<Document>;

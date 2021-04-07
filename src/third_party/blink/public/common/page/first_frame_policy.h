@@ -13,20 +13,14 @@
 // limitations under the License.
 //
 // SPDX-License-Identifier: Apache-2.0
-#ifndef THIRD_PARTY_BLINK_PUBLIC_WEB_NEVA_WEB_SETTINGS_NEVA_H_
-#define THIRD_PARTY_BLINK_PUBLIC_WEB_NEVA_WEB_SETTINGS_NEVA_H_
 
-#include "third_party/blink/public/common/page/first_frame_policy.h"
+#ifndef THIRD_PARTY_BLINK_PUBLIC_COMMON_PAGE_FIRST_FRAME_POLICY_H_
+#define THIRD_PARTY_BLINK_PUBLIC_COMMON_PAGE_FIRST_FRAME_POLICY_H_
 
 namespace blink {
 
-class WebSettingsNeva {
- public:
-  virtual void SetKeepAliveWebApp(bool) = 0;
-  virtual bool KeepAliveWebApp() = 0;
-  virtual void SetFirstFramePolicy(FirstFramePolicy) = 0;
-};
+enum class FirstFramePolicy { kImmediate, kContents, kMaxValue = kContents };
 
 }  // namespace blink
 
-#endif  // THIRD_PARTY_BLINK_PUBLIC_WEB_NEVA_WEB_SETTINGS_NEVA_H_
+#endif  // THIRD_PARTY_BLINK_PUBLIC_COMMON_PAGE_FIRST_FRAME_POLICY_H_

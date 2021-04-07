@@ -30,6 +30,11 @@
 #include "third_party/blink/renderer/platform/wtf/cross_thread_functional.h"
 #include "third_party/blink/renderer/platform/wtf/wtf.h"
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "third_party/blink/public/common/page/first_frame_policy.h"
+#include "third_party/blink/renderer/core/frame/settings.h"
+#endif
+
 namespace blink {
 
 namespace {
@@ -284,11 +289,22 @@ void PaintTiming::RegisterNotifyPresentationTime(PaintEvent event,
     return;
 
 #if defined(USE_NEVA_APPRUNTIME)
-  bool is_fcp = (event == PaintEvent::kFirstContentfulPaint);
+  bool is_fcp = false;
   bool is_container_reset = (event == PaintEvent::kFirstContainerResetPaint);
+  switch (GetFrame()->GetSettings()->GetFirstFramePolicy()) {
+    case FirstFramePolicy::kImmediate:
+      is_fcp = (event == PaintEvent::kFirstPaint);
+      break;
+    case FirstFramePolicy::kContents:
+      is_fcp = (event == PaintEvent::kFirstContentfulPaint);
+      break;
+    default:
+      is_fcp = (event == PaintEvent::kFirstContentfulPaint);
+      break;
+  }
   if (is_fcp || is_container_reset) {
     if (GetFrame()->GetDocument())
-      GetFrame()->GetDocument()->SetFirstContentfulPaintHappened(is_fcp);
+      GetFrame()->GetDocument()->SetFirstFramePolicyAccepted(is_fcp);
     GetFrame()->GetPage()->GetChromeClient().NotifyVizFMPSwap(
         *GetFrame(), is_fcp, is_container_reset);
   }

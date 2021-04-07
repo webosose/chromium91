@@ -12,6 +12,38 @@
 
 namespace mojo {
 
+#if defined(USE_NEVA_APPRUNTIME)
+// static
+blink::mojom::FirstFramePolicy
+EnumTraits<blink::mojom::FirstFramePolicy, blink::FirstFramePolicy>::ToMojom(
+    blink::FirstFramePolicy policy) {
+  switch (policy) {
+    case blink::FirstFramePolicy::kImmediate:
+      return blink::mojom::FirstFramePolicy::kImmediate;
+    case blink::FirstFramePolicy::kContents:
+      return blink::mojom::FirstFramePolicy::kContents;
+  }
+  NOTREACHED();
+  return blink::mojom::FirstFramePolicy::kContents;
+}
+
+// static
+bool EnumTraits<blink::mojom::FirstFramePolicy, blink::FirstFramePolicy>::
+    FromMojom(blink::mojom::FirstFramePolicy input,
+              blink::FirstFramePolicy* out) {
+  switch (input) {
+    case blink::mojom::FirstFramePolicy::kImmediate:
+      *out = blink::FirstFramePolicy::kImmediate;
+      return true;
+    case blink::mojom::FirstFramePolicy::kContents:
+      *out = blink::FirstFramePolicy::kContents;
+      return true;
+  }
+  NOTREACHED();
+  return false;
+}
+#endif
+
 // static
 bool StructTraits<blink::mojom::WebPreferencesDataView,
                   blink::web_pref::WebPreferences>::
@@ -51,6 +83,9 @@ bool StructTraits<blink::mojom::WebPreferencesDataView,
       !data.ReadWebAppScope(&out->web_app_scope)
 #if defined(OS_ANDROID)
       || !data.ReadDefaultVideoPosterUrl(&out->default_video_poster_url)
+#endif
+#if defined(USE_NEVA_APPRUNTIME)
+      || !data.ReadFirstFramePolicy(&out->first_frame_policy)
 #endif
   )
     return false;

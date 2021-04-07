@@ -7663,7 +7663,7 @@ bool Document::HaveRenderBlockingResourcesLoaded() const {
   return HaveImportsLoaded() &&
          style_engine_->HaveRenderBlockingStylesheetsLoaded() &&
          !font_preload_manager_->HasPendingRenderBlockingFonts() &&
-         (first_contentful_paint_happened_ ||
+         (first_frame_policy_accepted_ ||
           deferred_background_image_count_ == 0);
 }
 
@@ -8507,13 +8507,13 @@ void Document::RemoveDeferredBackgroundImage() {
     BeginLifecycleUpdatesIfRenderingReady();
 }
 
-void Document::SetFirstContentfulPaintHappened(bool happened) {
+void Document::SetFirstFramePolicyAccepted(bool accepted) {
   if (!IsMainThread() || !IsInMainFrame())
     return;
-  if (happened == first_contentful_paint_happened_)
+  if (accepted == first_frame_policy_accepted_)
     return;
-  first_contentful_paint_happened_ = happened;
-  if (happened) {
+  first_frame_policy_accepted_ = accepted;
+  if (accepted) {
     BeginLifecycleUpdatesIfRenderingReady();
   }
 }

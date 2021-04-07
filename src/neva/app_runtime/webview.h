@@ -85,6 +85,8 @@ class WebView : public content::WebContentsDelegate,
     FantasyFont
   };
 
+  enum class FirstFramePolicy { kImmediate, kContents };
+
   static void SetFileAccessBlocked(bool blocked);
 
   WebView(int width, int height, WebViewProfile* profile = nullptr);
@@ -181,6 +183,8 @@ class WebView : public content::WebContentsDelegate,
   void SetV8SnapshotPath(const std::string& v8_snapshot_path);
   void SetV8ExtraFlags(const std::string& v8_extra_flags);
   void SetUseNativeScroll(bool use_native_scroll);
+  void SetFirstFramePolicy(FirstFramePolicy policy);
+  FirstFramePolicy GetFirstFramePolicy() const;
 
   // content::WebContentsDelegate implementation
   content::WebContents* OpenURLFromTab(

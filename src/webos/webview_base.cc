@@ -711,6 +711,13 @@ void WebViewBase::DidLoadingEnd() {
   CallLoadVisuallyCommitted();
 }
 
+void WebViewBase::DidFirstPaint() {
+  VLOG(1) << __func__;
+  if (webview_->GetFirstFramePolicy() ==
+      neva_app_runtime::WebView::FirstFramePolicy::kImmediate)
+    CallLoadVisuallyCommitted();
+}
+
 void WebViewBase::DidFirstMeaningfulPaint() {
   VLOG(1) << __func__;
   CallLoadVisuallyCommitted();
@@ -735,6 +742,25 @@ void WebViewBase::CallLoadVisuallyCommitted() {
 
 void WebViewBase::SetUseNativeScroll(bool use_native_scroll) {
   webview_->SetUseNativeScroll(use_native_scroll);
+}
+
+void WebViewBase::SetFirstFramePolicy(FirstFramePolicy policy) {
+  neva_app_runtime::WebView::FirstFramePolicy appruntime_policy;
+  switch (policy) {
+    case FirstFramePolicy::kImmediate:
+      appruntime_policy =
+          neva_app_runtime::WebView::FirstFramePolicy::kImmediate;
+      break;
+    case FirstFramePolicy::kContents:
+      appruntime_policy =
+          neva_app_runtime::WebView::FirstFramePolicy::kContents;
+      break;
+    default:
+      appruntime_policy =
+          neva_app_runtime::WebView::FirstFramePolicy::kImmediate;
+      break;
+  }
+  webview_->SetFirstFramePolicy(appruntime_policy);
 }
 
 ///@name webOS/Lite stubs for AGL/jellyfish 10.0.1

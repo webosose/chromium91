@@ -79,6 +79,11 @@ class WEBOS_EXPORT WebViewBase
     MEMORY_PRESSURE_CRITICAL = 2
   };
 
+  enum class FirstFramePolicy {
+    kImmediate,
+    kContents,
+  };
+
   struct ProxySettings {
     bool enabled = false;
     std::string mode;
@@ -235,8 +240,10 @@ class WEBOS_EXPORT WebViewBase
   void SetV8SnapshotPath(const std::string& v8_snapshot_path);
   void SetV8ExtraFlags(const std::string& v8_extra_flags);
   void SetUseNativeScroll(bool use_native_scroll);
+  void SetFirstFramePolicy(FirstFramePolicy policy);
 
   // WebViewDelegate
+  void DidFirstPaint() override;
   void DidLoadingEnd() override;
   void DidFirstMeaningfulPaint() override;
   void DidNonFirstMeaningfulPaint() override;
