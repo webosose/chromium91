@@ -461,14 +461,7 @@ bool WebAppWindow::CanShiftContent(int shift_height) {
 }
 
 void WebAppWindow::InputPanelVisibilityChanged(bool visible) {
-  if (visible) {
-    web_app_scroll_observer_.reset(new WebAppScrollObserver(this));
-    CheckShiftContent();
-  } else {
-    web_app_scroll_observer_.reset();
-    RestoreContentByY();
-  }
-
+  (visible) ? CheckShiftContent() : RestoreContentByY();
   input_panel_visible_ = visible;
 }
 
@@ -534,6 +527,7 @@ void WebAppWindow::ShiftContentByY(int shift_height) {
   if (!is_shifted_content_) {
     native_view_bounds_for_restoring_ = bounds;
     is_shifted_content_ = true;
+    web_app_scroll_observer_.reset(new WebAppScrollObserver(this));
   }
 
   if (bounds.y()) {
@@ -559,6 +553,7 @@ void WebAppWindow::RestoreContentByY() {
     shift_y_ = native_view_bounds_for_restoring_.y();
     UpdateViewportYCallback();
     is_shifted_content_ = false;
+    web_app_scroll_observer_.reset();
   }
 }
 
