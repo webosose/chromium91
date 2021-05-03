@@ -18,6 +18,8 @@
 #ifndef OZONE_PLATFORM_OZONE_WAYLAND_WINDOW_H_
 #define OZONE_PLATFORM_OZONE_WAYLAND_WINDOW_H_
 
+#include <memory>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -33,6 +35,10 @@
 #include "ui/views/widget/desktop_aura/neva/ui_constants.h"
 
 class SkBitmap;
+
+namespace IPC {
+class Message;
+}
 
 namespace ui {
 
@@ -175,6 +181,7 @@ class OzoneWaylandWindow : public PlatformWindow,
   neva_app_runtime::CustomCursorType cursor_type_ =
       neva_app_runtime::CustomCursorType::kNotUse;
   bool allowed_cursor_overriding_ = false;
+  std::queue<std::unique_ptr<IPC::Message>> deferred_messages_;
   base::WeakPtrFactory<OzoneWaylandWindow> weak_factory_;
 };
 

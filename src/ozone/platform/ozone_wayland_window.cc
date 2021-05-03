@@ -391,6 +391,11 @@ void OzoneWaylandWindow::DeferredSendingToGpu() {
   AddRegion();
   if (bitmap_)
     SetCursor();
+
+  while (!deferred_messages_.empty()) {
+    sender_->Send(deferred_messages_.front().release());
+    deferred_messages_.pop();
+  }
 }
 
 void OzoneWaylandWindow::OnChannelDestroyed() {
@@ -500,7 +505,11 @@ void OzoneWaylandWindow::SetWindowProperty(const std::string& name,
                                                 this);
   }
 
-  sender_->Send(new WaylandDisplay_SetWindowProperty(handle_, name, value));
+  if (!sender_->Send(
+          new WaylandDisplay_SetWindowProperty(handle_, name, value))) {
+    deferred_messages_.push(std::make_unique<WaylandDisplay_SetWindowProperty>(
+        handle_, name, value));
+  }
 }
 
 void OzoneWaylandWindow::ResetCustomCursor() {
