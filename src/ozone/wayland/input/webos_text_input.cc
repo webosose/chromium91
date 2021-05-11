@@ -168,7 +168,10 @@ void WaylandTextInput::ShowInputPanel(wl_seat* input_seat, unsigned handle) {
 
   if (active_window) {
     if (activated_) {
-      if (state_ != InputPanelShown)
+      if (state_ == InputPanelShown)
+        WaylandDisplay::GetInstance()->InputPanelStateChanged(
+            handle, webos::InputPanelState::INPUT_PANEL_SHOWN);
+      else
         text_model_show_input_panel(text_model_);
     } else {
       ActivateTextModel(active_window);
