@@ -75,6 +75,10 @@ void PaintLayerCompositor::CleanUp() {
     SetOwnerNeedsCompositingInputsUpdate();
 }
 
+void PaintLayerCompositor::DidLayout() {
+  RootLayer()->SetNeedsCompositingInputsUpdate();
+}
+
 bool PaintLayerCompositor::InCompositingMode() const {
   // FIXME: This should assert that lifecycle is >= CompositingClean since
   // the last step of updateIfNeeded can set this bit to false.

@@ -74,6 +74,10 @@ class CORE_EXPORT PaintLayerCompositor {
   // pointers out of this object become invalid.
   void CleanUp();
 
+  // Called after layout is performed on the LocalFrame holding the LayoutView,
+  // during the document lifecycle update.
+  void DidLayout();
+
   void UpdateInputsIfNeededRecursive(
       DocumentLifecycle::LifecycleState target_state);
   void UpdateAssignmentsIfNeededRecursive(

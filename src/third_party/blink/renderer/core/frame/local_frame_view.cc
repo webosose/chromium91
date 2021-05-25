@@ -990,6 +990,8 @@ void LocalFrameView::UpdateLayout() {
   DocumentLifecycle::Scope lifecycle_scope(Lifecycle(),
                                            DocumentLifecycle::kLayoutClean);
 
+  GetLayoutView()->Compositor()->DidLayout();
+
   nested_layout_count_--;
   if (nested_layout_count_)
     return;
