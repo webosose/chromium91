@@ -53,7 +53,7 @@ std::string LunaServiceClient::GetServiceURI(URIType type,
       {URIType::AUDIO, kURIAudio},
       {URIType::SETTING, kURISetting},
       {URIType::MEDIACONTROLLER, kURIMediaController}};
-  auto luna_service_uri = [&kURIMap, &type]() {
+  auto luna_service_uri = [&type]() {
     std::map<URIType, std::string>::iterator it;
     it = kURIMap.find(type);
     if (it != kURIMap.end())
