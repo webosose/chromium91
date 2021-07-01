@@ -48,14 +48,14 @@ void InputMethodAuraLinuxNeva::OnDeleteRange(int32_t index, uint32_t length) {
           surround_range.set_end(
               std::min(range.GetMax(), composition_range.GetMin()));
         }
-        range.set_start(surround_range.GetMax() + index);
-        range.set_end(surround_range.start() + length);
+        range.set_start(surround_range.start() + index);
+        range.set_end(surround_range.start() + index + length);
       }
     } else {
       res = client->GetTextRange(&range);
     }
 
-    if (res)
+    if (res && range.IsValid())
       client->DeleteRange(range);
   }
 }
