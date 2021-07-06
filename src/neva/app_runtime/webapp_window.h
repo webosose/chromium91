@@ -159,9 +159,7 @@ class WebAppWindow : public views::NativeEventDelegate,
   void SetDeferredDeleting(bool deferred_deleting) {
     deferred_deleting_ = deferred_deleting;
   }
-  int input_panel_height() {
-    return input_panel_rect_.height() / scale_factor_;
-  }
+  int input_panel_height() { return input_panel_rect_.height(); }
 
  private:
   friend WebAppScrollObserver;
@@ -169,9 +167,10 @@ class WebAppWindow : public views::NativeEventDelegate,
   static views::Widget* CreateWebAppWindow(const WebAppWindowBase::CreateParams& create_params);
   void InitWindow();
   void ComputeScaleFactor();
-  int CalculateTextInputOverlappedHeight(const gfx::Rect& rect);
+  int CalculateTextInputOverlappedHeight();
   bool CanShiftContent(int shift_height);
   void CheckShiftContent();
+  gfx::Rect GetTextInputBounds();
   void ShiftContentByY(int shift_height);
   void UpdateViewportYCallback();
   void RestoreContentByY();

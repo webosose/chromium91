@@ -444,36 +444,34 @@ void WebAppWindow::CursorVisibilityChanged(bool visible) {
     delegate_->CursorVisibilityChanged(visible);
 }
 
-int WebAppWindow::CalculateTextInputOverlappedHeight(const gfx::Rect& rect) {
+int WebAppWindow::CalculateTextInputOverlappedHeight() {
   int shift_height = 0;
-  if (!host_)
+
+  gfx::Rect input_bounds = GetTextInputBounds();
+  if (input_bounds.IsEmpty())
     return shift_height;
 
-  ui::InputMethod* ime = host_->AsWindowTreeHost()->GetInputMethod();
-  if (!ime || !ime->GetTextInputClient())
+  if (is_shifted_content_) {
+    gfx::Rect webcon_bounds = web_contents_->GetContentNativeView()->bounds();
+    input_bounds.set_y(input_bounds.y() - webcon_bounds.y());
+    if (input_bounds.Intersects(input_panel_rect_)) {
+      int bottom = std::min(input_bounds.bottom(), rect_.bottom());
+      shift_height = bottom - input_panel_rect_.y() + webcon_bounds.y();
+    }
     return shift_height;
+  }
 
-  gfx::Rect input_bounds = ime->GetTextInputClient()->GetTextInputBounds();
-  gfx::Rect scaled_rect =
-      gfx::Rect(rect.x() / scale_factor_, rect.y() / scale_factor_,
-                rect.width() / scale_factor_, rect.height() / scale_factor_);
-
-  if (input_bounds.Intersects(scaled_rect))
-    shift_height = input_bounds.bottom() - scaled_rect.y();
+  if (input_bounds.Intersects(input_panel_rect_)) {
+    int bottom = std::min(input_bounds.bottom(), rect_.bottom());
+    shift_height = bottom - input_panel_rect_.y();
+    return shift_height;
+  }
 
   return shift_height;
 }
 
 bool WebAppWindow::CanShiftContent(int shift_height) {
-  if (!host_)
-    return false;
-
-  ui::InputMethod* ime = host_->AsWindowTreeHost()->GetInputMethod();
-  if (!ime || !ime->GetTextInputClient())
-    return false;
-
-  gfx::Rect input_bounds = ime->GetTextInputClient()->GetTextInputBounds();
-
+  gfx::Rect input_bounds = GetTextInputBounds();
   return input_bounds.y() - rect_.y() >= shift_height;
 }
 
@@ -494,27 +492,54 @@ void WebAppWindow::InputPanelRectChanged(int32_t x,
                                          uint32_t width,
                                          uint32_t height) {
   input_panel_rect_.SetRect(x, y, width, height);
-  if (input_panel_visible_)
+  if (input_panel_visible_) {
+    input_panel_rect_.SetRect(x / scale_factor_,
+                              (y - kKeyboardHeightMargin) / scale_factor_,
+                              width / scale_factor_,
+                              (height + kKeyboardHeightMargin) / scale_factor_);
     CheckShiftContent();
-}
-
-void WebAppWindow::CheckShiftContent() {
-  if (input_panel_rect_.height()) {
-    gfx::Rect panel_rect_margin = gfx::Rect(
-        input_panel_rect_.x(), input_panel_rect_.y() - kKeyboardHeightMargin,
-        input_panel_rect_.width(),
-        input_panel_rect_.height() + kKeyboardHeightMargin);
-    int shift_height = CalculateTextInputOverlappedHeight(panel_rect_margin);
-    if (shift_height != 0 && CanShiftContent(shift_height))
-        ShiftContentByY(shift_height);
   }
 }
 
-void WebAppWindow::ShiftContentByY(int shift_height) {
+void WebAppWindow::CheckShiftContent() {
   if (!web_contents_ || web_contents_->IsBeingDestroyed() ||
       !web_contents_->GetContentNativeView())
     return;
 
+  int shift_height = CalculateTextInputOverlappedHeight();
+  if (shift_height != 0 && CanShiftContent(shift_height)) {
+    ShiftContentByY(shift_height);
+    return;
+  }
+
+  if (!is_shifted_content_)
+    return;
+
+  gfx::Rect input_bounds = GetTextInputBounds();
+  if (input_bounds.IsEmpty()) {
+    RestoreContentByY();
+    return;
+  }
+
+  gfx::Rect webcon_bounds = web_contents_->GetContentNativeView()->bounds();
+  input_bounds.set_y(input_bounds.y() - webcon_bounds.y());
+
+  if (!input_bounds.Intersects(input_panel_rect_))
+    RestoreContentByY();
+}
+
+gfx::Rect WebAppWindow::GetTextInputBounds() {
+  if (!host_)
+    return gfx::Rect();
+
+  ui::InputMethod* ime = host_->AsWindowTreeHost()->GetInputMethod();
+  if (!ime || !ime->GetTextInputClient())
+    return gfx::Rect();
+
+  return ime->GetTextInputClient()->GetTextInputBounds();
+}
+
+void WebAppWindow::ShiftContentByY(int shift_height) {
   if (shift_height == 0)
     return;
 
