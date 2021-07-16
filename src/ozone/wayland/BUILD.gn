@@ -97,6 +97,8 @@ source_set("wayland") {
     "protocol/text-client-protocol.h",
     "protocol/ivi-application-protocol.c",
     "protocol/ivi-application-client-protocol.h",
+    "protocol/presentation-time-protocol.c",
+    "protocol/presentation-time-client-protocol.h",
     "protocol/xdg-shell-protocol.c",
     "protocol/xdg-shell-client-protocol.h",
     "shell/shell.cc",

@@ -72,6 +72,7 @@
 
 struct gbm_device;
 struct wl_egl_window;
+struct wp_presentation;
 #if defined(OS_WEBOS)
 struct text_model_factory;
 struct wl_webos_input_manager;
@@ -144,6 +145,7 @@ class WaylandDisplay : public ui::SurfaceFactoryOzone,
 
   wl_shm* GetShm() const { return shm_; }
   wl_compositor* GetCompositor() const { return compositor_; }
+  wp_presentation* GetPresentation() const { return presentation_; }
 #if defined(OS_WEBOS)
   text_model_factory* GetTextModelFactory() const;
   WebOSSurfaceGroupCompositor* GetGroupCompositor() const;
@@ -394,6 +396,7 @@ class WaylandDisplay : public ui::SurfaceFactoryOzone,
   wl_data_device_manager* data_device_manager_;
   WaylandShell* shell_;
   wl_shm* shm_;
+  wp_presentation* presentation_ = nullptr;
 #if defined(OS_WEBOS)
   text_model_factory* text_model_factory_;
   wl_webos_xinput_extension* webos_xinput_extension_;

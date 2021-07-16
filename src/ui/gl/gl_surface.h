@@ -13,6 +13,7 @@
 #include "base/memory/ref_counted.h"
 #include "base/memory/weak_ptr.h"
 #include "build/build_config.h"
+#include "components/viz/common/gpu/gpu_vsync_callback.h"
 #include "ui/gfx/delegated_ink_metadata.h"
 #include "ui/gfx/geometry/rect.h"
 #include "ui/gfx/geometry/rect_f.h"
@@ -325,6 +326,8 @@ class GL_EXPORT GLSurface : public base::RefCounted<GLSurface>,
   virtual bool SupportsDelegatedInk();
   virtual void SetDelegatedInkTrailStartPoint(
       std::unique_ptr<gfx::DelegatedInkMetadata> metadata) {}
+
+  virtual void SetVSyncCallback(viz::GpuVSyncCallback callback){};
 
  protected:
   virtual ~GLSurface();

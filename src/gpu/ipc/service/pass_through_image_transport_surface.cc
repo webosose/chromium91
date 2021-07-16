@@ -37,7 +37,11 @@ PassThroughImageTransportSurface::PassThroughImageTransportSurface(
       is_gpu_vsync_disabled_(!features::UseGpuVsync()),
       is_multi_window_swap_vsync_override_enabled_(
           override_vsync_for_multi_window_swap),
-      delegate_(delegate) {}
+      delegate_(delegate) {
+  if (surface->SupportsGpuVSync())
+    surface->SetVSyncCallback(std::move(delegate_->GetGpuVSyncCallback()));
+}
+
 
 PassThroughImageTransportSurface::~PassThroughImageTransportSurface() = default;
 

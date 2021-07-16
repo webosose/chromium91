@@ -19,9 +19,16 @@
 #define OZONE_WAYLAND_EGL_GL_SURFACE_WAYLAND_H_
 
 #include <memory>
+#include <memory>
 
+#include "base/timer/timer.h"
+#include "components/viz/common/gpu/gpu_vsync_callback.h"
 #include "ui/gfx/geometry/size.h"
+#include "ui/gfx/vsync_provider.h"
 #include "ui/gl/gl_surface_egl.h"
+
+struct wl_output;
+struct wp_presentation_feedback;
 
 namespace ozonewayland {
 
@@ -39,11 +46,49 @@ class GLSurfaceWayland : public gl::NativeViewGLSurfaceEGL {
               bool has_alpha) override;
   EGLConfig GetConfig() override;
   gfx::SwapResult SwapBuffers(PresentationCallback callback) override;
+  bool SupportsGpuVSync() const override;
+  void SetVSyncCallback(viz::GpuVSyncCallback callback) override;
+  void SetGpuVSyncEnabled(bool enabled) override;
+
+  base::TimeTicks GetLastVSyncTime() const;
+  base::TimeDelta GetLastInterval() const;
 
  private:
   ~GLSurfaceWayland() override;
 
+  // NativeViewGLSurfaceEGL overrides:
+  std::unique_ptr<gfx::VSyncProvider> CreateVsyncProviderInternal() override;
+
+  static void OnFeedbackSyncOutput(
+      void* data,
+      struct wp_presentation_feedback* presentation_feedback,
+      struct wl_output* output);
+  static void OnFeedbackPresented(
+      void* data,
+      struct wp_presentation_feedback* presentation_feedback,
+      uint32_t tv_sec_hi,
+      uint32_t tv_sec_lo,
+      uint32_t tv_nsec,
+      uint32_t refresh_nsec,
+      uint32_t seq_hi,
+      uint32_t seq_lo,
+      uint32_t flags);
+  static void OnFeedbackDiscarded(
+      void* data,
+      struct wp_presentation_feedback* presentation_feedback);
+  void StartWaitForVSync();
+  void StartOrStopVSync();
+  void OnVSync(base::TimeTicks vsync_time, base::TimeDelta vsync_interval);
+
   unsigned widget_;
+
+  viz::GpuVSyncCallback vsync_callback_;
+  std::set<struct wp_presentation_feedback*> wayland_presentation_feedbacks_;
+  base::TimeDelta last_interval_ = base::TimeDelta::FromSecondsD(1 / 60.);
+  base::TimeTicks last_vsync_time_ = base::TimeTicks::Now();
+  base::TimeTicks last_notified_vsync_time_;
+  base::OneShotTimer vsync_timer_;
+  bool vsync_enabled_ = false;
 };
 
 }  // namespace ozonewayland

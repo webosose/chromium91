@@ -36,6 +36,7 @@
 #include "ozone/wayland/input/keyboard.h"
 #include "ozone/wayland/input/pointer.h"
 #include "ozone/wayland/input/touchscreen.h"
+#include "ozone/wayland/protocol/presentation-time-client-protocol.h"
 #include "ozone/wayland/screen.h"
 #include "ozone/wayland/seat.h"
 #include "ozone/wayland/shell/shell.h"
@@ -462,6 +463,10 @@ void WaylandDisplay::Terminate() {
 
   close(m_fd_);
 #endif
+
+  if (presentation_)
+    wp_presentation_destroy(presentation_);
+
   if (compositor_)
     wl_compositor_destroy(compositor_);
 
@@ -1092,6 +1097,9 @@ void WaylandDisplay::DisplayHandleGlobal(void *data,
   } else if (strcmp(interface, "wl_shm") == 0) {
     disp->shm_ = static_cast<wl_shm*>(
         wl_registry_bind(registry, name, &wl_shm_interface, 1));
+  } else if (strcmp(interface, "wp_presentation") == 0) {
+    disp->presentation_ = static_cast<struct wp_presentation*>(
+        wl_registry_bind(registry, name, &wp_presentation_interface, 1));
   }
 #if defined(OS_WEBOS)
   else if (strcmp(interface, "text_model_factory") == 0) {
