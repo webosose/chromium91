@@ -124,6 +124,8 @@ void AppRuntimeRenderFrameObserver::SetVisibilityState(
   render_frame()->GetWebFrame()->View()->SetVisibilityState(
       page_visibility_state,
       visibility_state == mojom::VisibilityState::kLaunching);
+  render_frame()->GetWebFrame()->FrameWidget()->SetCompositorVisible(
+      visibility_state != mojom::VisibilityState::kHidden);
 }
 
 void AppRuntimeRenderFrameObserver::ChangeLocale(const std::string& locale) {
