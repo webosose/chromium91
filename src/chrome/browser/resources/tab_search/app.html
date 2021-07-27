@@ -1,0 +1,78 @@
+<style include="mwb-shared-style">
+  #no-results {
+    color: var(--cr-primary-text-color);
+    font-size: var(--mwb-primary-text-font-size);
+    padding: 12px;
+    text-align: center;
+  }
+
+  #feedback-text {
+    color: var(--cr-primary-text-color);
+    font-size: var(--mwb-primary-text-font-size);
+    margin-inline-start: var(--mwb-list-item-horizontal-margin);
+    user-select: none;
+  }
+
+  #feedback-footer {
+    border: none;
+    border-top: 1px solid var(--google-grey-refresh-500);
+    height: 40px;
+    width: 100%;
+  }
+
+  #feedback-footer:focus {
+    background-color: var(--mwb-list-item-selected-background-color);
+    outline: none;
+  }
+
+  #feedback-icon {
+    --iron-icon-fill-color: var(--google-grey-refresh-700);
+    height: var(--mwb-icon-size);
+    width: var(--mwb-icon-size);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #feedback-icon {
+      --iron-icon-fill-color: var(--google-blue-refresh-300);
+    }
+  }
+
+  .list-section-title {
+    align-items: center;
+    background-color: var(--mwb-background-color);
+    color: var(--cr-secondary-text-color);
+    display: flex;
+    font-size: var(--mwb-list-section-title-font-size);
+    height: var(--mwb-list-section-title-height);
+    padding-inline-start: 8px;
+    position: sticky;
+    text-transform: uppercase;
+    top: 0;
+    z-index: 1000;
+  }
+</style>
+<tab-search-search-field id="searchField" autofocus
+    clear-label="$i18n{clearSearch}" label="$i18n{searchTabs}"
+    on-focus="onSearchFocus_" on-keydown="onSearchKeyDown_"
+    on-search-changed="onSearchChanged_"
+    search-result-text="[[searchResultText_]]">
+</tab-search-search-field>
+<div hidden="[[!filteredTabItemsCount_(filteredOpenTabs_, filteredRecentlyClosedTabs_)]]">
+  <infinite-list id="tabsList" max-height="[[listMaxHeight_(availableHeight_)]]"
+      items="[[listItems_(filteredOpenTabs_, filteredRecentlyClosedTabs_)]]">
+    <template data-type="TitleItem">
+      <div class="list-section-title">[[item.title]]</div>
+    </template>
+    <template data-type="TabData" data-selectable>
+      <tab-search-item id="[[item.tab.tabId]]" aria-label="[[ariaLabel_(item)]]"
+          class="mwb-list-item" data="[[item]]" index="[[index]]"
+          on-click="onItemClick_" on-close="onItemClose_"
+          on-focus="onItemFocus_" on-keydown="onItemKeyDown_" role="option"
+          tabindex="0">
+      </tab-search-item>
+    </template>
+  </infinite-list>
+</div>
+<div id="no-results" hidden="[[filteredTabItemsCount_(filteredOpenTabs_, filteredRecentlyClosedTabs_)]]">
+  $i18n{noResultsFound}
+</div>

@@ -1,0 +1,12 @@
+include_rules = [
+  "+cc/base/switches.h",
+  "+cc/test",
+  "+components/viz/common",
+  "+pdf",
+  "+printing",
+  "+third_party/blink/public",
+  "+third_party/crashpad/crashpad/client",
+  "+third_party/skia/include",
+  "+components/policy",
+  "+components/prefs",
+]

@@ -1,0 +1,54 @@
+# Copyright 2018 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+assert(is_chromeos, "Non-ChromeOS builds cannot depend on //chromeos")
+
+source_set("cpp") {
+  sources = [
+    "handwriting_model_loader.cc",
+    "handwriting_model_loader.h",
+    "service_connection.cc",
+    "service_connection.h",
+  ]
+  defines = [ "IS_CHROMEOS_MLSERVICE_IMPL" ]
+  deps = [
+    "//base",
+    "//chromeos/dbus/dlcservice",
+    "//chromeos/dbus/machine_learning",
+    "//chromeos/services/machine_learning/public/mojom",
+  ]
+}
+
+component("stub") {
+  sources = [
+    "fake_service_connection.cc",
+    "fake_service_connection.h",
+  ]
+  defines = [ "IS_CHROMEOS_MLSERVICE_IMPL" ]
+  deps = [
+    "//base",
+    "//chromeos/services/machine_learning/public/mojom",
+    "//mojo/public/cpp/bindings",
+  ]
+  public_deps = [ ":cpp" ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+  sources = [
+    "handwriting_model_loader_unittest.cc",
+    "service_connection_unittest.cc",
+  ]
+  deps = [
+    ":cpp",
+    ":stub",
+    "//base/test:test_support",
+    "//chromeos/dbus/dlcservice:test_support",
+    "//chromeos/dbus/machine_learning",
+    "//chromeos/services/machine_learning/public/mojom",
+    "//mojo/core/embedder",
+    "//mojo/public/cpp/bindings",
+    "//testing/gtest",
+  ]
+}

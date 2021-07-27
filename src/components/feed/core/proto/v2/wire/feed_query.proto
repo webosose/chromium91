@@ -1,0 +1,27 @@
+// Copyright 2020 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+syntax = "proto2";
+
+package feedwire;
+
+import "components/feed/core/proto/v2/wire/chrome_fulfillment_info.proto";
+import "components/feed/core/proto/v2/wire/feed_entry_point_data.proto";
+import "components/feed/core/proto/v2/wire/token.proto";
+
+option optimize_for = LITE_RUNTIME;
+
+message FeedQuery {
+  message Tokens { repeated Token tokens = 1; }
+  enum RequestReason {
+    UNKNOWN_REQUEST_REASON = 0;
+    MANUAL_REFRESH = 1;
+    SCHEDULED_REFRESH = 2;
+    NEXT_PAGE_SCROLL = 3;
+  }
+  oneof token { Token next_page_token = 3; }
+  optional RequestReason reason = 1;
+  optional FeedEntryPointData feed_entry_point_data = 9;
+  optional ChromeFulfillmentInfo chrome_fulfillment_info = 341477699;
+}
