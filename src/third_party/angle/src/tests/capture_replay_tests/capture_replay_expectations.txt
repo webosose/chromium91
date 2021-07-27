@@ -1,0 +1,94 @@
+#
+# Copyright 2020 The ANGLE Project Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+#
+# capture_replay_expectations:
+#   Skip these tests because they are expected to fail
+#
+
+# Failed tests
+BindGeneratesResourceTest.*
+ClearTest.Depth16Scissored/*
+ClearTest.InceptionScissorClears/*
+ClientArraysTest.*
+CopyTextureTestWebGL.NPOT/*
+D3DImageFormatConversionTest.*
+DifferentStencilMasksTest.*
+FramebufferTest.MultiContextNoRenderingFeedbackLoops/*
+InstancingTest.LineLoop/*
+PbufferTest.BindTexImage/*
+PbufferTest.Clearing/*
+PbufferTest.TextureSizeReset/*
+SimpleStateChangeTest.DrawAndClearTextureRepeatedly/*
+SimpleStateChangeTest.RebindTranslatedAttribute/*
+StateChangeTest.DrawAfterFlushWithNoStateChange/*
+WebGL2ReadOutsideFramebufferTest.CopyTexSubImage3D/*
+WebGLDrawElementsTest.DrawElementsTypeAlignment/*
+WebGLGLSLTest.*
+WebGLReadOutsideFramebufferTest.*
+
+# Has undefined framebuffer pixels. This fails comparison checks.
+SimpleOperationTest.ClearAndSwap/*
+SimpleOperationTest.DrawQuadAndSwap/*
+
+# Crashed tests
+BlendMinMaxTest.*
+BlitFramebufferANGLETest.*
+BufferDataTest.*
+ClipDistanceTest.*
+ColorMaskTest.*
+CopyCompressedTextureTest.InternalFormat/*
+DebugMarkerTest.*
+DebugTest.*
+DepthStencilTest.*
+DrawBuffersTest.*
+EGLPrintEGLinfoTest.PrintGLESCapabilities/*
+EGLStreamTest.*
+ExternalWrapTest.*
+FenceNVTest.*
+GetImageTestNoExtensions.EntryPointsInactive/*
+GLSLTest.ArrayOfStructContainingArrayOfSamplers/*
+GLSLTest.InactiveSamplersInStruct/*
+GLSLTest.MixedShaderLengths/*
+GLSLTest.ZeroShaderLength/*
+GPUTestConfigTest.GPUTestConfigConditions_D3D11/*
+ImageTest.*
+IndexedPointsTestUByte.*
+IndexedPointsTestUInt.*
+IndexedPointsTestUShort.*
+OcclusionQueriesTest.*
+PBOExtensionTest.*
+PixmapTest.Clearing/*
+RobustClientMemoryTest.*
+SemaphoreTest.*
+SRGBFramebufferTest.Validation/*
+StateChangeRenderTest.GenerateMipmap/*
+SyncQueriesTest.*
+TextureLimitsTest.MaxCombinedTextures/*
+TimerQueriesTest.*
+UniformTest.Sampler/*
+UnpackAlignmentTest.*
+UnpackRowLengthTest.*
+VertexAttributeCachingTest.*
+VertexAttributeOORTest.*
+VertexAttributeTest.*
+ViewportTest.*
+VulkanExternalImageTest.ShouldClearMutableNoStorageUsageOpaqueFdRGBA8/*
+VulkanExternalImageTest.ShouldClearOpaqueFdWithSemaphores/*
+VulkanExternalImageTest.ShouldClearZirconVmoRGBA8/*
+VulkanExternalImageTest.ShouldClearZirconWithFlagsVmoRGBA8/*
+VulkanExternalImageTest.ShouldImportSemaphoreOpaqueFd/*
+VulkanExternalImageTest.TextureFormatCompatChromiumMutableNoStorageZirconVmo/*
+VulkanExternalImageTest.TextureFormatCompatChromiumZirconVmo/*
+WebGLCompatibilityTest.*
+WebGLFramebufferTest.*
+
+# Skipped tests
+EGLProgramCacheControlTest.NegativeAPI/*
+EGLProgramCacheControlTest.SaveAndReload/*
+LineLoopTest.DISABLED_DrawArraysWithLargeCount/*
+MipmapTest.DISABLED_ThreeLevelsInitData/*
+
+# Compile failed tests
+RobustResourceInitTest.*

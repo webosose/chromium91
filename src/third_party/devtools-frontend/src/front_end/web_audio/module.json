@@ -1,0 +1,10 @@
+{
+  "dependencies": [
+    "components",
+    "ui/legacy"
+  ],
+    "resources": [
+    "webAudio.css",
+    "audioContextSelector.css"
+  ]
+}

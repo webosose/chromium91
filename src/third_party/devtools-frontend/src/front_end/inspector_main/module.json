@@ -1,0 +1,10 @@
+{
+  "dependencies": [
+    "components",
+    "panels/mobile_throttling"
+  ],
+    "resources": [
+    "nodeIcon.css",
+    "renderingOptions.css"
+  ]
+}

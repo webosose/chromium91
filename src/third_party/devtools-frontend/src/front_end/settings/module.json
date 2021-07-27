@@ -1,0 +1,10 @@
+{
+  "dependencies": [
+    "components"
+  ],
+    "resources": [
+    "frameworkIgnoreListSettingsTab.css",
+    "settingsScreen.css",
+    "keybindsSettingsTab.css"
+  ]
+}

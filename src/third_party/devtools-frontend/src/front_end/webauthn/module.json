@@ -1,0 +1,9 @@
+{
+  "dependencies": [
+    "data_grid",
+    "ui/legacy"
+  ],
+    "resources": [
+    "webauthnPane.css"
+  ]
+}

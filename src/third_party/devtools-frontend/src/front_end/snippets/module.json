@@ -1,0 +1,6 @@
+{
+  "dependencies": [
+    "quick_open",
+    "models/persistence"
+  ]
+}

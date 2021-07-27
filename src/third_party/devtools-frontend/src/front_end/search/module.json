@@ -1,0 +1,9 @@
+{
+  "dependencies": [
+    "components"
+  ],
+    "resources": [
+    "searchResultsPane.css",
+    "searchView.css"
+  ]
+}
