@@ -1062,7 +1062,7 @@ media::GpuVideoAcceleratorFactories* RenderThreadImpl::GetGpuFactories() {
 
   const bool enable_video_accelerator =
 
-#if defined(OS_LINUX)
+#if defined(OS_LINUX) && !defined(USE_NEVA_V4L2_CODEC)
       base::FeatureList::IsEnabled(media::kVaapiVideoDecodeLinux) &&
 #else
       !cmd_line->HasSwitch(switches::kDisableAcceleratedVideoDecode) &&

@@ -93,6 +93,13 @@ source_set("common") {
     "//ui/gfx/linux:gbm",
     "//ui/gl",
   ]
+
+  # VDAVideoDecoder(V4L2VideoDecodeAccelerator) doesn't use gbm at runtime.
+  # But if we has gbm dependency, libminigbm.so is needed.
+  # To exclude it, we delete gbm dependency.
+  if (use_neva_v4l2_codec) {
+    deps -= [ "//ui/gfx/linux:gbm" ]
+  }
 }
 
 # Although fourcc is platform-agnostic; however, it is restricted by the above
