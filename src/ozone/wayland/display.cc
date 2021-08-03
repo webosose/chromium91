@@ -875,6 +875,7 @@ void WaylandDisplay::SetInputRegion(unsigned handle,
   }
 
   widget->SetInputRegion(region);
+  FlushDisplay();
 }
 
 void WaylandDisplay::SetGroupKeyMask(unsigned handle, ui::KeyMask key_mask) {
@@ -886,6 +887,7 @@ void WaylandDisplay::SetGroupKeyMask(unsigned handle, ui::KeyMask key_mask) {
   }
 
   widget->SetGroupKeyMask(key_mask);
+  FlushDisplay();
 }
 
 void WaylandDisplay::SetKeyMask(unsigned handle,
@@ -899,6 +901,7 @@ void WaylandDisplay::SetKeyMask(unsigned handle,
   }
 
   widget->SetKeyMask(key_mask, set);
+  FlushDisplay();
 }
 
 void WaylandDisplay::SetSurroundingText(const std::string& text,
