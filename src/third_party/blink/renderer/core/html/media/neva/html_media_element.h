@@ -390,6 +390,14 @@ WebString HTMLMediaElementExtendingWebMediaPlayerClient<original_t>::Cookies()
   if (!doc || !doc->GetFrame() || !doc->TopFrameOrigin())
     return String();
 
+  const SecurityOrigin* security_origin =
+      doc->GetFrame()->GetSecurityContext()->GetSecurityOrigin();
+  if (security_origin &&
+      !security_origin->IsSameOriginWith(
+          SecurityOrigin::Create(self->currentSrc()).get())) {
+    return String();
+  }
+
   if (&doc->GetFrame()->GetBrowserInterfaceBroker() ==
       &GetEmptyBrowserInterfaceBroker()) {
     LOG(ERROR) << __func__ << " empty broker";
@@ -400,14 +408,6 @@ WebString HTMLMediaElementExtendingWebMediaPlayerClient<original_t>::Cookies()
   doc->GetFrame()->GetBrowserInterfaceBroker().GetInterface(
       backend.BindNewPipeAndPassReceiver(
           doc->GetTaskRunner(TaskType::kMiscPlatformAPI)));
-
-  const SecurityOrigin* security_origin =
-      doc->GetFrame()->GetSecurityContext()->GetSecurityOrigin();
-  if (security_origin &&
-      !security_origin->IsSameOriginWith(
-          SecurityOrigin::Create(self->currentSrc()).get())) {
-    return String();
-  }
 
   String value;
   backend->GetCookiesString(self->currentSrc(), doc->SiteForCookies(),
