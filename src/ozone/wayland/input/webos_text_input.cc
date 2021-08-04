@@ -365,13 +365,6 @@ void WaylandTextInput::OnKeysym(void* data,
     if (panel->state == InputPanelHidden)
       hide_ime = true;
 
-  if (state == WL_KEYBOARD_KEY_STATE_RELEASED &&
-      (key_code == KEY_ENTER || key_code == KEY_KPENTER) &&
-      (panel->input_content_type !=
-       ui::InputContentType::kTextArea) &&
-      (panel->state == InputPanelShown))
-    hide_ime = true;
-
   if (key_code == KEY_TAB)
     hide_ime = true;
 
