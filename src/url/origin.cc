@@ -174,7 +174,10 @@ base::Optional<base::UnguessableToken> Origin::GetNonceForSerialization()
 
 bool Origin::IsSameOriginWith(const Origin& other) const {
 #if defined(USE_NEVA_APPRUNTIME)
-  if (other.GetURL().SchemeIsFile() && file_origin_changed_)
+  // Avoid file-scheme tuples equality check fail below since app_id is appended
+  // to default file-scheme origin value to trigger separate local storage
+  // creation for each webapp.
+  if (scheme() == kFileScheme && other.scheme() == kFileScheme)
     return true;
 #endif
   // scheme/host/port must match, even for opaque origins where |tuple_| holds
