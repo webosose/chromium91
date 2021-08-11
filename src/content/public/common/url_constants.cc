@@ -91,6 +91,10 @@ const char kChromeUICrashDcheckURL[] = "chrome://crash/dcheck";
 // have a chrome:// scheme that might let it be confused with a WebUI page.
 const char kUnreachableWebDataURL[] = "chrome-error://chromewebdata/";
 
+#if defined(USE_NEVA_APPRUNTIME)
+const char kIllegalDataURL[] = "chrome-error://chromeillegalwebdata/";
+#endif
+
 const char kBlockedURL[] = "about:blank#blocked";
 
 const char kChromeUIResourcesURL[] = "chrome://resources/";

@@ -183,9 +183,8 @@ void AppRuntimeContentRendererClient::WillSendRequest(
           "Access is blocked to resource: " + url.GetString().Ascii());
       frame->AddMessageToConsole(error_msg);
 
-      // Redirect to unreachable URL (throws net::ERR_UNKNOWN_URL_SCHEME
-      // to console)
-      *new_url = GURL(content::kUnreachableWebDataURL);
+      // Redirect to unreachable URL
+      *new_url = GURL(content::kIllegalDataURL);
     }
   }
 }
