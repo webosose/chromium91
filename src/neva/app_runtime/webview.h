@@ -91,6 +91,7 @@ class WebView : public content::WebContentsDelegate,
   ~WebView() override;
 
   void SetDelegate(WebViewDelegate* delegate);
+  void CreateRenderView();
   void SetControllerDelegate(WebViewControllerDelegate* delegate);
 
   void CreateWebContents();

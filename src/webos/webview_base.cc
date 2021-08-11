@@ -101,6 +101,8 @@ void WebViewBase::Initialize(const std::string& app_id,
   SetV8SnapshotPath(v8_snapshot_path);
   SetV8ExtraFlags(v8_extra_flags);
 
+  webview_->CreateRenderView();
+
   // Mirror WebViewInfo to renderer side
   webview_->SendWebViewInfo(webview_info_.app_path, webview_info_.trust_level);
 
