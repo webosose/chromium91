@@ -63,6 +63,7 @@ class AppRuntimeContentBrowserClient : public content::ContentBrowserClient {
   CreateDevToolsManagerDelegate() override;
 
   bool ShouldEnableStrictSiteIsolation() override;
+  bool ShouldIsolateErrorPage(bool is_main_frame) override;
 
   bool IsFileSchemeNavigationAllowed(const std::string& file_path,
                                      int render_frame_id,
