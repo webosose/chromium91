@@ -21,7 +21,7 @@
 
 #include "base/unguessable_token.h"
 #include "mojo/public/cpp/base/unguessable_token_mojom_traits.h"
-#include "ui/platform_window/neva/mojom/video_window.mojom.h"
+#include "ui/platform_window/neva/mojom/video_window.mojom-shared.h"
 #include "ui/platform_window/neva/video_window_info.h"
 
 namespace mojo {
