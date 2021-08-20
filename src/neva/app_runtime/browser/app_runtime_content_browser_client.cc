@@ -174,6 +174,14 @@ bool AppRuntimeContentBrowserClient::ShouldEnableStrictSiteIsolation() {
   return false;
 }
 
+bool AppRuntimeContentBrowserClient::IsFileAccessAllowedFromNetwork() const {
+  // If there is no delegate set up, keep original implementation (deny
+  // access from network URI to local file resources). If there is a
+  // delegate, then let it decide if file access is allowed for that
+  // origin.
+  return GetFileAccessController() != nullptr;
+}
+
 bool AppRuntimeContentBrowserClient::IsFileSchemeNavigationAllowed(
     const std::string& file_path,
     int render_frame_id,

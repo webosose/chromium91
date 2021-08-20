@@ -881,6 +881,14 @@ void WriteRenderFrameImplDeletion(perfetto::EventContext& ctx,
   data->set_intent(FrameDeleteIntentionToProto(intent));
 }
 
+static bool IsFileAccessAllowedFromNetwork() {
+#if defined(USE_NEVA_APPRUNTIME)
+  return GetContentClient()->browser()->IsFileAccessAllowedFromNetwork();
+#else
+  return false;
+#endif
+}
+
 }  // namespace
 
 #if BUILDFLAG(ENABLE_PLUGINS)
@@ -6814,6 +6822,7 @@ void RenderFrameHostImpl::CommitNavigation(
     // TODO(crbug.com/888079): In the future, use
     // GetOriginForURLLoaderFactory/GetOriginToCommit.
     if ((common_params->url.SchemeIsFile() ||
+         IsFileAccessAllowedFromNetwork() ||
          (common_params->url.IsAboutBlank() &&
           common_params->initiator_origin &&
           common_params->initiator_origin->scheme() == url::kFileScheme)) &&
