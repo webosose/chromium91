@@ -314,8 +314,7 @@ bool ContentBrowserClient::IsFileAccessAllowed(
 bool ContentBrowserClient::IsFileSchemeNavigationAllowed(
     const std::string& file_path,
     int render_frame_id,
-    bool browser_initiated,
-    bool initiator_scheme_is_file) {
+    bool browser_initiated) {
   return true;
 }
 #endif  // defined(USE_NEVA_APPRUNTIME)

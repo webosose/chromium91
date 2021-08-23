@@ -68,8 +68,7 @@ class AppRuntimeContentBrowserClient : public content::ContentBrowserClient {
   bool IsFileAccessAllowedFromNetwork() const override;
   bool IsFileSchemeNavigationAllowed(const std::string& file_path,
                                      int render_frame_id,
-                                     bool browser_initiated,
-                                     bool initiator_scheme_is_file) override;
+                                     bool browser_initiated) override;
 
   void AppendExtraCommandLineSwitches(base::CommandLine* command_line,
                                       int child_process_id) override;

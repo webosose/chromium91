@@ -1474,17 +1474,9 @@ void NavigationRequest::BeginNavigation() {
 
 #if defined(USE_NEVA_APPRUNTIME)
   if (GetURL().SchemeIsFile()) {
-    bool initiator_scheme_is_file = false;
-
-    if (!browser_initiated_) {
-      // Only relevant for webOS whitelisting implementation
-      initiator_scheme_is_file =
-          GetInitiatorOrigin().value().GetURL().SchemeIsFile();
-    }
-
     if (!GetContentClient()->browser()->IsFileSchemeNavigationAllowed(
             GetURL().path(), frame_tree_node_->frame_tree_node_id(),
-            browser_initiated_, initiator_scheme_is_file)) {
+            browser_initiated_)) {
       StartNavigation(false);
       OnRequestFailedInternal(
           network::URLLoaderCompletionStatus(net::ERR_ACCESS_DENIED),

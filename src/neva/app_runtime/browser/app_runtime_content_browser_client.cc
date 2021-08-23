@@ -185,8 +185,7 @@ bool AppRuntimeContentBrowserClient::IsFileAccessAllowedFromNetwork() const {
 bool AppRuntimeContentBrowserClient::IsFileSchemeNavigationAllowed(
     const std::string& file_path,
     int render_frame_id,
-    bool browser_initiated,
-    bool initiator_scheme_is_file) {
+    bool browser_initiated) {
   const AppRuntimeFileAccessController* file_access_controller =
       GetFileAccessController();
 
@@ -210,14 +209,9 @@ bool AppRuntimeContentBrowserClient::IsFileSchemeNavigationAllowed(
                                                ->GetAsWebContents()
                                                ->GetDelegate());
   // webOS WAM case (whitelisting)
-  if (browser_initiated || initiator_scheme_is_file) {
-    return file_access_controller->IsAccessAllowed(
-        base::FilePath(file_path),
-        webview->GetWebViewDelegate()->GetWebViewInfo());
-  } else {
-    // Proceed since it's covered by allow_local_resource_load permission
-    return true;
-  }
+  return file_access_controller->IsAccessAllowed(
+      base::FilePath(file_path),
+      webview->GetWebViewDelegate()->GetWebViewInfo());
 }
 
 bool AppRuntimeContentBrowserClient::ShouldIsolateErrorPage(

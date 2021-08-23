@@ -166,11 +166,6 @@ void AppRuntimeContentRendererClient::WillSendRequest(
   if (!static_cast<GURL>(url).SchemeIsFile())
     return;
 
-  // Ignore file scheme requests from non-file scheme origins granted
-  // with allow_local_resource_load permission
-  if (!initiator_origin->GetURL().SchemeIsFile())
-    return;
-
   const AppRuntimeFileAccessController* file_access_controller =
       GetFileAccessController();
 
