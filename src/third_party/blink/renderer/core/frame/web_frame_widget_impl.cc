@@ -2348,6 +2348,16 @@ void WebFrameWidgetImpl::SetHandlingInputEvent(bool handling) {
 }
 
 #if defined(USE_NEVA_APPRUNTIME)
+void WebFrameWidgetImpl::ActivateCompositor() {
+  if (widget_base_ && !widget_base_->never_composited())
+    widget_base_->SetCompositorVisible(!widget_base_->is_hidden());
+}
+
+void WebFrameWidgetImpl::DeactivateCompositor() {
+  if (widget_base_)
+    widget_base_->SetCompositorVisible(false);
+}
+
 bool WebFrameWidgetImpl::HasImeEventGuard() const {
   return widget_base_->HasImeEventGuard();
 }

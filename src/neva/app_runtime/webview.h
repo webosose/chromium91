@@ -267,6 +267,9 @@ class WebView : public content::WebContentsDelegate,
   // For access to WebViewInfo of related webapp
   const WebViewDelegate* GetWebViewDelegate() const { return webview_delegate_; }
 
+  void ActivateRendererCompositor();
+  void DeactivateRendererCompositor();
+
  private:
   void SendGetCookiesResponse(const net::CookieAccessResultList& cookie_list,
                               const net::CookieAccessResultList& excluded_cookies);

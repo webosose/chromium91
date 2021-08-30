@@ -140,6 +140,13 @@ interface FrameWidget {
   // third_party/blink/public/mojom/frame/viewport_intersection_state.mojom
   SetViewportIntersection(ViewportIntersectionState intersection_state,
                           VisualProperties? visual_properties);
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  [EnableIf=neva_appruntime]
+  ActivateCompositor();
+  [EnableIf=neva_appruntime]
+  DeactivateCompositor();
+  ///@}
 };
 
 // Implemented in Browser, this interface defines frame-widget-specific methods that

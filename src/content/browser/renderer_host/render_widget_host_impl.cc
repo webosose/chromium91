@@ -3136,6 +3136,18 @@ RenderWidgetHostImpl::BindAndGenerateCreateFrameWidgetParamsForNewWindow() {
   return params;
 }
 
+#if defined(USE_NEVA_APPRUNTIME)
+void RenderWidgetHostImpl::ActivateRendererCompositor() {
+  if (blink_frame_widget_)
+    blink_frame_widget_->ActivateCompositor();
+}
+
+void RenderWidgetHostImpl::DeactivateRendererCompositor() {
+  if (blink_frame_widget_)
+    blink_frame_widget_->DeactivateCompositor();
+}
+#endif
+
 void RenderWidgetHostImpl::DispatchInputEventWithLatencyInfo(
     const blink::WebInputEvent& event,
     ui::LatencyInfo* latency) {

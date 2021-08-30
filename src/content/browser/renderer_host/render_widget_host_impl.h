@@ -854,6 +854,11 @@ class CONTENT_EXPORT RenderWidgetHostImpl
   mojom::CreateFrameWidgetParamsPtr
   BindAndGenerateCreateFrameWidgetParamsForNewWindow();
 
+#if defined(USE_NEVA_APPRUNTIME)
+  void ActivateRendererCompositor();
+  void DeactivateRendererCompositor();
+#endif
+
  protected:
   // |routing_id| must not be MSG_ROUTING_NONE.
   // If this object outlives |delegate|, DetachDelegate() must be called when

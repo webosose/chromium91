@@ -469,11 +469,11 @@ void WebViewBase::DidDropAllPeerConnections(
 }
 
 void WebViewBase::ActivateRendererCompositor() {
-  NOTIMPLEMENTED();
+  webview_->ActivateRendererCompositor();
 }
 
 void WebViewBase::DeactivateRendererCompositor() {
-  NOTIMPLEMENTED();
+  webview_->DeactivateRendererCompositor();
 }
 
 void WebViewBase::RequestInjectionLoading(const std::string& injection_name) {

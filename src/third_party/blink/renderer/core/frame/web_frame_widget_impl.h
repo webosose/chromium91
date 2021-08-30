@@ -396,6 +396,10 @@ class CORE_EXPORT WebFrameWidgetImpl
                          const gfx::PointF& screen_point,
                          ui::mojom::blink::DragOperation,
                          base::OnceClosure callback) override;
+#if defined(USE_NEVA_APPRUNTIME)
+  void ActivateCompositor() override;
+  void DeactivateCompositor() override;
+#endif  // USE_NEVA_APPRUNTIME
 
   // Sets the display mode, which comes from the top-level browsing context and
   // is applied to all widgets.
