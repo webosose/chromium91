@@ -393,12 +393,6 @@ void AppRuntimeContentBrowserClient::GetAdditionalAllowedSchemesForFileSystem(
     additional_schemes->push_back(url::kFileScheme);
 }
 
-void AppRuntimeContentBrowserClient::OnNetworkServiceCreated(
-    network::mojom::NetworkService* network_service) {
-  network::mojom::CryptConfigPtr config = network::mojom::CryptConfig::New();
-  content::GetNetworkService()->SetCryptConfig(std::move(config));
-}
-
 std::unique_ptr<content::LoginDelegate>
 AppRuntimeContentBrowserClient::CreateLoginDelegate(
     const net::AuthChallengeInfo& auth_info,
@@ -436,6 +430,8 @@ std::string AppRuntimeContentBrowserClient::GetUserAgent() {
 
 void AppRuntimeContentBrowserClient::OnNetworkServiceCreated(
     network::mojom::NetworkService* network_service) {
+  network::mojom::CryptConfigPtr config = network::mojom::CryptConfig::New();
+  content::GetNetworkService()->SetCryptConfig(std::move(config));
 #if defined(OS_WEBOS)
   network_service->DisableQuic();
 #endif
