@@ -46,8 +46,12 @@ WaylandExtensionsWebos* WaylandWindowWebos::GetWebosExtensions() {
   return webos_extensions_;
 }
 
-void WaylandWindowWebos::HandleExposed() {
-  delegate()->OnWindowExposed();
+void WaylandWindowWebos::HandleWindowHostClose() {
+  delegate()->OnWindowHostClose();
+}
+
+void WaylandWindowWebos::HandleWindowHostExposed() {
+  delegate()->OnWindowHostExposed();
 }
 
 void WaylandWindowWebos::HandleStateAboutToChange(PlatformWindowState state) {

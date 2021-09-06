@@ -767,7 +767,16 @@ void DesktopWindowTreeHostPlatform::OnKeyboardLeave() {
 #endif  // defined(USE_NEVA_APPRUNTIME)
 }
 
-void DesktopWindowTreeHostPlatform::OnWindowExposed() {
+void DesktopWindowTreeHostPlatform::OnWindowHostClose() {
+#if defined(USE_NEVA_APPRUNTIME)
+  NativeEventDelegate* delegate =
+      desktop_native_widget_aura_->GetNativeEventDelegate();
+  if (delegate)
+    delegate->WindowHostClose();
+#endif  // defined(USE_NEVA_APPRUNTIME)
+}
+
+void DesktopWindowTreeHostPlatform::OnWindowHostExposed() {
 #if defined(USE_NEVA_APPRUNTIME)
   NativeEventDelegate* delegate =
       desktop_native_widget_aura_->GetNativeEventDelegate();

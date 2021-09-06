@@ -120,7 +120,8 @@ class VIEWS_EXPORT DesktopWindowTreeHostPlatform
   ///@{
   void OnKeyboardEnter() override;
   void OnKeyboardLeave() override;
-  void OnWindowExposed() override;
+  void OnWindowHostClose() override;
+  void OnWindowHostExposed() override;
   void OnWindowStateAboutToChange(ui::PlatformWindowState state) override;
   void OnCursorVisibilityChanged(bool visible) override;
   void OnInputPanelVisibilityChanged(bool visible) override;

@@ -20,6 +20,7 @@
 
 #include "base/check.h"
 #include "base/logging.h"
+#include "neva/logging.h"
 #include "ui/display/display.h"
 #include "ui/display/screen.h"
 #include "ui/ozone/platform/wayland/extensions/webos/host/wayland_extensions_webos.h"
@@ -190,7 +191,11 @@ void WebosShellSurfaceWrapper::PositionChanged(
 void WebosShellSurfaceWrapper::Close(
     void* data,
     wl_webos_shell_surface* webos_shell_surface) {
-  NOTIMPLEMENTED_LOG_ONCE();
+  WebosShellSurfaceWrapper* shell_surface_wrapper =
+      static_cast<WebosShellSurfaceWrapper*>(data);
+  NEVA_DCHECK(shell_surface_wrapper);
+  NEVA_DCHECK(shell_surface_wrapper->wayland_window_);
+  shell_surface_wrapper->wayland_window_->HandleWindowHostClose();
 }
 
 void WebosShellSurfaceWrapper::Exposed(
@@ -202,7 +207,7 @@ void WebosShellSurfaceWrapper::Exposed(
   DCHECK(shell_surface_wrapper);
   DCHECK(shell_surface_wrapper->wayland_window_);
   if (shell_surface_wrapper->wayland_window_)
-    shell_surface_wrapper->wayland_window_->HandleExposed();
+    shell_surface_wrapper->wayland_window_->HandleWindowHostExposed();
 }
 
 void WebosShellSurfaceWrapper::StateAboutToChange(

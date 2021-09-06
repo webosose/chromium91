@@ -39,7 +39,8 @@ class WaylandWindowWebos : public WaylandToplevelWindow {
   WaylandInputMethodContext* GetInputMethodContext();
   WaylandExtensionsWebos* GetWebosExtensions();
 
-  void HandleExposed();
+  void HandleWindowHostClose();
+  void HandleWindowHostExposed();
   void HandleStateAboutToChange(PlatformWindowState state);
   void HandleCursorVisibilityChanged(bool is_visible);
   void HandleInputPanelVisibilityChanged(bool is_visible);

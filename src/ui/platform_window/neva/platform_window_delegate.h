@@ -56,7 +56,6 @@ class PlatformWindowDelegate {
   virtual void OnKeyboardLeave() {}
   virtual void OnWindowHostStateChanged(ui::WidgetState new_state) {}
   virtual void OnWindowHostStateAboutToChange(ui::WidgetState state) {}
-  virtual void OnWindowExposed() {}
   virtual void OnWindowStateAboutToChange(ui::PlatformWindowState state) {}
   virtual void OnCursorVisibilityChanged(bool visible) {}
 };
