@@ -173,6 +173,10 @@ bool PmLogProvider::IsLogCategoryEnabled(int severity, uint32_t category) {
   FOR_LEVELS_CALL();
 
 #undef PMLOG_CALL
+
+  // the return statement below is not executed. but, Added "return" to avoid
+  // risk when FOR_LEVELS_CALL() changes.
+  return false;
 }
 
 }  // namespace logging
