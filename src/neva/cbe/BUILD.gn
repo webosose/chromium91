@@ -14,6 +14,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import("//build/config/compiler/compiler.gni")
 import("//neva/neva.gni")
 
 if (use_cbe) {
@@ -29,6 +30,11 @@ if (use_cbe) {
     ]
 
     public_deps = []
+
+    ldflags = []
+    if (target_cpu == "arm" && symbol_level == 2) {
+      ldflags += [ "-Wl,--long-plt"  ]
+    }
 
     if (is_chrome_cbe) {
       sources += [
