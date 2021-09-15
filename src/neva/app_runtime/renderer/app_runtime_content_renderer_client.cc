@@ -20,7 +20,9 @@
 #include "base/strings/string_number_conversions.h"
 #include "components/watchdog/switches.h"
 #include "content/public/common/url_constants.h"
+#include "content/public/renderer/render_frame_observer.h"
 #include "content/public/renderer/render_thread.h"
+#include "content/public/renderer/render_thread_observer.h"
 #include "content/public/renderer/render_view.h"
 #include "net/base/filename_util.h"
 #include "neva/app_runtime/app/app_runtime_main_delegate.h"
@@ -75,13 +77,13 @@ using blink::mojom::FetchCacheMode;
 
 namespace neva_app_runtime {
 
-class AppRuntimeContentRendererClient::AppRuntimeRenderThreadObserver
-    : public content::RenderThreadObserver {
+class AppRuntimeRenderThreadObserver : public content::RenderFrameObserver,
+                                       public content::RenderThreadObserver {
  public:
-  AppRuntimeRenderThreadObserver(
-      content::RenderFrame* render_frame,
+  AppRuntimeRenderThreadObserver(content::RenderFrame* render_frame,
       AppRuntimeContentRendererClient* renderer_client)
-      : render_frame_(render_frame), renderer_client_(renderer_client) {
+      : content::RenderFrameObserver(render_frame),
+        renderer_client_(renderer_client) {
     content::RenderThread::Get()->AddObserver(this);
   }
 
@@ -89,18 +91,18 @@ class AppRuntimeContentRendererClient::AppRuntimeRenderThreadObserver
     content::RenderThread::Get()->RemoveObserver(this);
   }
 
+  void OnDestruct() override { renderer_client_->DestructObserver(); }
+
   void NetworkStateChanged(bool online) override {
-    if (!render_frame_ || !render_frame_->GetWebFrame() || !renderer_client_)
-      return;
     if (online) {
-      render_frame_->GetWebFrame()->StartReload(
-          blink::WebFrameLoadType::kReload);
-      renderer_client_->OnNetworkAppear();
+      if (render_frame() && render_frame()->GetWebFrame())
+        render_frame()->GetWebFrame()->StartReload(
+            blink::WebFrameLoadType::kReload);
+      OnDestruct();
     }
   }
 
  private:
-  content::RenderFrame* render_frame_ = nullptr;
   AppRuntimeContentRendererClient* renderer_client_;
 };
 
@@ -151,8 +153,7 @@ void AppRuntimeContentRendererClient::PrepareErrorPage(
           &error_strings, "t");
     }
 
-    render_thread_observer_ =
-        std::make_unique<AppRuntimeRenderThreadObserver>(render_frame, this);
+    observer_.reset(new AppRuntimeRenderThreadObserver(render_frame, this));
   }
 }
 
@@ -197,8 +198,8 @@ void AppRuntimeContentRendererClient::SetWebViewInfo(
   webview_info_.trust_level = trust_level;
 }
 
-void AppRuntimeContentRendererClient::OnNetworkAppear() {
-  render_thread_observer_ = nullptr;
+void AppRuntimeContentRendererClient::DestructObserver() {
+  observer_.reset();
 }
 
 #if defined(USE_NEVA_MEDIA)
