@@ -194,7 +194,6 @@ class WEBOS_EXPORT WebViewBase
   void SetMediaCodecCapability(const std::string& capability);
   void SetMediaPreferences(const std::string& preferences);
   void SetSearchKeywordForCustomPlayer(bool enabled);
-  void SetSupportDolbyHDRContents(bool support);
   void SetUseUnlimitedMediaPolicy(bool enabled);
 
   // WebPreferences
@@ -265,7 +264,6 @@ class WEBOS_EXPORT WebViewBase
 
   // stubs
   void EnableGlobalCaretWidthSetting(bool is_enabled) {}
-  void SetSupportDolbyATMOSContents(bool support) {}
 
   ///@name webOS/Lite stubs for AGL/jellyfish 10.0.1
   ///@{

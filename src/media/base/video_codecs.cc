@@ -22,8 +22,14 @@ std::string GetCodecName(VideoCodec codec) {
     case kCodecH264:
       return "h264";
     case kCodecHEVC:
+#if defined(USE_TV_MEDIA)
+      return "h265";
+#endif
       return "hevc";
     case kCodecDolbyVision:
+#if defined(USE_TV_MEDIA)
+      return "h265";
+#endif
       return "dolbyvision";
     case kCodecVC1:
       return "vc1";
