@@ -33,6 +33,7 @@
 #include "content/public/browser/storage_partition.h"
 #include "content/public/common/content_neva_switches.h"
 #include "content/public/common/content_switches.h"
+#include "net/base/filename_util.h"
 #include "neva/app_runtime/app/app_runtime_main_delegate.h"
 #include "neva/app_runtime/browser/app_runtime_browser_main_parts.h"
 #include "neva/app_runtime/browser/app_runtime_browser_switches.h"
@@ -186,7 +187,7 @@ bool AppRuntimeContentBrowserClient::IsFileAccessAllowedFromNetwork() const {
 }
 
 bool AppRuntimeContentBrowserClient::IsFileSchemeNavigationAllowed(
-    const std::string& file_path,
+    const GURL& url,
     int render_frame_id,
     bool browser_initiated) {
   const AppRuntimeFileAccessController* file_access_controller =
@@ -212,9 +213,12 @@ bool AppRuntimeContentBrowserClient::IsFileSchemeNavigationAllowed(
                                                ->GetAsWebContents()
                                                ->GetDelegate());
   // webOS WAM case (whitelisting)
+  base::FilePath file_path;
+  if (!net::FileURLToFilePath(url, &file_path))
+    return false;
+
   return file_access_controller->IsAccessAllowed(
-      base::FilePath(file_path),
-      webview->GetWebViewDelegate()->GetWebViewInfo());
+      file_path, webview->GetWebViewDelegate()->GetWebViewInfo());
 }
 
 bool AppRuntimeContentBrowserClient::ShouldIsolateErrorPage(

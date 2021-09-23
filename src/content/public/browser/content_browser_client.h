@@ -618,7 +618,7 @@ class CONTENT_EXPORT ContentBrowserClient {
 
   // Indicates whether a particular file scheme navigation for specific
   // renderer (webapp) is allowed.
-  virtual bool IsFileSchemeNavigationAllowed(const std::string& file_path,
+  virtual bool IsFileSchemeNavigationAllowed(const GURL& url,
                                              int render_frame_id,
                                              bool browser_initiated);
 #endif  // defined(USE_NEVA_APPRUNTIME)

@@ -66,7 +66,7 @@ class AppRuntimeContentBrowserClient : public content::ContentBrowserClient {
   bool ShouldIsolateErrorPage(bool is_main_frame) override;
 
   bool IsFileAccessAllowedFromNetwork() const override;
-  bool IsFileSchemeNavigationAllowed(const std::string& file_path,
+  bool IsFileSchemeNavigationAllowed(const GURL& url,
                                      int render_frame_id,
                                      bool browser_initiated) override;
 

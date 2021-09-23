@@ -1475,7 +1475,7 @@ void NavigationRequest::BeginNavigation() {
 #if defined(USE_NEVA_APPRUNTIME)
   if (GetURL().SchemeIsFile()) {
     if (!GetContentClient()->browser()->IsFileSchemeNavigationAllowed(
-            GetURL().path(), frame_tree_node_->frame_tree_node_id(),
+            GetURL(), frame_tree_node_->frame_tree_node_id(),
             browser_initiated_)) {
       StartNavigation(false);
       OnRequestFailedInternal(

@@ -22,6 +22,7 @@
 #include "content/public/common/url_constants.h"
 #include "content/public/renderer/render_thread.h"
 #include "content/public/renderer/render_view.h"
+#include "net/base/filename_util.h"
 #include "neva/app_runtime/app/app_runtime_main_delegate.h"
 #include "neva/app_runtime/common/app_runtime_file_access_controller.h"
 #include "neva/app_runtime/grit/app_runtime_network_error_resources.h"
@@ -175,8 +176,9 @@ void AppRuntimeContentRendererClient::WillSendRequest(
                                                      ui::PAGE_TRANSITION_FIRST))
       return;
 
-    if (!file_access_controller->IsAccessAllowed(
-            base::FilePath(static_cast<GURL>(url).path()), webview_info_)) {
+    base::FilePath path;
+    if (!net::FileURLToFilePath(GURL(url), &path) ||
+        !file_access_controller->IsAccessAllowed(path, webview_info_)) {
       blink::WebConsoleMessage error_msg;
       error_msg.level = blink::mojom::ConsoleMessageLevel::kError;
       error_msg.text = blink::WebString::FromASCII(
