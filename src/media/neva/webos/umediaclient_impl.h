@@ -227,7 +227,6 @@ class UMediaClientImpl : public WebOSMediaClient,
   bool use_set_uri_ = false;
   bool use_dass_control_ = false;
   bool updated_source_info_ = false;
-  bool buffering_ = false;
   bool requests_play_ = false;
   bool requests_pause_ = false;
   bool released_media_resource_ = false;

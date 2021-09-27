@@ -289,9 +289,10 @@ void MojoMediaPlayer::OnCustomMessage(
   client_->OnCustomMessage(media_event_type, detail);
 }
 
-void MojoMediaPlayer::OnBufferingUpdate(int percentage) {
+void MojoMediaPlayer::OnBufferingStateChanged(
+    const media::BufferingState buffering_state) {
   DCHECK(main_task_runner_->BelongsToCurrentThread());
-  client_->OnBufferingUpdate(percentage);
+  client_->OnBufferingStateChanged(buffering_state);
 }
 
 void MojoMediaPlayer::OnTimeUpdate(base::TimeDelta current_timestamp,

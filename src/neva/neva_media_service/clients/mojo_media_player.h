@@ -113,7 +113,7 @@ class COMPONENT_EXPORT(NEVA_MEDIA_SERVICE) MojoMediaPlayer
                           const gfx::Size& natural_size) override;
   void OnCustomMessage(const media::MediaEventType,
                        const std::string& detail) override;
-  void OnBufferingUpdate(int percentage) override;
+  void OnBufferingStateChanged(const media::BufferingState buffering_state) override;
   void OnTimeUpdate(base::TimeDelta current_timestamp,
                     base::TimeTicks current_time_ticks) override;
   void OnAudioTracksUpdated(

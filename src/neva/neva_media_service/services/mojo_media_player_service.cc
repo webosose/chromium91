@@ -220,8 +220,9 @@ void MojoMediaPlayerService::OnCustomMessage(
   remote_client_->OnCustomMessage(media_event_type, detail);
 }
 
-void MojoMediaPlayerService::OnBufferingUpdate(int percentage) {
-  remote_client_->OnBufferingUpdate(percentage);
+void MojoMediaPlayerService::OnBufferingStateChanged(
+    const media::BufferingState buffering_state) {
+  remote_client_->OnBufferingStateChanged(buffering_state);
 }
 
 void MojoMediaPlayerService::OnAudioTracksUpdated(

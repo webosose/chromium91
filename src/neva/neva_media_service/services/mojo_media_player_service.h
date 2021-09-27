@@ -94,7 +94,8 @@ class MojoMediaPlayerService : public mojom::MediaPlayer,
   void OnMediaPlayerPause() override;
   void OnCustomMessage(const media::MediaEventType media_event_type,
                        const std::string& detail) override;
-  void OnBufferingUpdate(int percentage) override;
+  void OnBufferingStateChanged(
+      const media::BufferingState buffering_state) override;
   void OnAudioTracksUpdated(
       const std::vector<media::MediaTrackInfo>& audio_track_info) override;
   void OnTimeUpdate(base::TimeDelta current_timestamp,

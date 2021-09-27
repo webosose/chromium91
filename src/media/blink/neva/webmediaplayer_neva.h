@@ -210,7 +210,7 @@ class MEDIA_BLINK_EXPORT WebMediaPlayerNeva
                               bool success) override;
   void OnLoadComplete() override;
   void OnPlaybackComplete() override;
-  void OnBufferingUpdate(int percentage) override;
+  void OnBufferingStateChanged(const BufferingState buffering_state) override;
   // void OnBufferingUpdate(double begin, double end) override;
   void OnSeekComplete(const base::TimeDelta& current_time) override;
   void OnMediaError(int error_type) override;
@@ -337,9 +337,6 @@ class MEDIA_BLINK_EXPORT WebMediaPlayerNeva
   // Callback responsible for determining if loading of media should be deferred
   // for external reasons; called during load().
   WebMediaPlayerParams::DeferLoadCB defer_load_cb_;
-
-  // Save the list of buffered time ranges.
-  blink::WebTimeRanges buffered_;
 
   // Size of the video.
   gfx::Size coded_size_;

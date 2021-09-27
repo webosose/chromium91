@@ -184,7 +184,6 @@ WebMediaPlayerNeva::WebMediaPlayerNeva(
       delegate_(delegate),
       delegate_id_(0),
       defer_load_cb_(params->defer_load_cb()),
-      buffered_(static_cast<size_t>(1)),
       seeking_(false),
       did_loading_progress_(false),
       create_media_player_neva_cb_(
@@ -844,14 +843,28 @@ void WebMediaPlayerNeva::OnPlaybackComplete() {
     player_api_->Start();
 }
 
-void WebMediaPlayerNeva::OnBufferingUpdate(int percentage) {
+
+void WebMediaPlayerNeva::OnBufferingStateChanged(
+    const BufferingState buffering_state) {
   DCHECK(main_task_runner_->BelongsToCurrentThread());
-  buffered_[0].end = Duration() * percentage / 100;
   did_loading_progress_ = true;
   did_loading_progress_ = true;
 
-  if (percentage == 100 && network_state_ < WebMediaPlayer::kNetworkStateLoaded)
-    UpdateNetworkState(WebMediaPlayer::kNetworkStateLoaded);
+  switch (buffering_state) {
+    case BUFFERING_HAVE_NOTHING:
+      interpolator_.StopInterpolating();
+      UpdateReadyState(WebMediaPlayer::kReadyStateHaveCurrentData);
+      break;
+    case BUFFERING_HAVE_ENOUGH:
+      if (is_playing_)
+        interpolator_.StartInterpolating();
+      UpdateReadyState(WebMediaPlayer::kReadyStateHaveEnoughData);
+      if (network_state_ < WebMediaPlayer::kNetworkStateLoaded)
+        UpdateNetworkState(WebMediaPlayer::kNetworkStateLoaded);
+      break;
+    default:
+      NOTREACHED() << "Invalid buffering state";
+  }
 }
 
 void WebMediaPlayerNeva::OnSeekComplete(const base::TimeDelta& current_time) {
