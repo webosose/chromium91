@@ -59,7 +59,6 @@ class AppRuntimeBrowserContext : public content::BrowserContext {
   void Initialize();
 
  private:
-  void FlushCookieStoreIO();
   base::FilePath InitPath(const BrowserContextAdapter* adapter) const;
 
   const BrowserContextAdapter* adapter_;

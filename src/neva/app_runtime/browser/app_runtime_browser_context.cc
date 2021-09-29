@@ -161,12 +161,6 @@ AppRuntimeBrowserContext::GetLocalStorageTracker() {
 }
 
 void AppRuntimeBrowserContext::FlushCookieStore() {
-  base::PostTask(FROM_HERE, {content::BrowserThread::IO},
-                 base::Bind(&AppRuntimeBrowserContext::FlushCookieStoreIO,
-                            base::Unretained(this)));
-}
-
-void AppRuntimeBrowserContext::FlushCookieStoreIO() {
   content::BrowserContext::GetDefaultStoragePartition(this)
       ->GetCookieManagerForBrowserProcess()
       ->FlushCookieStore(
