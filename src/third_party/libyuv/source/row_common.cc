@@ -10,7 +10,6 @@
 
 #include "libyuv/row.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>  // For memcpy and memset.
 
@@ -56,11 +55,6 @@ static __inline int32_t clamp1023(int32_t v) {
   return (-(v >= 1023) | v) & 1023;
 }
 
-// clamp to 2^n - 1
-static __inline int32_t clamp2nm1(int32_t v, int32_t max) {
-  return (-(v >= max) | v) & max;
-}
-
 static __inline uint32_t Abs(int32_t v) {
   int m = -(v < 0);
   return (v + m) ^ m;
@@ -76,10 +70,6 @@ static __inline int32_t clamp255(int32_t v) {
 
 static __inline int32_t clamp1023(int32_t v) {
   return (v > 1023) ? 1023 : v;
-}
-
-static __inline int32_t clamp2nm1(int32_t v, int32_t max) {
-  return (v > max) ? max : v;
 }
 
 static __inline uint32_t Abs(int32_t v) {
@@ -428,82 +418,6 @@ void ARGBToAR30Row_C(const uint8_t* src_argb, uint8_t* dst_ar30, int width) {
   }
 }
 
-void ARGBToAR64Row_C(const uint8_t* src_argb, uint16_t* dst_ar64, int width) {
-  int x;
-  for (x = 0; x < width; ++x) {
-    dst_ar64[0] = src_argb[0] * 0x0101;
-    dst_ar64[1] = src_argb[1] * 0x0101;
-    dst_ar64[2] = src_argb[2] * 0x0101;
-    dst_ar64[3] = src_argb[3] * 0x0101;
-    dst_ar64 += 4;
-    src_argb += 4;
-  }
-}
-
-void ARGBToAB64Row_C(const uint8_t* src_argb, uint16_t* dst_ab64, int width) {
-  int x;
-  for (x = 0; x < width; ++x) {
-    dst_ab64[0] = src_argb[2] * 0x0101;
-    dst_ab64[1] = src_argb[1] * 0x0101;
-    dst_ab64[2] = src_argb[0] * 0x0101;
-    dst_ab64[3] = src_argb[3] * 0x0101;
-    dst_ab64 += 4;
-    src_argb += 4;
-  }
-}
-
-void AR64ToARGBRow_C(const uint16_t* src_ar64, uint8_t* dst_argb, int width) {
-  int x;
-  for (x = 0; x < width; ++x) {
-    dst_argb[0] = src_ar64[0] >> 8;
-    dst_argb[1] = src_ar64[1] >> 8;
-    dst_argb[2] = src_ar64[2] >> 8;
-    dst_argb[3] = src_ar64[3] >> 8;
-    dst_argb += 4;
-    src_ar64 += 4;
-  }
-}
-
-void AB64ToARGBRow_C(const uint16_t* src_ab64, uint8_t* dst_argb, int width) {
-  int x;
-  for (x = 0; x < width; ++x) {
-    dst_argb[0] = src_ab64[2] >> 8;
-    dst_argb[1] = src_ab64[1] >> 8;
-    dst_argb[2] = src_ab64[0] >> 8;
-    dst_argb[3] = src_ab64[3] >> 8;
-    dst_argb += 4;
-    src_ab64 += 4;
-  }
-}
-
-// TODO(fbarchard): Make shuffle compatible with SIMD versions
-void AR64ShuffleRow_C(const uint8_t* src_ar64,
-                      uint8_t* dst_ar64,
-                      const uint8_t* shuffler,
-                      int width) {
-  const uint16_t* src_ar64_16 = (const uint16_t*)src_ar64;
-  uint16_t* dst_ar64_16 = (uint16_t*)dst_ar64;
-  int index0 = shuffler[0] / 2;
-  int index1 = shuffler[2] / 2;
-  int index2 = shuffler[4] / 2;
-  int index3 = shuffler[6] / 2;
-  // Shuffle a row of AR64.
-  int x;
-  for (x = 0; x < width / 2; ++x) {
-    // To support in-place conversion.
-    uint16_t b = src_ar64_16[index0];
-    uint16_t g = src_ar64_16[index1];
-    uint16_t r = src_ar64_16[index2];
-    uint16_t a = src_ar64_16[index3];
-    dst_ar64_16[0] = b;
-    dst_ar64_16[1] = g;
-    dst_ar64_16[2] = r;
-    dst_ar64_16[3] = a;
-    src_ar64_16 += 4;
-    dst_ar64_16 += 4;
-  }
-}
-
 #ifdef LIBYUV_RGB7
 // Old 7 bit math for compatibility on unsupported platforms.
 static __inline int RGBToY(uint8_t r, uint8_t g, uint8_t b) {
@@ -553,80 +467,80 @@ static __inline int RGB2xToV(uint16_t r, uint16_t g, uint16_t b) {
 // Intel version mimic SSE/AVX which does 2 pavgb
 #if LIBYUV_ARGBTOUV_PAVGB
 
-#define MAKEROWY(NAME, R, G, B, BPP)                                       \
-  void NAME##ToYRow_C(const uint8_t* src_rgb, uint8_t* dst_y, int width) { \
-    int x;                                                                 \
-    for (x = 0; x < width; ++x) {                                          \
-      dst_y[0] = RGBToY(src_rgb[R], src_rgb[G], src_rgb[B]);               \
-      src_rgb += BPP;                                                      \
-      dst_y += 1;                                                          \
-    }                                                                      \
-  }                                                                        \
-  void NAME##ToUVRow_C(const uint8_t* src_rgb, int src_stride_rgb,         \
-                       uint8_t* dst_u, uint8_t* dst_v, int width) {        \
-    const uint8_t* src_rgb1 = src_rgb + src_stride_rgb;                    \
-    int x;                                                                 \
-    for (x = 0; x < width - 1; x += 2) {                                   \
-      uint8_t ab = AVGB(AVGB(src_rgb[B], src_rgb1[B]),                     \
-                        AVGB(src_rgb[B + BPP], src_rgb1[B + BPP]));        \
-      uint8_t ag = AVGB(AVGB(src_rgb[G], src_rgb1[G]),                     \
-                        AVGB(src_rgb[G + BPP], src_rgb1[G + BPP]));        \
-      uint8_t ar = AVGB(AVGB(src_rgb[R], src_rgb1[R]),                     \
-                        AVGB(src_rgb[R + BPP], src_rgb1[R + BPP]));        \
-      dst_u[0] = RGBToU(ar, ag, ab);                                       \
-      dst_v[0] = RGBToV(ar, ag, ab);                                       \
-      src_rgb += BPP * 2;                                                  \
-      src_rgb1 += BPP * 2;                                                 \
-      dst_u += 1;                                                          \
-      dst_v += 1;                                                          \
-    }                                                                      \
-    if (width & 1) {                                                       \
-      uint8_t ab = AVGB(src_rgb[B], src_rgb1[B]);                          \
-      uint8_t ag = AVGB(src_rgb[G], src_rgb1[G]);                          \
-      uint8_t ar = AVGB(src_rgb[R], src_rgb1[R]);                          \
-      dst_u[0] = RGBToU(ar, ag, ab);                                       \
-      dst_v[0] = RGBToV(ar, ag, ab);                                       \
-    }                                                                      \
+#define MAKEROWY(NAME, R, G, B, BPP)                                         \
+  void NAME##ToYRow_C(const uint8_t* src_argb0, uint8_t* dst_y, int width) { \
+    int x;                                                                   \
+    for (x = 0; x < width; ++x) {                                            \
+      dst_y[0] = RGBToY(src_argb0[R], src_argb0[G], src_argb0[B]);           \
+      src_argb0 += BPP;                                                      \
+      dst_y += 1;                                                            \
+    }                                                                        \
+  }                                                                          \
+  void NAME##ToUVRow_C(const uint8_t* src_rgb0, int src_stride_rgb,          \
+                       uint8_t* dst_u, uint8_t* dst_v, int width) {          \
+    const uint8_t* src_rgb1 = src_rgb0 + src_stride_rgb;                     \
+    int x;                                                                   \
+    for (x = 0; x < width - 1; x += 2) {                                     \
+      uint8_t ab = AVGB(AVGB(src_rgb0[B], src_rgb1[B]),                      \
+                        AVGB(src_rgb0[B + BPP], src_rgb1[B + BPP]));         \
+      uint8_t ag = AVGB(AVGB(src_rgb0[G], src_rgb1[G]),                      \
+                        AVGB(src_rgb0[G + BPP], src_rgb1[G + BPP]));         \
+      uint8_t ar = AVGB(AVGB(src_rgb0[R], src_rgb1[R]),                      \
+                        AVGB(src_rgb0[R + BPP], src_rgb1[R + BPP]));         \
+      dst_u[0] = RGBToU(ar, ag, ab);                                         \
+      dst_v[0] = RGBToV(ar, ag, ab);                                         \
+      src_rgb0 += BPP * 2;                                                   \
+      src_rgb1 += BPP * 2;                                                   \
+      dst_u += 1;                                                            \
+      dst_v += 1;                                                            \
+    }                                                                        \
+    if (width & 1) {                                                         \
+      uint8_t ab = AVGB(src_rgb0[B], src_rgb1[B]);                           \
+      uint8_t ag = AVGB(src_rgb0[G], src_rgb1[G]);                           \
+      uint8_t ar = AVGB(src_rgb0[R], src_rgb1[R]);                           \
+      dst_u[0] = RGBToU(ar, ag, ab);                                         \
+      dst_v[0] = RGBToV(ar, ag, ab);                                         \
+    }                                                                        \
   }
 #else
 // ARM version does sum / 2 then multiply by 2x smaller coefficients
-#define MAKEROWY(NAME, R, G, B, BPP)                                       \
-  void NAME##ToYRow_C(const uint8_t* src_rgb, uint8_t* dst_y, int width) { \
-    int x;                                                                 \
-    for (x = 0; x < width; ++x) {                                          \
-      dst_y[0] = RGBToY(src_rgb[R], src_rgb[G], src_rgb[B]);               \
-      src_rgb += BPP;                                                      \
-      dst_y += 1;                                                          \
-    }                                                                      \
-  }                                                                        \
-  void NAME##ToUVRow_C(const uint8_t* src_rgb, int src_stride_rgb,         \
-                       uint8_t* dst_u, uint8_t* dst_v, int width) {        \
-    const uint8_t* src_rgb1 = src_rgb + src_stride_rgb;                    \
-    int x;                                                                 \
-    for (x = 0; x < width - 1; x += 2) {                                   \
-      uint16_t ab = (src_rgb[B] + src_rgb[B + BPP] + src_rgb1[B] +         \
-                     src_rgb1[B + BPP] + 1) >>                             \
-                    1;                                                     \
-      uint16_t ag = (src_rgb[G] + src_rgb[G + BPP] + src_rgb1[G] +         \
-                     src_rgb1[G + BPP] + 1) >>                             \
-                    1;                                                     \
-      uint16_t ar = (src_rgb[R] + src_rgb[R + BPP] + src_rgb1[R] +         \
-                     src_rgb1[R + BPP] + 1) >>                             \
-                    1;                                                     \
-      dst_u[0] = RGB2xToU(ar, ag, ab);                                     \
-      dst_v[0] = RGB2xToV(ar, ag, ab);                                     \
-      src_rgb += BPP * 2;                                                  \
-      src_rgb1 += BPP * 2;                                                 \
-      dst_u += 1;                                                          \
-      dst_v += 1;                                                          \
-    }                                                                      \
-    if (width & 1) {                                                       \
-      uint16_t ab = src_rgb[B] + src_rgb1[B];                              \
-      uint16_t ag = src_rgb[G] + src_rgb1[G];                              \
-      uint16_t ar = src_rgb[R] + src_rgb1[R];                              \
-      dst_u[0] = RGB2xToU(ar, ag, ab);                                     \
-      dst_v[0] = RGB2xToV(ar, ag, ab);                                     \
-    }                                                                      \
+#define MAKEROWY(NAME, R, G, B, BPP)                                         \
+  void NAME##ToYRow_C(const uint8_t* src_argb0, uint8_t* dst_y, int width) { \
+    int x;                                                                   \
+    for (x = 0; x < width; ++x) {                                            \
+      dst_y[0] = RGBToY(src_argb0[R], src_argb0[G], src_argb0[B]);           \
+      src_argb0 += BPP;                                                      \
+      dst_y += 1;                                                            \
+    }                                                                        \
+  }                                                                          \
+  void NAME##ToUVRow_C(const uint8_t* src_rgb0, int src_stride_rgb,          \
+                       uint8_t* dst_u, uint8_t* dst_v, int width) {          \
+    const uint8_t* src_rgb1 = src_rgb0 + src_stride_rgb;                     \
+    int x;                                                                   \
+    for (x = 0; x < width - 1; x += 2) {                                     \
+      uint16_t ab = (src_rgb0[B] + src_rgb0[B + BPP] + src_rgb1[B] +         \
+                     src_rgb1[B + BPP] + 1) >>                               \
+                    1;                                                       \
+      uint16_t ag = (src_rgb0[G] + src_rgb0[G + BPP] + src_rgb1[G] +         \
+                     src_rgb1[G + BPP] + 1) >>                               \
+                    1;                                                       \
+      uint16_t ar = (src_rgb0[R] + src_rgb0[R + BPP] + src_rgb1[R] +         \
+                     src_rgb1[R + BPP] + 1) >>                               \
+                    1;                                                       \
+      dst_u[0] = RGB2xToU(ar, ag, ab);                                       \
+      dst_v[0] = RGB2xToV(ar, ag, ab);                                       \
+      src_rgb0 += BPP * 2;                                                   \
+      src_rgb1 += BPP * 2;                                                   \
+      dst_u += 1;                                                            \
+      dst_v += 1;                                                            \
+    }                                                                        \
+    if (width & 1) {                                                         \
+      uint16_t ab = src_rgb0[B] + src_rgb1[B];                               \
+      uint16_t ag = src_rgb0[G] + src_rgb1[G];                               \
+      uint16_t ar = src_rgb0[R] + src_rgb1[R];                               \
+      dst_u[0] = RGB2xToU(ar, ag, ab);                                       \
+      dst_v[0] = RGB2xToV(ar, ag, ab);                                       \
+    }                                                                        \
   }
 #endif
 
@@ -694,80 +608,80 @@ static __inline int RGB2xToVJ(uint16_t r, uint16_t g, uint16_t b) {
 // ARGBToYJ_C and ARGBToUVJ_C
 // Intel version mimic SSE/AVX which does 2 pavgb
 #if LIBYUV_ARGBTOUV_PAVGB
-#define MAKEROWYJ(NAME, R, G, B, BPP)                                       \
-  void NAME##ToYJRow_C(const uint8_t* src_rgb, uint8_t* dst_y, int width) { \
-    int x;                                                                  \
-    for (x = 0; x < width; ++x) {                                           \
-      dst_y[0] = RGBToYJ(src_rgb[R], src_rgb[G], src_rgb[B]);               \
-      src_rgb += BPP;                                                       \
-      dst_y += 1;                                                           \
-    }                                                                       \
-  }                                                                         \
-  void NAME##ToUVJRow_C(const uint8_t* src_rgb, int src_stride_rgb,         \
-                        uint8_t* dst_u, uint8_t* dst_v, int width) {        \
-    const uint8_t* src_rgb1 = src_rgb + src_stride_rgb;                     \
-    int x;                                                                  \
-    for (x = 0; x < width - 1; x += 2) {                                    \
-      uint8_t ab = AVGB(AVGB(src_rgb[B], src_rgb1[B]),                      \
-                        AVGB(src_rgb[B + BPP], src_rgb1[B + BPP]));         \
-      uint8_t ag = AVGB(AVGB(src_rgb[G], src_rgb1[G]),                      \
-                        AVGB(src_rgb[G + BPP], src_rgb1[G + BPP]));         \
-      uint8_t ar = AVGB(AVGB(src_rgb[R], src_rgb1[R]),                      \
-                        AVGB(src_rgb[R + BPP], src_rgb1[R + BPP]));         \
-      dst_u[0] = RGBToUJ(ar, ag, ab);                                       \
-      dst_v[0] = RGBToVJ(ar, ag, ab);                                       \
-      src_rgb += BPP * 2;                                                   \
-      src_rgb1 += BPP * 2;                                                  \
-      dst_u += 1;                                                           \
-      dst_v += 1;                                                           \
-    }                                                                       \
-    if (width & 1) {                                                        \
-      uint8_t ab = AVGB(src_rgb[B], src_rgb1[B]);                           \
-      uint8_t ag = AVGB(src_rgb[G], src_rgb1[G]);                           \
-      uint8_t ar = AVGB(src_rgb[R], src_rgb1[R]);                           \
-      dst_u[0] = RGBToUJ(ar, ag, ab);                                       \
-      dst_v[0] = RGBToVJ(ar, ag, ab);                                       \
-    }                                                                       \
+#define MAKEROWYJ(NAME, R, G, B, BPP)                                         \
+  void NAME##ToYJRow_C(const uint8_t* src_argb0, uint8_t* dst_y, int width) { \
+    int x;                                                                    \
+    for (x = 0; x < width; ++x) {                                             \
+      dst_y[0] = RGBToYJ(src_argb0[R], src_argb0[G], src_argb0[B]);           \
+      src_argb0 += BPP;                                                       \
+      dst_y += 1;                                                             \
+    }                                                                         \
+  }                                                                           \
+  void NAME##ToUVJRow_C(const uint8_t* src_rgb0, int src_stride_rgb,          \
+                        uint8_t* dst_u, uint8_t* dst_v, int width) {          \
+    const uint8_t* src_rgb1 = src_rgb0 + src_stride_rgb;                      \
+    int x;                                                                    \
+    for (x = 0; x < width - 1; x += 2) {                                      \
+      uint8_t ab = AVGB(AVGB(src_rgb0[B], src_rgb1[B]),                       \
+                        AVGB(src_rgb0[B + BPP], src_rgb1[B + BPP]));          \
+      uint8_t ag = AVGB(AVGB(src_rgb0[G], src_rgb1[G]),                       \
+                        AVGB(src_rgb0[G + BPP], src_rgb1[G + BPP]));          \
+      uint8_t ar = AVGB(AVGB(src_rgb0[R], src_rgb1[R]),                       \
+                        AVGB(src_rgb0[R + BPP], src_rgb1[R + BPP]));          \
+      dst_u[0] = RGBToUJ(ar, ag, ab);                                         \
+      dst_v[0] = RGBToVJ(ar, ag, ab);                                         \
+      src_rgb0 += BPP * 2;                                                    \
+      src_rgb1 += BPP * 2;                                                    \
+      dst_u += 1;                                                             \
+      dst_v += 1;                                                             \
+    }                                                                         \
+    if (width & 1) {                                                          \
+      uint8_t ab = AVGB(src_rgb0[B], src_rgb1[B]);                            \
+      uint8_t ag = AVGB(src_rgb0[G], src_rgb1[G]);                            \
+      uint8_t ar = AVGB(src_rgb0[R], src_rgb1[R]);                            \
+      dst_u[0] = RGBToUJ(ar, ag, ab);                                         \
+      dst_v[0] = RGBToVJ(ar, ag, ab);                                         \
+    }                                                                         \
   }
 #else
 // ARM version does sum / 2 then multiply by 2x smaller coefficients
-#define MAKEROWYJ(NAME, R, G, B, BPP)                                       \
-  void NAME##ToYJRow_C(const uint8_t* src_rgb, uint8_t* dst_y, int width) { \
-    int x;                                                                  \
-    for (x = 0; x < width; ++x) {                                           \
-      dst_y[0] = RGBToYJ(src_rgb[R], src_rgb[G], src_rgb[B]);               \
-      src_rgb += BPP;                                                       \
-      dst_y += 1;                                                           \
-    }                                                                       \
-  }                                                                         \
-  void NAME##ToUVJRow_C(const uint8_t* src_rgb, int src_stride_rgb,         \
-                        uint8_t* dst_u, uint8_t* dst_v, int width) {        \
-    const uint8_t* src_rgb1 = src_rgb + src_stride_rgb;                     \
-    int x;                                                                  \
-    for (x = 0; x < width - 1; x += 2) {                                    \
-      uint16_t ab = (src_rgb[B] + src_rgb[B + BPP] + src_rgb1[B] +          \
-                     src_rgb1[B + BPP] + 1) >>                              \
-                    1;                                                      \
-      uint16_t ag = (src_rgb[G] + src_rgb[G + BPP] + src_rgb1[G] +          \
-                     src_rgb1[G + BPP] + 1) >>                              \
-                    1;                                                      \
-      uint16_t ar = (src_rgb[R] + src_rgb[R + BPP] + src_rgb1[R] +          \
-                     src_rgb1[R + BPP] + 1) >>                              \
-                    1;                                                      \
-      dst_u[0] = RGB2xToUJ(ar, ag, ab);                                     \
-      dst_v[0] = RGB2xToVJ(ar, ag, ab);                                     \
-      src_rgb += BPP * 2;                                                   \
-      src_rgb1 += BPP * 2;                                                  \
-      dst_u += 1;                                                           \
-      dst_v += 1;                                                           \
-    }                                                                       \
-    if (width & 1) {                                                        \
-      uint16_t ab = (src_rgb[B] + src_rgb1[B]);                             \
-      uint16_t ag = (src_rgb[G] + src_rgb1[G]);                             \
-      uint16_t ar = (src_rgb[R] + src_rgb1[R]);                             \
-      dst_u[0] = RGB2xToUJ(ar, ag, ab);                                     \
-      dst_v[0] = RGB2xToVJ(ar, ag, ab);                                     \
-    }                                                                       \
+#define MAKEROWYJ(NAME, R, G, B, BPP)                                         \
+  void NAME##ToYJRow_C(const uint8_t* src_argb0, uint8_t* dst_y, int width) { \
+    int x;                                                                    \
+    for (x = 0; x < width; ++x) {                                             \
+      dst_y[0] = RGBToYJ(src_argb0[R], src_argb0[G], src_argb0[B]);           \
+      src_argb0 += BPP;                                                       \
+      dst_y += 1;                                                             \
+    }                                                                         \
+  }                                                                           \
+  void NAME##ToUVJRow_C(const uint8_t* src_rgb0, int src_stride_rgb,          \
+                        uint8_t* dst_u, uint8_t* dst_v, int width) {          \
+    const uint8_t* src_rgb1 = src_rgb0 + src_stride_rgb;                      \
+    int x;                                                                    \
+    for (x = 0; x < width - 1; x += 2) {                                      \
+      uint16_t ab = (src_rgb0[B] + src_rgb0[B + BPP] + src_rgb1[B] +          \
+                     src_rgb1[B + BPP] + 1) >>                                \
+                    1;                                                        \
+      uint16_t ag = (src_rgb0[G] + src_rgb0[G + BPP] + src_rgb1[G] +          \
+                     src_rgb1[G + BPP] + 1) >>                                \
+                    1;                                                        \
+      uint16_t ar = (src_rgb0[R] + src_rgb0[R + BPP] + src_rgb1[R] +          \
+                     src_rgb1[R + BPP] + 1) >>                                \
+                    1;                                                        \
+      dst_u[0] = RGB2xToUJ(ar, ag, ab);                                       \
+      dst_v[0] = RGB2xToVJ(ar, ag, ab);                                       \
+      src_rgb0 += BPP * 2;                                                    \
+      src_rgb1 += BPP * 2;                                                    \
+      dst_u += 1;                                                             \
+      dst_v += 1;                                                             \
+    }                                                                         \
+    if (width & 1) {                                                          \
+      uint16_t ab = (src_rgb0[B] + src_rgb1[B]);                              \
+      uint16_t ag = (src_rgb0[G] + src_rgb1[G]);                              \
+      uint16_t ar = (src_rgb0[R] + src_rgb1[R]);                              \
+      dst_u[0] = RGB2xToUJ(ar, ag, ab);                                       \
+      dst_v[0] = RGB2xToVJ(ar, ag, ab);                                       \
+    }                                                                         \
   }
 
 #endif
@@ -1237,16 +1151,16 @@ void ARGBShadeRow_C(const uint8_t* src_argb,
 #define REPEAT8(v) (v) | ((v) << 8)
 #define SHADE(f, v) v* f >> 16
 
-void ARGBMultiplyRow_C(const uint8_t* src_argb,
+void ARGBMultiplyRow_C(const uint8_t* src_argb0,
                        const uint8_t* src_argb1,
                        uint8_t* dst_argb,
                        int width) {
   int i;
   for (i = 0; i < width; ++i) {
-    const uint32_t b = REPEAT8(src_argb[0]);
-    const uint32_t g = REPEAT8(src_argb[1]);
-    const uint32_t r = REPEAT8(src_argb[2]);
-    const uint32_t a = REPEAT8(src_argb[3]);
+    const uint32_t b = REPEAT8(src_argb0[0]);
+    const uint32_t g = REPEAT8(src_argb0[1]);
+    const uint32_t r = REPEAT8(src_argb0[2]);
+    const uint32_t a = REPEAT8(src_argb0[3]);
     const uint32_t b_scale = src_argb1[0];
     const uint32_t g_scale = src_argb1[1];
     const uint32_t r_scale = src_argb1[2];
@@ -1255,7 +1169,7 @@ void ARGBMultiplyRow_C(const uint8_t* src_argb,
     dst_argb[1] = SHADE(g, g_scale);
     dst_argb[2] = SHADE(r, r_scale);
     dst_argb[3] = SHADE(a, a_scale);
-    src_argb += 4;
+    src_argb0 += 4;
     src_argb1 += 4;
     dst_argb += 4;
   }
@@ -1265,16 +1179,16 @@ void ARGBMultiplyRow_C(const uint8_t* src_argb,
 
 #define SHADE(f, v) clamp255(v + f)
 
-void ARGBAddRow_C(const uint8_t* src_argb,
+void ARGBAddRow_C(const uint8_t* src_argb0,
                   const uint8_t* src_argb1,
                   uint8_t* dst_argb,
                   int width) {
   int i;
   for (i = 0; i < width; ++i) {
-    const int b = src_argb[0];
-    const int g = src_argb[1];
-    const int r = src_argb[2];
-    const int a = src_argb[3];
+    const int b = src_argb0[0];
+    const int g = src_argb0[1];
+    const int r = src_argb0[2];
+    const int a = src_argb0[3];
     const int b_add = src_argb1[0];
     const int g_add = src_argb1[1];
     const int r_add = src_argb1[2];
@@ -1283,7 +1197,7 @@ void ARGBAddRow_C(const uint8_t* src_argb,
     dst_argb[1] = SHADE(g, g_add);
     dst_argb[2] = SHADE(r, r_add);
     dst_argb[3] = SHADE(a, a_add);
-    src_argb += 4;
+    src_argb0 += 4;
     src_argb1 += 4;
     dst_argb += 4;
   }
@@ -1292,16 +1206,16 @@ void ARGBAddRow_C(const uint8_t* src_argb,
 
 #define SHADE(f, v) clamp0(f - v)
 
-void ARGBSubtractRow_C(const uint8_t* src_argb,
+void ARGBSubtractRow_C(const uint8_t* src_argb0,
                        const uint8_t* src_argb1,
                        uint8_t* dst_argb,
                        int width) {
   int i;
   for (i = 0; i < width; ++i) {
-    const int b = src_argb[0];
-    const int g = src_argb[1];
-    const int r = src_argb[2];
-    const int a = src_argb[3];
+    const int b = src_argb0[0];
+    const int g = src_argb0[1];
+    const int r = src_argb0[2];
+    const int a = src_argb0[3];
     const int b_sub = src_argb1[0];
     const int g_sub = src_argb1[1];
     const int r_sub = src_argb1[2];
@@ -1310,7 +1224,7 @@ void ARGBSubtractRow_C(const uint8_t* src_argb,
     dst_argb[1] = SHADE(g, g_sub);
     dst_argb[2] = SHADE(r, r_sub);
     dst_argb[3] = SHADE(a, a_sub);
-    src_argb += 4;
+    src_argb0 += 4;
     src_argb1 += 4;
     dst_argb += 4;
   }
@@ -3019,105 +2933,6 @@ void MergeARGBRow_C(const uint8_t* src_r,
   }
 }
 
-void MergeXR30Row_C(const uint16_t* src_r,
-                    const uint16_t* src_g,
-                    const uint16_t* src_b,
-                    uint8_t* dst_ar30,
-                    int depth,
-                    int width) {
-  assert(depth >= 10);
-  assert(depth <= 16);
-  int x;
-  int shift = depth - 10;
-  uint32_t* dst_ar30_32 = (uint32_t*)dst_ar30;
-  for (x = 0; x < width; ++x) {
-    uint32_t r = clamp1023(src_r[x] >> shift);
-    uint32_t g = clamp1023(src_g[x] >> shift);
-    uint32_t b = clamp1023(src_b[x] >> shift);
-    dst_ar30_32[x] = b | (g << 10) | (r << 20) | 0xc0000000;
-  }
-}
-
-void MergeAR64Row_C(const uint16_t* src_r,
-                    const uint16_t* src_g,
-                    const uint16_t* src_b,
-                    const uint16_t* src_a,
-                    uint16_t* dst_ar64,
-                    int depth,
-                    int width) {
-  assert(depth >= 1);
-  assert(depth <= 16);
-  int x;
-  int shift = 16 - depth;
-  int max = (1 << depth) - 1;
-  for (x = 0; x < width; ++x) {
-    dst_ar64[0] = clamp2nm1(src_b[x], max) << shift;
-    dst_ar64[1] = clamp2nm1(src_g[x], max) << shift;
-    dst_ar64[2] = clamp2nm1(src_r[x], max) << shift;
-    dst_ar64[3] = clamp2nm1(src_a[x], max) << shift;
-    dst_ar64 += 4;
-  }
-}
-
-void MergeARGB16To8Row_C(const uint16_t* src_r,
-                         const uint16_t* src_g,
-                         const uint16_t* src_b,
-                         const uint16_t* src_a,
-                         uint8_t* dst_argb,
-                         int depth,
-                         int width) {
-  assert(depth >= 8);
-  assert(depth <= 16);
-  int x;
-  int shift = depth - 8;
-  for (x = 0; x < width; ++x) {
-    dst_argb[0] = clamp255(src_b[x] >> shift);
-    dst_argb[1] = clamp255(src_g[x] >> shift);
-    dst_argb[2] = clamp255(src_r[x] >> shift);
-    dst_argb[3] = clamp255(src_a[x] >> shift);
-    dst_argb += 4;
-  }
-}
-
-void MergeXR64Row_C(const uint16_t* src_r,
-                    const uint16_t* src_g,
-                    const uint16_t* src_b,
-                    uint16_t* dst_ar64,
-                    int depth,
-                    int width) {
-  assert(depth >= 1);
-  assert(depth <= 16);
-  int x;
-  int shift = 16 - depth;
-  int max = (1 << depth) - 1;
-  for (x = 0; x < width; ++x) {
-    dst_ar64[0] = clamp2nm1(src_b[x], max) << shift;
-    dst_ar64[1] = clamp2nm1(src_g[x], max) << shift;
-    dst_ar64[2] = clamp2nm1(src_r[x], max) << shift;
-    dst_ar64[3] = 0xffff;
-    dst_ar64 += 4;
-  }
-}
-
-void MergeXRGB16To8Row_C(const uint16_t* src_r,
-                         const uint16_t* src_g,
-                         const uint16_t* src_b,
-                         uint8_t* dst_argb,
-                         int depth,
-                         int width) {
-  assert(depth >= 8);
-  assert(depth <= 16);
-  int x;
-  int shift = depth - 8;
-  for (x = 0; x < width; ++x) {
-    dst_argb[0] = clamp255(src_b[x] >> shift);
-    dst_argb[1] = clamp255(src_g[x] >> shift);
-    dst_argb[2] = clamp255(src_r[x] >> shift);
-    dst_argb[3] = 0xff;
-    dst_argb += 4;
-  }
-}
-
 void SplitXRGBRow_C(const uint8_t* src_argb,
                     uint8_t* dst_r,
                     uint8_t* dst_g,
@@ -3154,8 +2969,6 @@ void MergeUVRow_16_C(const uint16_t* src_u,
                      int depth,
                      int width) {
   int shift = 16 - depth;
-  assert(depth >= 8);
-  assert(depth <= 16);
   int x;
   for (x = 0; x < width; ++x) {
     dst_uv[0] = src_u[x] << shift;
@@ -3172,8 +2985,6 @@ void SplitUVRow_16_C(const uint16_t* src_uv,
                      int width) {
   int shift = 16 - depth;
   int x;
-  assert(depth >= 8);
-  assert(depth <= 16);
   for (x = 0; x < width; ++x) {
     dst_u[x] = src_uv[0] >> shift;
     dst_v[x] = src_uv[1] >> shift;
@@ -3211,9 +3022,6 @@ void Convert16To8Row_C(const uint16_t* src_y,
                        int scale,
                        int width) {
   int x;
-  assert(scale >= 256);
-  assert(scale <= 32768);
-
   for (x = 0; x < width; ++x) {
     dst_y[x] = clamp255((src_y[x] * scale) >> 16);
   }
@@ -3347,19 +3155,19 @@ void UYVYToYRow_C(const uint8_t* src_uyvy, uint8_t* dst_y, int width) {
 
 #define BLEND(f, b, a) clamp255((((256 - a) * b) >> 8) + f)
 
-// Blend src_argb over src_argb1 and store to dst_argb.
-// dst_argb may be src_argb or src_argb1.
+// Blend src_argb0 over src_argb1 and store to dst_argb.
+// dst_argb may be src_argb0 or src_argb1.
 // This code mimics the SSSE3 version for better testability.
-void ARGBBlendRow_C(const uint8_t* src_argb,
+void ARGBBlendRow_C(const uint8_t* src_argb0,
                     const uint8_t* src_argb1,
                     uint8_t* dst_argb,
                     int width) {
   int x;
   for (x = 0; x < width - 1; x += 2) {
-    uint32_t fb = src_argb[0];
-    uint32_t fg = src_argb[1];
-    uint32_t fr = src_argb[2];
-    uint32_t a = src_argb[3];
+    uint32_t fb = src_argb0[0];
+    uint32_t fg = src_argb0[1];
+    uint32_t fr = src_argb0[2];
+    uint32_t a = src_argb0[3];
     uint32_t bb = src_argb1[0];
     uint32_t bg = src_argb1[1];
     uint32_t br = src_argb1[2];
@@ -3368,10 +3176,10 @@ void ARGBBlendRow_C(const uint8_t* src_argb,
     dst_argb[2] = BLEND(fr, br, a);
     dst_argb[3] = 255u;
 
-    fb = src_argb[4 + 0];
-    fg = src_argb[4 + 1];
-    fr = src_argb[4 + 2];
-    a = src_argb[4 + 3];
+    fb = src_argb0[4 + 0];
+    fg = src_argb0[4 + 1];
+    fr = src_argb0[4 + 2];
+    a = src_argb0[4 + 3];
     bb = src_argb1[4 + 0];
     bg = src_argb1[4 + 1];
     br = src_argb1[4 + 2];
@@ -3379,16 +3187,16 @@ void ARGBBlendRow_C(const uint8_t* src_argb,
     dst_argb[4 + 1] = BLEND(fg, bg, a);
     dst_argb[4 + 2] = BLEND(fr, br, a);
     dst_argb[4 + 3] = 255u;
-    src_argb += 8;
+    src_argb0 += 8;
     src_argb1 += 8;
     dst_argb += 8;
   }
 
   if (width & 1) {
-    uint32_t fb = src_argb[0];
-    uint32_t fg = src_argb[1];
-    uint32_t fr = src_argb[2];
-    uint32_t a = src_argb[3];
+    uint32_t fb = src_argb0[0];
+    uint32_t fg = src_argb0[1];
+    uint32_t fr = src_argb0[2];
+    uint32_t a = src_argb0[3];
     uint32_t bb = src_argb1[0];
     uint32_t bg = src_argb1[1];
     uint32_t br = src_argb1[2];

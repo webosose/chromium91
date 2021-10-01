@@ -41,6 +41,11 @@ class BLINK_PLATFORM_EXPORT WebMediaPlayerDelegate {
     // Players should typically respond by releasing resources, for example by
     // discarding their decoders.
     virtual void OnIdleTimeout() = 0;
+
+#if defined(USE_NEVA_MEDIA)
+    virtual void OnMediaActivationPermitted() {}
+    virtual void OnSuspend() {}
+#endif
   };
 
   // Returns true if the host frame is hidden or closed.

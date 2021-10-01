@@ -271,6 +271,10 @@
 #include "content/browser/serial/serial_service.h"
 #endif
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "content/public/browser/web_contents.h"
+#endif
+
 #if defined(OS_MAC)
 #include "content/browser/renderer_host/popup_menu_helper_mac.h"
 #endif
@@ -1849,7 +1853,9 @@ void RenderFrameHostImpl::ExecuteJavaScriptMethod(
 void RenderFrameHostImpl::ExecuteJavaScript(const std::u16string& javascript,
                                             JavaScriptResultCallback callback) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
+#if !defined(USE_NEVA_APPRUNTIME)
   CHECK(CanExecuteJavaScript());
+#endif
 
   const bool wants_result = !callback.is_null();
   GetMojomFrameInRenderer()->JavaScriptExecuteRequest(javascript, wants_result,
@@ -5287,6 +5293,38 @@ void RenderFrameHostImpl::SetKeepAliveTimeoutForTesting(
   keep_alive_handle_factory_.set_timeout(timeout);
 }
 
+#if defined(USE_NEVA_APPRUNTIME)
+void RenderFrameHostImpl::DropAllPeerConnections(base::OnceClosure cb) {
+  GetPeerConnectionTrackerHost().DropAllConnections(cb);
+}
+#endif  // defined(USE_NEVA_APPRUNTIME)
+
+#if defined(USE_NEVA_MEDIA)
+mojom::FrameMediaController* RenderFrameHostImpl::GetFrameMediaController() {
+  if (!frame_media_controller_)
+    GetRemoteAssociatedInterfaces()->GetInterface(&frame_media_controller_);
+  return frame_media_controller_.get();
+}
+
+void RenderFrameHostImpl::SetSuppressed(bool is_suppressed) {
+  if (GetFrameMediaController())
+    GetFrameMediaController()->SetSuppressed(is_suppressed);
+}
+
+gfx::AcceleratedWidget RenderFrameHostImpl::GetAcceleratedWidget() {
+  RenderWidgetHostViewBase* view = static_cast<RenderWidgetHostViewBase*>(
+      frame_tree_node_->IsMainFrame()
+          ? render_view_host_->GetWidget()->GetView()
+          : frame_tree_node_->frame_tree()
+                ->GetMainFrame()
+                ->render_view_host_->GetWidget()
+                ->GetView());
+  if (view)
+    return view->GetAcceleratedWidget();
+  return gfx::kNullAcceleratedWidget;
+}
+#endif
+
 void RenderFrameHostImpl::UpdateState(const blink::PageState& state) {
   OPTIONAL_TRACE_EVENT1("content", "RenderFrameHostImpl::UpdateState",
                         "render_frame_host", this);
@@ -6017,6 +6055,17 @@ CanCommitStatus RenderFrameHostImpl::CanCommitOriginAndUrl(
     return CanCommitStatus::CAN_COMMIT_ORIGIN_AND_URL;
   }
 
+#if defined(USE_NEVA_APPRUNTIME)
+  if (origin.scheme() == url::kFileScheme) {
+    if (delegate_->GetAsWebContents()) {
+      blink::RendererPreferences* renderer_prefs =
+          delegate_->GetAsWebContents()->GetMutableRendererPrefs();
+      if (!renderer_prefs->file_security_origin.empty())
+        return CanCommitStatus::CAN_COMMIT_ORIGIN_AND_URL;
+    }
+  }
+#endif
+
   // Renderer-debug URLs can never be committed.
   if (IsRendererDebugURL(url)) {
     LogCanCommitOriginAndUrlFailureReason("is_renderer_debug_url");
@@ -6568,6 +6617,12 @@ void RenderFrameHostImpl::CommitNavigation(
         navigation_request->GetSubresourceWebBundleNavigationInfo();
   }
 
+#if defined(USE_NEVA_APPRUNTIME)
+  auto* web_contents = delegate_->GetAsWebContents();
+  if (web_contents->GetDelegate()->GetAllowLocalResourceLoad())
+    commit_params->can_load_local_resources = true;
+#endif
+
   UpdatePermissionsForNavigation(*common_params, *commit_params);
 
   // Get back to a clean state, in case we start a new navigation without
@@ -7097,6 +7152,16 @@ void RenderFrameHostImpl::SetUpMojoIfNeeded() {
                 blink::mojom::LocalFrameHost::Name_));
       },
       base::Unretained(this)));
+
+#if defined(USE_NEVA_MEDIA)
+  associated_registry_->AddInterface(base::BindRepeating(
+      [](RenderFrameHostImpl* impl,
+         mojo::PendingAssociatedReceiver<
+             content::mojom::FrameVideoWindowFactory> receiver) {
+        impl->frame_video_window_factory_receiver_.Bind(std::move(receiver));
+      },
+      base::Unretained(this)));
+#endif  // defined(USE_NEVA_MEDIA)
 
   if (frame_tree_node_->IsMainFrame()) {
     associated_registry_->AddInterface(base::BindRepeating(

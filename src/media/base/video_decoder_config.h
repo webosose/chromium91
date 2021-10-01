@@ -167,6 +167,11 @@ class MEDIA_EXPORT VideoDecoderConfig {
   // useful for decryptors that decrypts an encrypted stream to a clear stream.
   void SetIsEncrypted(bool is_encrypted);
 
+#if defined(USE_NEVA_MEDIA)
+  bool is_live_stream() const { return is_live_stream_; }
+  void set_live_stream(bool live_stream) { is_live_stream_ = live_stream; }
+#endif
+
   // Sets whether this config is for WebRTC or not.
   void set_is_rtc(bool is_rtc) { is_rtc_ = is_rtc; }
   bool is_rtc() const { return is_rtc_; }
@@ -194,6 +199,11 @@ class MEDIA_EXPORT VideoDecoderConfig {
   EncryptionScheme encryption_scheme_ = EncryptionScheme::kUnencrypted;
 
   VideoColorSpace color_space_info_;
+
+#if defined(USE_NEVA_MEDIA)
+  bool is_live_stream_ = false;
+#endif
+
   base::Optional<gfx::HDRMetadata> hdr_metadata_;
   bool is_rtc_ = false;
 

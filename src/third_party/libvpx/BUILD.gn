@@ -10,6 +10,8 @@ import("//build/config/sanitizers/sanitizers.gni")
 import("//third_party/libvpx/libvpx_srcs.gni")
 import("//third_party/nasm/nasm_assemble.gni")
 
+import("//neva/neva.gni")
+
 # Sets the architecture name for building libvpx.
 if (current_cpu == "x86") {
   cpu_arch_full = "ia32"
@@ -23,7 +25,10 @@ if (current_cpu == "x86") {
   if (is_chromeos_ash) {
     # ChromeOS gets highbd vp9 but other arm targets do not.
     cpu_arch_full = "arm-neon-highbd"
-  } else if (arm_use_neon) {
+  } else if (arm_use_neon && webos_product_type != "tv") {
+    # TODO(neva, sync-to-91)
+    # We found runtime crash while encoding in WebRTC.
+    # Disable neon until we find a solution.
     cpu_arch_full = "arm-neon"
   } else if (is_android) {
     cpu_arch_full = "arm-neon-cpu-detect"
@@ -335,7 +340,10 @@ static_library("libvpx") {
   } else if (current_cpu == "arm") {
     if (is_chromeos_ash) {
       sources = libvpx_srcs_arm_neon_highbd
-    } else if (arm_use_neon) {
+    } else if (arm_use_neon && webos_product_type != "tv") {
+      # TODO(neva, sync-to-91)
+      # We found runtime crash while encoding in WebRTC.
+      # Disable neon until we find a solution.
       sources = libvpx_srcs_arm_neon
     } else if (is_android) {
       sources = libvpx_srcs_arm_neon_cpu_detect

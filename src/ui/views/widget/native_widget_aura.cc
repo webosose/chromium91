@@ -70,7 +70,9 @@
 #endif
 
 #if BUILDFLAG(ENABLE_DESKTOP_AURA) && \
-    (defined(OS_LINUX) || defined(OS_CHROMEOS))
+    (defined(OS_LINUX) || defined(OS_CHROMEOS)) && \
+    !defined(OZONE_PLATFORM_WAYLAND) && \
+    !defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
 #include "ui/views/linux_ui/linux_ui.h"
 #include "ui/views/widget/desktop_aura/desktop_window_tree_host_linux.h"
 #endif
@@ -1124,7 +1126,9 @@ void NativeWidgetAura::SetInitialFocus(ui::WindowShowState show_state) {
 
 namespace {
 #if BUILDFLAG(ENABLE_DESKTOP_AURA) && \
-    (defined(OS_WIN) || defined(OS_LINUX) || defined(OS_CHROMEOS))
+    (defined(OS_WIN) || defined(OS_LINUX) || defined(OS_CHROMEOS)) && \
+    !defined(OZONE_PLATFORM_WAYLAND) && \
+    !defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
 void CloseWindow(aura::Window* window) {
   if (window) {
     Widget* widget = Widget::GetWidgetForNativeView(window);
@@ -1155,7 +1159,9 @@ void Widget::CloseAllSecondaryWidgets() {
 #endif
 
 #if BUILDFLAG(ENABLE_DESKTOP_AURA) && \
-    (defined(OS_LINUX) || defined(OS_CHROMEOS))
+    (defined(OS_LINUX) || defined(OS_CHROMEOS)) && \
+    !defined(OZONE_PLATFORM_WAYLAND) && \
+    !defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
   DesktopWindowTreeHostLinux::CleanUpWindowList(CloseWindow);
 #endif
 }
@@ -1168,7 +1174,9 @@ const ui::NativeTheme* Widget::GetNativeTheme() const {
   }
 
 #if BUILDFLAG(ENABLE_DESKTOP_AURA) && \
-    (defined(OS_LINUX) || defined(OS_CHROMEOS))
+    (defined(OS_LINUX) || defined(OS_CHROMEOS)) && \
+    !defined(OZONE_PLATFORM_WAYLAND) && \
+    !defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
   const LinuxUI* linux_ui = LinuxUI::instance();
   if (linux_ui) {
     ui::NativeTheme* native_theme =

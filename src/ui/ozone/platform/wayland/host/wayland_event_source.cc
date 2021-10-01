@@ -135,6 +135,20 @@ uint32_t WaylandEventSource::OnKeyboardKeyEvent(
   return DispatchEvent(&event);
 }
 
+#if defined(OS_WEBOS)
+void WaylandEventSource::OnKeyboardLGKeyEvent(EventType type,
+                                              uint32_t lg_code,
+                                              base::TimeTicks timestamp,
+                                              int device_id) {
+  DCHECK(type == ET_KEY_PRESSED || type == ET_KEY_RELEASED);
+
+  KeyEvent event(type, static_cast<KeyboardCode>(lg_code), DomCode::NONE,
+                 keyboard_modifiers_, DomKey(), timestamp);
+  event.set_source_device_id(device_id);
+  DispatchEvent(&event);
+}
+#endif
+
 void WaylandEventSource::OnPointerFocusChanged(WaylandWindow* window,
                                                const gfx::PointF& location) {
   // Save new pointer location.

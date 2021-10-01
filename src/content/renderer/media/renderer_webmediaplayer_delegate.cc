@@ -296,5 +296,4 @@ void RendererWebMediaPlayerDelegate::CleanUpIdlePlayers(
 void RendererWebMediaPlayerDelegate::OnDestruct() {
   delete this;
 }
-
 }  // namespace media

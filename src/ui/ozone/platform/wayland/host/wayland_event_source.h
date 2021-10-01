@@ -89,6 +89,12 @@ class WaylandEventSource : public PlatformEventSource,
                               base::TimeTicks timestamp,
                               int device_id,
                               WaylandKeyboard::KeyEventKind kind) override;
+#if defined(OS_WEBOS)
+  void OnKeyboardLGKeyEvent(EventType type,
+                            uint32_t lg_code,
+                            base::TimeTicks timestamp,
+                            int device_id) override;
+#endif
 
   // WaylandPointer::Delegate
   void OnPointerFocusChanged(WaylandWindow* window,

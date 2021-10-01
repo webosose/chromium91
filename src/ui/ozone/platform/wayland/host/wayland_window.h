@@ -183,6 +183,23 @@ class WaylandWindow : public PlatformWindow,
   virtual void HandlePopupConfigure(const gfx::Rect& bounds);
   virtual void UpdateVisualSize(const gfx::Size& size_px);
 
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  virtual void HandleStateChanged(PlatformWindowState state);
+  virtual void HandleActivationChanged(bool is_activated);
+  void HandleKeyboardEnter();
+  void HandleKeyboardLeave();
+  void OnSurfaceContentChanged();
+
+  // neva::PlatformWindow
+  void SetInputRegion(const std::vector<gfx::Rect>& regions) override;
+  void SetCustomCursor(neva_app_runtime::CustomCursorType type,
+                       const std::string& path,
+                       int hotspot_x,
+                       int hotspot_y,
+                       bool allowed_cursor_overriding) override;
+  ///@}
+
   // Handles close requests.
   virtual void OnCloseRequest();
 
@@ -289,6 +306,12 @@ class WaylandWindow : public PlatformWindow,
 
   // The current cursor bitmap (immutable).
   scoped_refptr<BitmapCursorOzone> bitmap_;
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  bool allowed_cursor_overriding_ = false;
+  neva_app_runtime::CustomCursorType cursor_type_ =
+      neva_app_runtime::CustomCursorType::kNotUse;
+  ///@}
 
   // Current bounds of the platform window. This is either initialized, or the
   // requested size by the Wayland compositor. When this is set in SetBounds(),

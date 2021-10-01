@@ -26,6 +26,10 @@
 #include "ui/ozone/platform/wayland/host/wayland_window_observer.h"
 #include "ui/ozone/public/mojom/wayland/wayland_buffer_manager.mojom.h"
 
+#if defined(USE_NEVA_MEDIA)
+#include "ui/ozone/common/neva/mojom/video_window_provider.mojom.h"
+#endif  // defined(USE_NEVA_MEDIA)
+
 namespace ui {
 
 class WaylandConnection;
@@ -99,6 +103,11 @@ class WaylandBufferManagerHost : public ozone::mojom::WaylandBufferManagerHost,
   // interface bindings, it will be unbound and the state of the
   // |buffer_manager_| will be cleared.
   mojo::PendingRemote<ozone::mojom::WaylandBufferManagerHost> BindInterface();
+
+#if defined(USE_NEVA_MEDIA)
+  void BindVideoWindowProviderClient(
+      mojo::Remote<mojom::VideoWindowProviderClient> remote);
+#endif  // defined(USE_NEVA_MEDIA)
 
   // Unbinds the interface and clears the state of the |buffer_manager_|. Used
   // only when the GPU channel, which uses the mojo pipe to this interface, is

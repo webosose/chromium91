@@ -21,6 +21,10 @@
 #include "components/viz/service/viz_service_export.h"
 #include "gpu/ipc/common/surface_handle.h"
 
+#if defined(USE_NEVA_MEDIA)
+#include "components/viz/service/display/neva/neva_layer_overlay.h"
+#endif
+
 namespace cc {
 class DisplayResourceProvider;
 }
@@ -121,6 +125,10 @@ class VIZ_SERVICE_EXPORT OverlayProcessorUsingStrategy
     gfx::RectF GetPrimaryPlaneDisplayRect(const PrimaryPlane* primary_plane);
   };
   using StrategyList = std::vector<std::unique_ptr<Strategy>>;
+
+#if defined(USE_NEVA_MEDIA)
+  OverlayProcessorUsingStrategy(gpu::SurfaceHandle surface_handle);
+#endif
 
   ~OverlayProcessorUsingStrategy() override;
 
@@ -282,6 +290,10 @@ class VIZ_SERVICE_EXPORT OverlayProcessorUsingStrategy
   base::TimeTicks last_time_interval_switch_overlay_tick_;
   ProposedCandidateKey prev_overlay_tracking_id_;
   uint64_t frame_sequence_number_ = 0;
+
+#if defined(USE_NEVA_MEDIA)
+  NevaLayerOverlayProcessor neva_processor_;
+#endif
 
   // These values are used for tracking how much we can downscale with overlays
   // and is used for when we require an overlay so we can determine how much we

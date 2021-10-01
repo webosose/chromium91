@@ -14,6 +14,11 @@
 #include "build/chromeos_buildflags.h"
 #include "content/public/app/content_main_delegate.h"
 
+///@name USE_NEVA_APPRUNTIME
+///@{
+#include "extensions/shell/app/neva/app_shell_export.h"
+///@}
+
 namespace content {
 class ContentBrowserClient;
 class ContentClient;
@@ -22,7 +27,11 @@ class ContentRendererClient;
 
 namespace extensions {
 
-class ShellMainDelegate : public content::ContentMainDelegate {
+///@name USE_NEVA_APPRUNTIME
+///@{
+class APP_SHELL_EXPORT ShellMainDelegate
+///@}
+    : public content::ContentMainDelegate {
  public:
   ShellMainDelegate();
   ~ShellMainDelegate() override;

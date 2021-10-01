@@ -24,6 +24,12 @@
 #include "media/base/android/media_codec_util.h"
 #endif
 
+#if defined(USE_NEVA_WEBRTC)
+#include "base/command_line.h"
+#include "media/base/media_switches_neva.h"
+#include "media/webrtc/neva/neva_webrtc_video_decoder_factory.h"
+#endif
+
 namespace blink {
 
 namespace {
@@ -214,6 +220,19 @@ std::unique_ptr<webrtc::VideoDecoderFactory> CreateWebrtcVideoDecoderFactory(
     media::DecoderFactory* media_decoder_factory,
     scoped_refptr<base::SequencedTaskRunner> media_task_runner,
     const gfx::ColorSpace& render_color_space) {
+#if defined(USE_NEVA_WEBRTC)
+  std::unique_ptr<webrtc::VideoDecoderFactory> decoder_factory_neva;
+  const base::CommandLine* cmd_line = base::CommandLine::ForCurrentProcess();
+  if (gpu_factories &&
+      cmd_line->HasSwitch(switches::kEnableWebRTCPlatformVideoDecoder)) {
+    decoder_factory_neva =
+        std::make_unique<media::NevaWebRtcVideoDecoderFactory>(
+            gpu_factories->GetTaskRunner());
+  }
+  if (decoder_factory_neva)
+    return std::make_unique<DecoderAdapter>(std::move(decoder_factory_neva));
+#endif
+
   const bool use_hw_decoding = gpu_factories != nullptr &&
                                gpu_factories->IsGpuVideoAcceleratorEnabled() &&
                                Platform::Current()->IsWebRtcHWDecodingEnabled();

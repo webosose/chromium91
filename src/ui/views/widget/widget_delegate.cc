@@ -196,14 +196,24 @@ void WidgetDelegate::WidgetInitializing(Widget* widget) {
   widget_ = widget;
   for (auto&& callback : *widget_initializing_callbacks_)
     std::move(callback).Run();
+#if !defined(OS_WEBOS)
+  // FIXME(neva): M91: Don't reset to avoid segfault since logic is incompatible
+  // with neva_app_runtime::WebAppWindow::RecreateIfNeeded ('InitWindow' branch)
+  // scenario. Revise in case of an upstream change.
   widget_initializing_callbacks_.reset();
+#endif
   OnWidgetInitializing();
 }
 
 void WidgetDelegate::WidgetInitialized() {
   for (auto&& callback : *widget_initialized_callbacks_)
     std::move(callback).Run();
+#if !defined(OS_WEBOS)
+  // FIXME(neva): M91: Don't reset to avoid segfault since logic is incompatible
+  // with neva_app_runtime::WebAppWindow::RecreateIfNeeded ('InitWindow' branch)
+  // scenario. Revise in case of an upstream change.
   widget_initialized_callbacks_.reset();
+#endif
   OnWidgetInitialized();
 }
 

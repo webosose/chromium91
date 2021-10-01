@@ -205,6 +205,11 @@ void ScriptResource::SetSerializedCachedMetadata(mojo_base::BigBuffer data) {
   Resource::SetSerializedCachedMetadata(mojo_base::BigBuffer());
   if (cached_metadata_handler_) {
     cached_metadata_handler_->SetSerializedCachedMetadata(std::move(data));
+
+#if defined(USE_FILESCHEME_CODECACHE)
+    LOG(INFO) << "V8CodeCache Consume " << Url().GetString().Utf8().data()
+              << "(" << data.size() << ")";
+#endif
   }
 }
 
@@ -276,6 +281,21 @@ void ScriptResource::ResponseReceived(const ResourceResponse& response) {
                             response, mojom::blink::CodeCacheType::kJavascript,
                             GetResourceRequest().RequestorOrigin()));
   }
+#if defined(USE_FILESCHEME_CODECACHE)
+  // In the case of cache busting, codecache will be created but not used
+  // mostly. So create only for url which doesn't have query string.
+  else if (GetResourceRequest().Url().IsLocalFile() &&
+           response.CurrentRequestUrl().IsLocalFile() &&
+           GetResourceRequest().Url().Query().IsNull() &&
+           response.CurrentRequestUrl().Query().IsNull() &&
+           RuntimeEnabledFeatures::LocalResourceCodeCacheEnabled()) {
+    cached_metadata_handler_ =
+        MakeGarbageCollected<ScriptCachedMetadataHandler>(
+            Encoding(), CachedMetadataSender::Create(
+                            response, mojom::blink::CodeCacheType::kJavascript,
+                            GetResourceRequest().RequestorOrigin()));
+  }
+#endif
 }  // namespace blink
 
 void ScriptResource::ResponseBodyReceived(

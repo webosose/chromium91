@@ -16,6 +16,17 @@
 #include "ui/ozone/platform/wayland/host/wayland_data_source.h"
 #include "ui/ozone/platform/wayland/host/wayland_window_manager.h"
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "ui/ozone/platform/wayland/host/wayland_seat.h"
+#include "ui/ozone/platform/wayland/host/wayland_seat_manager.h"
+#endif  // defined(USE_NEVA_APPRUNTIME)
+
+#if defined(USE_NEVA_MEDIA)
+#include "mojo/public/cpp/bindings/remote.h"
+#include "ui/ozone/common/neva/video_window_controller_mojo.h"
+#include "ui/ozone/common/neva/video_window_provider_impl.h"
+#endif  // defined(USE_NEVA_MEDIA)
+
 struct wl_cursor;
 
 namespace gfx {
@@ -49,6 +60,11 @@ class GtkPrimarySelectionDeviceManager;
 class ZwpPrimarySelectionDeviceManager;
 class XdgForeignWrapper;
 
+///@name USE_NEVA_APPRUNTIME
+///@{
+class WaylandExtensions;
+///@}
+
 class WaylandConnection {
  public:
   // Stores the last serial and the event type it is associated with.
@@ -63,6 +79,15 @@ class WaylandConnection {
   ~WaylandConnection();
 
   bool Initialize();
+
+#if defined(USE_NEVA_MEDIA)
+  void BindVideoWindowProviderClient(
+      mojo::Remote<mojom::VideoWindowProviderClient> remote);
+
+  VideoWindowProvider* video_window_provider() const {
+    return video_window_provider_impl_.get();
+  }
+#endif  // defined(USE_NEVA_MEDIA)
 
   // Schedules a flush of the Wayland connection.
   void ScheduleFlush();
@@ -80,7 +105,30 @@ class WaylandConnection {
   wp_viewporter* viewporter() const { return viewporter_.get(); }
   xdg_wm_base* shell() const { return shell_.get(); }
   zxdg_shell_v6* shell_v6() const { return shell_v6_.get(); }
+#if defined(USE_NEVA_APPRUNTIME)
+  // Returns current cursor, which may be null.
+  WaylandCursor* cursor() const;
+
+  // Returns current touch, which may be null.
+  WaylandTouch* touch() const;
+
+  // Returns the current pointer, which may be null.
+  WaylandPointer* pointer() const;
+
+  // Returns the current keyboard, which may be null.
+  WaylandKeyboard* keyboard() const;
+
+  // Returns the cursor position, which may be null.
+  WaylandCursorPosition* wayland_cursor_position() const;
+
+  zcr_keyboard_extension_v1* keyboard_extension_v1() const {
+    return keyboard_extension_v1_.get();
+  }
+  wl_seat* seat() const;
+  WaylandSeatManager* seat_manager() const { return seat_manager_.get(); }
+#else   // defined(USE_NEVA_APPRUNTIME)
   wl_seat* seat() const { return seat_.get(); }
+#endif  // !defined(USE_NEVA_APPRUNTIME)
   wp_presentation* presentation() const { return presentation_.get(); }
   zwp_text_input_manager_v1* text_input_manager_v1() const {
     return text_input_manager_v1_.get();
@@ -112,6 +160,7 @@ class WaylandConnection {
 
   WaylandEventSource* event_source() const { return event_source_.get(); }
 
+#if !defined(USE_NEVA_APPRUNTIME)
   // Returns the current touch, which may be null.
   WaylandTouch* touch() const { return touch_.get(); }
 
@@ -120,6 +169,7 @@ class WaylandConnection {
 
   // Returns the current keyboard, which may be null.
   WaylandKeyboard* keyboard() const { return keyboard_.get(); }
+#endif  // !defined(USE_NEVA_APPRUNTIME)
 
   WaylandClipboard* clipboard() const { return clipboard_.get(); }
 
@@ -127,10 +177,12 @@ class WaylandConnection {
     return wayland_output_manager_.get();
   }
 
+#if !defined(USE_NEVA_APPRUNTIME)
   // Returns the cursor position, which may be null.
   WaylandCursorPosition* wayland_cursor_position() const {
     return wayland_cursor_position_.get();
   }
+#endif  // !defined(USE_NEVA_APPRUNTIME)
 
   WaylandBufferManagerHost* buffer_manager_host() const {
     return buffer_manager_host_.get();
@@ -144,7 +196,16 @@ class WaylandConnection {
 
   WaylandZwpLinuxDmabuf* zwp_dmabuf() const { return zwp_dmabuf_.get(); }
 
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  WaylandExtensions* extensions() { return extensions_.get(); }
+  ///@}
+
+#if !defined(OS_WEBOS)
   WaylandDrm* drm() const { return drm_.get(); }
+#else   // defined(OS_WEBOS)
+  WaylandDrm* drm() const { return nullptr; }
+#endif  // !defined(OS_WEBOS)
 
   WaylandShm* shm() const { return shm_.get(); }
 
@@ -186,15 +247,19 @@ class WaylandConnection {
   friend class WaylandConnectionTestApi;
 
   void Flush();
+#if !defined(USE_NEVA_APPRUNTIME)
   void UpdateInputDevices(wl_seat* seat, uint32_t capabilities);
+#endif  // !defined(USE_NEVA_APPRUNTIME)
 
   // Initialize data-related objects if required protocol objects are already
   // in place, i.e: wl_seat and wl_data_device_manager.
   void CreateDataObjectsIfReady();
 
+#if !defined(USE_NEVA_APPRUNTIME)
   // Creates WaylandKeyboard with the currently acquired protocol objects, if
   // possible. Returns true iff WaylandKeyboard was created.
   bool CreateKeyboard();
+#endif  // !defined(USE_NEVA_APPRUNTIME)
 
   DeviceHotplugEventObserver* GetHotplugEventObserver();
 
@@ -206,9 +271,11 @@ class WaylandConnection {
                      uint32_t version);
   static void GlobalRemove(void* data, wl_registry* registry, uint32_t name);
 
+#if !defined(USE_NEVA_APPRUNTIME)
   // wl_seat_listener
   static void Capabilities(void* data, wl_seat* seat, uint32_t capabilities);
   static void Name(void* data, wl_seat* seat, const char* name);
+#endif  // !defined(USE_NEVA_APPRUNTIME)
 
   // zxdg_shell_v6_listener
   static void PingV6(void* data, zxdg_shell_v6* zxdg_shell_v6, uint32_t serial);
@@ -221,7 +288,9 @@ class WaylandConnection {
   wl::Object<wl_registry> registry_;
   wl::Object<wl_compositor> compositor_;
   wl::Object<wl_subcompositor> subcompositor_;
+#if !defined(USE_NEVA_APPRUNTIME)
   wl::Object<wl_seat> seat_;
+#endif  // !defined(USE_NEVA_APPRUNTIME)
   wl::Object<xdg_wm_base> shell_;
   wl::Object<zxdg_shell_v6> shell_v6_;
   wl::Object<wp_presentation> presentation_;
@@ -237,23 +306,42 @@ class WaylandConnection {
   // outlives them so thus being able to properly handle their destruction.
   std::unique_ptr<WaylandEventSource> event_source_;
 
+#if defined(USE_NEVA_APPRUNTIME)
+  // Manages Wayland seats.
+  std::unique_ptr<WaylandSeatManager> seat_manager_;
+#else  // defined(USE_NEVA_APPRUNTIME)
   // Input device objects.
   std::unique_ptr<WaylandKeyboard> keyboard_;
   std::unique_ptr<WaylandPointer> pointer_;
   std::unique_ptr<WaylandTouch> touch_;
 
   std::unique_ptr<WaylandCursor> cursor_;
+#endif  // !defined(USE_NEVA_APPRUNTIME)
   std::unique_ptr<WaylandDataDeviceManager> data_device_manager_;
   std::unique_ptr<WaylandClipboard> clipboard_;
   std::unique_ptr<WaylandOutputManager> wayland_output_manager_;
+#if !defined(USE_NEVA_APPRUNTIME)
   std::unique_ptr<WaylandCursorPosition> wayland_cursor_position_;
+#endif  // !defined(USE_NEVA_APPRUNTIME)
   std::unique_ptr<WaylandZAuraShell> zaura_shell_;
   std::unique_ptr<WaylandZcrCursorShapes> zcr_cursor_shapes_;
   std::unique_ptr<WaylandZwpLinuxDmabuf> zwp_dmabuf_;
+#if !defined(OS_WEBOS)
   std::unique_ptr<WaylandDrm> drm_;
+#endif  // !defined(OS_WEBOS)
   std::unique_ptr<WaylandShm> shm_;
   std::unique_ptr<WaylandBufferManagerHost> buffer_manager_host_;
   std::unique_ptr<XdgForeignWrapper> xdg_foreign_;
+
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  std::unique_ptr<WaylandExtensions> extensions_;
+  ///@}
+
+#if defined(USE_NEVA_MEDIA)
+  std::unique_ptr<VideoWindowProviderImpl> video_window_provider_impl_;
+  std::unique_ptr<VideoWindowControllerMojo> video_window_controller_mojo_;
+#endif  // defined(USE_NEVA_MEDIA)
 
   std::unique_ptr<GtkPrimarySelectionDeviceManager>
       gtk_primary_selection_device_manager_;

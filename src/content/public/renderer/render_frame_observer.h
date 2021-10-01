@@ -303,6 +303,10 @@ class CONTENT_EXPORT RenderFrameObserver : public IPC::Listener,
       const std::string& interface_name,
       mojo::ScopedMessagePipeHandle* interface_pipe) {}
 
+#if defined(USE_NEVA_APPRUNTIME)
+  virtual void DidResetStateToMarkNextPaint() {}
+#endif
+
   // Similar to above but for handling Channel-associated interface requests.
   // Returns |true| if the request is handled by the implementation (taking
   // ownership of |*handle|) and |false| otherwise (leaving |*handle|

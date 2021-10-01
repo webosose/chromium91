@@ -51,6 +51,9 @@ enum class StatusCode : StatusCodeType {
   // This is a temporary error for use only by existing code during the
   // DecodeStatus => Status conversion.
   kDecodeErrorDoNotUse = 0x0000010F,
+#if defined(USE_NEVA_MEDIA)
+  kDecodeErrorResourceIsReleased = 0x000001FE,
+#endif  // defined(USE_NEVA_MEDIA)
 
   // Windows Errors: 0x02
   kWindowsWrappedHresult = 0x00000201,
@@ -172,6 +175,9 @@ enum class StatusCode : StatusCodeType {
   // Android only. Used as a signal to fallback MediaPlayerRenderer, and thus
   // not exactly an 'error' per say.
   kPipelineErrorDemuxerErrorDetectedHLS = 0x00000916,
+#if defined(USE_NEVA_MEDIA)
+  kPipelineErrorDecrypt = 0x000009FE,
+#endif  // defined(USE_NEVA_MEDIA)
 
   // Frame operation errors: 0x0A
   kUnsupportedFrameFormatError = 0x00000A01,

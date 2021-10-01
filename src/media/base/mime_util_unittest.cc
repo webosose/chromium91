@@ -565,6 +565,9 @@ TEST(IsCodecSupportedOnAndroidTest, EncryptedCodecBehavior) {
           case MimeUtil::INVALID_CODEC:
           case MimeUtil::MPEG_H_AUDIO:
           case MimeUtil::THEORA:
+#if defined(USE_NEVA_MEDIA)
+          case MimeUtil::VALID_CODEC:
+#endif
             EXPECT_FALSE(result);
             break;
 
@@ -633,6 +636,9 @@ TEST(IsCodecSupportedOnAndroidTest, ClearCodecBehavior) {
           case MimeUtil::INVALID_CODEC:
           case MimeUtil::MPEG_H_AUDIO:
           case MimeUtil::THEORA:
+#if defined(USE_NEVA_MEDIA)
+          case MimeUtil::VALID_CODEC:
+#endif
             EXPECT_FALSE(result);
             break;
 

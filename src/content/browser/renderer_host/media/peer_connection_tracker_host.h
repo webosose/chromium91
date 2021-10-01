@@ -64,6 +64,10 @@ class PeerConnectionTrackerHost
   void GetStandardStats();
   void GetLegacyStats();
 
+#if defined(USE_NEVA_APPRUNTIME)
+  void DropAllConnections(base::OnceClosure& cb);
+#endif
+
   void BindReceiver(
       mojo::PendingReceiver<blink::mojom::PeerConnectionTrackerHost>
           pending_receiver);

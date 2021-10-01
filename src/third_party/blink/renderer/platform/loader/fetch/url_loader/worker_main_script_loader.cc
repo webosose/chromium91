@@ -190,11 +190,35 @@ void WorkerMainScriptLoader::OnComplete(
   NotifyCompletionIfAppropriate();
 }
 
+#if defined(USE_FILESCHEME_CODECACHE)
+bool WorkerMainScriptLoader::CanCreateCachedMetadataHandler() {
+  if (initial_request_url_.ProtocolIsInHTTPFamily() &&
+      resource_response_.CurrentRequestUrl().ProtocolIsInHTTPFamily()) {
+    return true;
+  }
+  // In the case of cache busting, codecache will be created but not used
+  // mostly.
+  // So create only for url which doesn't have query string.
+  if (initial_request_url_.IsLocalFile() &&
+      resource_response_.CurrentRequestUrl().IsLocalFile() &&
+      initial_request_url_.Query().IsNull() &&
+      resource_response_.CurrentRequestUrl().Query().IsNull() &&
+      RuntimeEnabledFeatures::LocalResourceCodeCacheEnabled()) {
+    return true;
+  }
+  return false;
+}
+#endif
+
 SingleCachedMetadataHandler*
 WorkerMainScriptLoader::CreateCachedMetadataHandler() {
+#if defined(USE_FILESCHEME_CODECACHE)
+  if (!CanCreateCachedMetadataHandler()) {
+#else
   // Currently we support the metadata caching only for HTTP family.
   if (!initial_request_url_.ProtocolIsInHTTPFamily() ||
       !resource_response_.CurrentRequestUrl().ProtocolIsInHTTPFamily()) {
+#endif
     return nullptr;
   }
 

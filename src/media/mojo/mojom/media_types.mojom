@@ -164,6 +164,9 @@ struct AudioDecoderConfig {
   mojo_base.mojom.TimeDelta seek_preroll;
   int32 codec_delay;
   EncryptionScheme encryption_scheme;
+
+  [EnableIf=use_neva_media]
+  bool is_dolby_atmos;
 };
 
 // This defines a mojo transport format for media::VideoDecoderConfig.
@@ -181,6 +184,9 @@ struct VideoDecoderConfig {
   EncryptionScheme encryption_scheme;
   VideoColorSpace color_space_info;
   gfx.mojom.HDRMetadata? hdr_metadata;
+
+  [EnableIf=use_neva_webrtc]
+  bool is_live_stream;
 };
 
 // Native struct media::SubsampleEntry;

@@ -45,6 +45,11 @@
 #include "services/viz/privileged/mojom/gl/gpu_service.mojom.h"
 #include "third_party/skia/include/core/SkGraphics.h"
 
+#if defined(USE_OZONE) && defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+#include "ui/ozone/public/ozone_platform.h"
+#include "ui/ozone/public/gpu_platform_support.h"
+#endif
+
 #if defined(OS_ANDROID)
 #include "media/base/android/media_drm_bridge_client.h"
 #include "media/mojo/clients/mojo_android_overlay.h"
@@ -160,6 +165,17 @@ bool GpuChildThread::Send(IPC::Message* msg) {
   return ChildThreadImpl::Send(msg);
 }
 
+#if defined(USE_OZONE) && defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+bool GpuChildThread::OnControlMessageReceived(const IPC::Message& msg) {
+  if (ui::OzonePlatform::GetInstance()
+          ->GetGpuPlatformSupport()
+          ->OnMessageReceived(msg))
+    return true;
+
+  return false;
+}
+#endif
+
 void GpuChildThread::OnInitializationFailed() {
   OnChannelError();
 }
@@ -172,6 +188,12 @@ void GpuChildThread::OnGpuServiceConnection(viz::GpuServiceImpl* gpu_service) {
                           base::ThreadTaskRunnerHandle::Get());
   gpu_service->media_gpu_channel_manager()->SetOverlayFactory(
       overlay_factory_cb);
+#endif
+
+#if defined(USE_OZONE) && defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+  ui::OzonePlatform::GetInstance()
+      ->GetGpuPlatformSupport()
+      ->OnChannelEstablished(this);
 #endif
 
   if (!IsInBrowserProcess()) {

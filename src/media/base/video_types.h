@@ -107,6 +107,10 @@ MEDIA_SHMEM_EXPORT bool IsOpaque(VideoPixelFormat format);
 // Returns the number of significant bits per channel.
 MEDIA_SHMEM_EXPORT size_t BitDepth(VideoPixelFormat format);
 
+#if defined(USE_NEVA_WEBRTC)
+MEDIA_SHMEM_EXPORT bool IsEncodedData(VideoPixelFormat format);
+#endif
+
 }  // namespace media
 
 #endif  // MEDIA_BASE_VIDEO_TYPES_H_

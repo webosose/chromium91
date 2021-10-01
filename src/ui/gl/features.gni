@@ -6,10 +6,11 @@ import("//build/config/chromecast_build.gni")
 import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/chromeos/ui_mode.gni")
 import("//build/util/version.gni")
+import("//neva/neva.gni")
 
 declare_args() {
   # Should ANGLE be linked statically?
-  use_static_angle = is_android
+  use_static_angle = is_android || is_webos
 
   # Should EGL support be compiled?
   # Can be overriden to test during bring up of EGL support on other platforms.

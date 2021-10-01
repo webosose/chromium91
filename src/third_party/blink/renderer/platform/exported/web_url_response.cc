@@ -470,6 +470,12 @@ void WebURLResponse::SetRecursivePrefetchToken(
   resource_response_->SetRecursivePrefetchToken(token);
 }
 
+#if defined(USE_FILESCHEME_CODECACHE)
+void WebURLResponse::SetFileLastModifiedTime(base::Time last_modified_time) {
+  resource_response_->SetFileLastModifiedTime(last_modified_time);
+}
+#endif
+
 bool WebURLResponse::WasAlpnNegotiated() const {
   return resource_response_->WasAlpnNegotiated();
 }

@@ -169,6 +169,11 @@
 #include "media/mojo/mojom/remoting.mojom-forward.h"
 #endif
 
+#if defined(USE_NEVA_MEDIA)
+#include "content/browser/media/neva/frame_video_window_factory_impl.h"
+#include "content/common/media/neva/frame_media_controller.mojom.h"
+#endif
+
 #if BUILDFLAG(ENABLE_PLUGINS)
 #include "content/common/pepper_plugin.mojom.h"
 #endif
@@ -1229,6 +1234,16 @@ class CONTENT_EXPORT RenderFrameHostImpl
   bool is_mhtml_document() { return is_mhtml_document_; }
 
   bool is_overriding_user_agent() { return is_overriding_user_agent_; }
+
+#if defined(USE_NEVA_APPRUNTIME)
+  void DropAllPeerConnections(base::OnceClosure cb) override;
+#endif  // defined(USE_NEVA_APPRUNTIME)
+
+#if defined(USE_NEVA_MEDIA)
+  // content::RendererFrameHost implementation
+  void SetSuppressed(bool is_suppressed) override;
+  gfx::AcceleratedWidget GetAcceleratedWidget() override;
+#endif
 
   // Notifies the render frame that |frame_tree_node_| has received user
   // activation. May be invoked multiple times. This is called both for the
@@ -2821,6 +2836,17 @@ class CONTENT_EXPORT RenderFrameHostImpl
   void RecordDocumentCreatedUkmEvent(const url::Origin& origin,
                                      const ukm::SourceId document_ukm_source_id,
                                      ukm::UkmRecorder* ukm_recorder);
+
+#if defined(USE_NEVA_MEDIA)
+  // Lazily initializes and returns the mojom::FrameMediaController
+  // interface for this frame.
+  mojom::FrameMediaController* GetFrameMediaController();
+  mojo::AssociatedRemote<mojom::FrameMediaController> frame_media_controller_;
+
+  FrameVideoWindowFactoryImpl frame_video_window_factory_impl_{this};
+  mojo::AssociatedReceiver<content::mojom::FrameVideoWindowFactory>
+      frame_video_window_factory_receiver_{&frame_video_window_factory_impl_};
+#endif
 
   // Has the RenderFrame been created in the renderer process and not yet been
   // deleted, exited or crashed. See RenderFrameState.

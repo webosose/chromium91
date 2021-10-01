@@ -16,18 +16,34 @@
 #include "ui/gfx/native_widget_types.h"
 #include "ui/platform_window/platform_window_delegate.h"
 
+///@name USE_NEVA_APPRUNTIME
+///@{
+#include "ui/aura/neva/window_tree_host_platform.h"
+#include "ui/base/ime/neva/input_method_neva_observer.h"
+///@}
+
 namespace ui {
 enum class DomCode;
 class PlatformWindow;
 class KeyboardHook;
 struct PlatformWindowInitProperties;
+
+///@name USE_NEVA_APPRUNTIME
+///@{
+class LinuxInputMethodContext;
+///@}
 }  // namespace ui
 
 namespace aura {
 
 // The unified WindowTreeHost implementation for platforms
 // that implement PlatformWindow.
-class AURA_EXPORT WindowTreeHostPlatform : public WindowTreeHost,
+class AURA_EXPORT WindowTreeHostPlatform : ///@name USE_NEVA_APPRUNTIME
+                                           ///@{
+                                           //public WindowTreeHost,
+                                           public neva::WindowTreeHostPlatform,
+                                           public ui::InputMethodNevaObserver,
+                                           ///@}
                                            public ui::PlatformWindowDelegate {
  public:
   explicit WindowTreeHostPlatform(ui::PlatformWindowInitProperties properties,
@@ -48,6 +64,31 @@ class AURA_EXPORT WindowTreeHostPlatform : public WindowTreeHost,
   void MoveCursorToScreenLocationInPixels(
       const gfx::Point& location_in_pixels) override;
   void OnCursorVisibilityChangedNative(bool show) override;
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  void SetCustomCursor(neva_app_runtime::CustomCursorType type,
+                       const std::string& path,
+                       int hotspot_x,
+                       int hotspot_y) override;
+  void SetGroupKeyMask(ui::KeyMask key_mask) override;
+  void SetKeyMask(ui::KeyMask key_mask, bool set) override;
+  void SetInputRegion(const std::vector<gfx::Rect>& region) override;
+  void SetUseVirtualKeyboard(bool enable) override;
+  void SetWindowProperty(const std::string& name,
+                         const std::string& value) override;
+  void ToggleFullscreen() override;
+  void CreateGroup(const ui::WindowGroupConfiguration& config) override;
+  void AttachToGroup(const std::string& group_name,
+                     const std::string& layer_name) override;
+  void FocusGroupOwner() override;
+  void FocusGroupLayer() override;
+  void DetachGroup() override;
+  void XInputActivate(const std::string& type) override;
+  void XInputDeactivate() override;
+  void XInputInvokeAction(std::uint32_t keysym,
+                          ui::XInputKeySymbolType symbol_type,
+                          ui::XInputEventType event_type) override;
+  ///@}
 
   ui::PlatformWindow* platform_window() { return platform_window_.get(); }
   const ui::PlatformWindow* platform_window() const {
@@ -77,6 +118,30 @@ class AURA_EXPORT WindowTreeHostPlatform : public WindowTreeHost,
   void OnWillDestroyAcceleratedWidget() override;
   void OnAcceleratedWidgetDestroyed() override;
   void OnActivationChanged(bool active) override;
+
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  void OnWindowHostStateChanged(ui::WidgetState new_state) override;
+  ui::LinuxInputMethodContext* GetInputMethodContext() override;
+
+#if defined(OS_WEBOS)
+  void OnInputPanelVisibilityChanged(bool visibility) override;
+  void OnInputPanelRectChanged(int32_t x,
+                               int32_t y,
+                               uint32_t width,
+                               uint32_t height) override;
+#endif
+
+  // Overridden from ui::InputMethodNevaObserver:
+  void OnShowIme() override;
+  void OnHideIme() override;
+  void OnTextInputInfoChanged(
+      const ui::TextInputInfo& text_input_info) override;
+  void SetSurroundingText(const std::string& text,
+                          size_t cursor_position,
+                          size_t anchor_position) override;
+  ///@}
+
   void OnMouseEnter() override;
 
   // Overridden from aura::WindowTreeHost:

@@ -8,6 +8,7 @@ import("//build/config/chromeos/args.gni")
 import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/features.gni")
 import("//media/gpu/args.gni")
+import("//neva/neva.gni")
 import("//testing/libfuzzer/fuzzer_test.gni")
 import("//third_party/libgav1/options.gni")
 
@@ -72,7 +73,7 @@ declare_args() {
   # On Fuchsia, these are logged as VLOGs.
   enable_logging_override = is_chromecast || is_fuchsia
 
-  enable_dav1d_decoder = !is_ios
+  enable_dav1d_decoder = !is_ios && !is_webos
 
   # Enable browser managed persistent metadata storage for EME persistent
   # session and persistent usage record session.
@@ -178,6 +179,7 @@ if (is_chromecast) {
   ]
   _default_mojo_media_host = "gpu"
 } else if (is_chromeos_ash || is_mac || is_win ||
+           use_neva_v4l2_codec ||
            ((is_linux || is_chromeos_lacros) && use_vaapi)) {
   _default_mojo_media_services = [ "video_decoder" ]
   _default_mojo_media_host = "gpu"

@@ -248,7 +248,6 @@ void WaylandInputMethodContext::OnPreeditString(
       continue;
     composition_text.ime_text_spans.push_back(std::move(text_span));
   }
-
   if (preedit_cursor < 0) {
     composition_text.selection = gfx::Range::InvalidRange();
   } else {

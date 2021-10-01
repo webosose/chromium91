@@ -36,6 +36,19 @@
 #include "third_party/blink/public/web/web_window_features.h"
 #include "ui/base/ui_base_features.h"
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "third_party/blink/public/platform/web_security_origin.h"
+#endif
+
+#if defined(USE_NEVA_MEDIA)
+#include "media/neva/media_preferences.h"
+#endif
+
+#if defined(USE_NEVA_SUSPEND_MEDIA_CAPTURE)
+#include "content/public/common/content_neva_switches.h"
+#include "content/renderer/media/audio/neva/audio_capturer_source_manager.h"
+#endif
+
 using blink::WebFrame;
 using blink::WebLocalFrame;
 using blink::WebNavigationPolicy;
@@ -519,7 +532,10 @@ const blink::RendererPreferences& RenderViewImpl::GetRendererPreferences()
 }
 
 void RenderViewImpl::OnPageVisibilityChanged(PageVisibilityState visibility) {
-#if defined(OS_ANDROID)
+#if defined(USE_NEVA_SUSPEND_MEDIA_CAPTURE)
+  SuspendAudioCaptureDevices(visibility != PageVisibilityState::kVisible);
+#endif
+#if defined(OS_ANDROID) || defined(USE_NEVA_SUSPEND_MEDIA_CAPTURE)
   SuspendVideoCaptureDevices(visibility != PageVisibilityState::kVisible);
 #endif
 }
@@ -570,10 +586,47 @@ void RenderViewImpl::DidUpdateRendererPreferences() {
       renderer_prefs.arrow_bitmap_height_vertical_scroll_bar_in_dips,
       renderer_prefs.arrow_bitmap_width_horizontal_scroll_bar_in_dips);
 #endif
+
+#if defined(USE_NEVA_APPRUNTIME)
+  const blink::RendererPreferences& renderer_prefs = GetRendererPreferences();
+
+  if (!renderer_prefs.file_security_origin.empty())
+    url::Origin::SetFileOriginChanged(true);
+  blink::SetMutableLocalOrigin(renderer_prefs.file_security_origin);
+
+#if defined(USE_NEVA_MEDIA)
+  std::string media_codec_capability =
+      renderer_prefs.media_codec_capability;
+  if (!media_codec_capability.empty())
+    media::MediaPreferences::Get()->SetMediaCodecCapabilities(
+        media_codec_capability);
+
+  std::string media_preferences = renderer_prefs.media_preferences;
+  if (!media_preferences.empty())
+    media::MediaPreferences::Get()->Update(media_preferences);
+#endif  // defined(USE_NEVA_MEDIA)
+#endif  // defined(USE_NEVA_APPRUNTIME)
 }
 
-#if defined(OS_ANDROID)
+#if defined(USE_NEVA_SUSPEND_MEDIA_CAPTURE)
+void RenderViewImpl::SuspendAudioCaptureDevices(bool suspend) {
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kDisableSuspendAudioCapture))
+    return;
+
+  RenderThreadImpl::current()->audio_capturer_source_manager()->SuspendDevices(
+      suspend);
+}
+#endif
+
+#if defined(OS_ANDROID) || defined(USE_NEVA_SUSPEND_MEDIA_CAPTURE)
 void RenderViewImpl::SuspendVideoCaptureDevices(bool suspend) {
+#if defined(USE_NEVA_SUSPEND_MEDIA_CAPTURE)
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kDisableSuspendVideoCapture))
+    return;
+#endif
+
   if (!main_render_frame_)
     return;
 
@@ -587,6 +640,6 @@ void RenderViewImpl::SuspendVideoCaptureDevices(bool suspend) {
   RenderThreadImpl::current()->video_capture_impl_manager()->SuspendDevices(
       video_devices, suspend);
 }
-#endif  // defined(OS_ANDROID)
+#endif  // defined(OS_ANDROID) || defined(USE_NEVA_SUSPEND_MEDIA_CAPTURE)
 
 }  // namespace content

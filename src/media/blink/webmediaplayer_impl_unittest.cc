@@ -169,6 +169,11 @@ class MockWebMediaPlayerClient : public blink::WebMediaPlayerClient {
   MOCK_METHOD0(DidSeek, void());
   MOCK_METHOD0(GetFeatures, Features(void));
   MOCK_METHOD0(OnRequestVideoFrameCallback, void());
+#if defined(USE_NEVA_MEDIA)
+  MOCK_METHOD2(SendCustomMessage,
+               void(const blink::WebMediaPlayer::MediaEventType,
+                    const blink::WebString&));
+#endif
   MOCK_METHOD0(GetTextTrackMetadata, std::vector<blink::TextTrackMetadata>());
 
   bool was_always_muted_ = false;
@@ -228,6 +233,13 @@ class MockWebMediaPlayerDelegate : public blink::WebMediaPlayerDelegate {
     DCHECK_EQ(player_id_, player_id);
     return is_idle_;
   }
+
+#if defined(USE_NEVA_MEDIA)
+  MOCK_METHOD2(DidMediaCreated, void(int, bool));
+  MOCK_METHOD1(DidMediaActivated, void(int));
+  MOCK_METHOD1(DidMediaActivationNeeded, void(int));
+  MOCK_METHOD1(DidMediaSuspended, void(int));
+#endif
 
   void ClearStaleFlag(int player_id) override {
     DCHECK_EQ(player_id_, player_id);

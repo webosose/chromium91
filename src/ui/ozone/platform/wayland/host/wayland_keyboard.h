@@ -5,7 +5,11 @@
 #ifndef UI_OZONE_PLATFORM_WAYLAND_HOST_WAYLAND_KEYBOARD_H_
 #define UI_OZONE_PLATFORM_WAYLAND_HOST_WAYLAND_KEYBOARD_H_
 
-#include <keyboard-extension-unstable-v1-client-protocol.h>
+///@name USE_NEVA_APPRUNTIME
+///@{
+// The header below moved to the 'wayland_keyboard.cc'
+//#include <keyboard-extension-unstable-v1-client-protocol.h>
+///@}
 
 #include <cstdint>
 
@@ -143,6 +147,13 @@ class WaylandKeyboard::Delegate {
                                       base::TimeTicks timestamp,
                                       int device_id,
                                       WaylandKeyboard::KeyEventKind kind) = 0;
+
+#if defined(OS_WEBOS)
+  virtual void OnKeyboardLGKeyEvent(EventType type,
+                                    uint32_t lg_code,
+                                    base::TimeTicks timestamp,
+                                    int device_id) = 0;
+#endif
 
  protected:
   // Prevent deletion through a WaylandKeyboard::Delegate pointer.

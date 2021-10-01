@@ -1,0 +1,79 @@
+// Copyright 2019 LG Electronics, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+#include "neva/pal_service/webos/application_registrator_delegate_webos.h"
+
+#include "base/json/json_reader.h"
+#include "base/logging.h"
+#include "neva/pal_service/luna/luna_names.h"
+
+namespace {
+
+const char kMessage[] = "message";
+const char kRegisterNativeAppMethod[] = "registerNativeApp";
+const char kRegisterAppRequest[] = R"JSON({"subscribe":true})JSON";
+
+}  // namespace
+
+namespace pal {
+namespace webos {
+
+ApplicationRegistratorDelegateWebOS::ApplicationRegistratorDelegateWebOS(
+    std::string application_name,
+    RepeatingResponse callback)
+    : application_name_(std::move(application_name)),
+      callback_(std::move(callback)) {
+  pal::luna::Client::Params params;
+  params.name = application_name_;
+  luna_client_ = pal::luna::CreateClient(params);
+
+  if (luna_client_ && luna_client_->IsInitialized()) {
+    const bool subscribed = luna_client_->SubscribeFromApp(
+        luna::GetServiceURI(luna::service_uri::kApplicationManager,
+                            kRegisterNativeAppMethod),
+        std::string(kRegisterAppRequest), application_name_,
+        base::BindRepeating(&ApplicationRegistratorDelegateWebOS::OnResponse,
+                            base::Unretained(this)));
+    status_ = subscribed ? Status::kSuccess : Status::kFailed;
+  }
+}
+
+ApplicationRegistratorDelegateWebOS::~ApplicationRegistratorDelegateWebOS() {}
+
+ApplicationRegistratorDelegate::Status
+ApplicationRegistratorDelegateWebOS::GetStatus() const {
+  return status_;
+}
+
+std::string ApplicationRegistratorDelegateWebOS::GetApplicationName() const {
+  return application_name_;
+};
+
+void ApplicationRegistratorDelegateWebOS::OnResponse(
+    pal::luna::Client::ResponseStatus,
+    unsigned,
+    const std::string& json) {
+  base::Optional<base::Value> root(base::JSONReader::Read(json));
+  if (!root || !root->is_dict())
+    return;
+
+  const std::string* message = root->FindStringKey(kMessage);
+  if (message)
+    callback_.Run(*message);
+}
+
+}  // namespace webos
+}  // namespace pal

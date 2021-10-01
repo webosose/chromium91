@@ -35,6 +35,10 @@ class WaylandOutput {
 
   float GetUIScaleFactor() const;
 
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  wl_output* output() const { return output_.get(); }
+  ///@}
   uint32_t output_id() const { return output_id_; }
   bool has_output(wl_output* output) const { return output_.get() == output; }
   int32_t scale_factor() const { return scale_factor_; }

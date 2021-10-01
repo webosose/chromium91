@@ -4,13 +4,16 @@
 
 #include "ui/gfx/linux/drm_util_linux.h"
 
+#if !defined(OS_WEBOS)
 #include <drm_fourcc.h>
+#endif  // !defined(OS_WEBOS)
 
 #include "base/notreached.h"
 
 namespace ui {
 
 int GetFourCCFormatFromBufferFormat(gfx::BufferFormat format) {
+#if !defined(OS_WEBOS)
   switch (format) {
     case gfx::BufferFormat::R_8:
       return DRM_FORMAT_R8;
@@ -44,10 +47,14 @@ int GetFourCCFormatFromBufferFormat(gfx::BufferFormat format) {
       return DRM_FORMAT_P010;
   }
   return DRM_FORMAT_INVALID;
+#else   // !defined(OS_WEBOS)
+  return 0;
+#endif  // defined(OS_WEBOS)
 }
 
 gfx::BufferFormat GetBufferFormatFromFourCCFormat(int format) {
   switch (format) {
+#if !defined(OS_WEBOS)
     case DRM_FORMAT_R8:
       return gfx::BufferFormat::R_8;
     case DRM_FORMAT_GR88:
@@ -72,6 +79,7 @@ gfx::BufferFormat GetBufferFormatFromFourCCFormat(int format) {
       return gfx::BufferFormat::YVU_420;
     case DRM_FORMAT_P010:
       return gfx::BufferFormat::P010;
+#endif  // !defined(OS_WEBOS)
     default:
       NOTREACHED();
       return gfx::BufferFormat::BGRA_8888;
@@ -79,6 +87,7 @@ gfx::BufferFormat GetBufferFormatFromFourCCFormat(int format) {
 }
 
 bool IsValidBufferFormat(uint32_t current_format) {
+#if !defined(OS_WEBOS)
   switch (current_format) {
     case DRM_FORMAT_R8:
     case DRM_FORMAT_GR88:
@@ -96,6 +105,7 @@ bool IsValidBufferFormat(uint32_t current_format) {
     default:
       return false;
   }
+#endif  // !defined(OS_WEBOS)
   return false;
 }
 

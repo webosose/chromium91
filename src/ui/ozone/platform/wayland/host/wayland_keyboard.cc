@@ -23,9 +23,25 @@
 #include "ui/ozone/platform/wayland/host/wayland_connection.h"
 #include "ui/ozone/platform/wayland/host/wayland_window.h"
 
+#if defined(OS_WEBOS)
+#include "ui/events/keycodes/webos/keycode_converter.h"
+#endif
+
 #if BUILDFLAG(USE_XKBCOMMON)
 #include "ui/events/ozone/layout/xkb/xkb_keyboard_layout_engine.h"
 #endif
+
+///@name USE_NEVA_APPRUNTIME
+///@{
+// The header included below has been moved from the 'wayland_keyboard.h'
+// header file in order to:
+// 1) fix the issue raised by the preprocessor failing to locate the below
+//    header
+// 2) follow the best C/C++ coding practice on avoiding inclusions of headers
+//    within header files and place them within implementation files instead
+//    (if possible)
+#include <keyboard-extension-unstable-v1-client-protocol.h>
+///@}
 
 namespace ui {
 
@@ -143,6 +159,17 @@ void WaylandKeyboard::Enter(void* data,
     auto* self = static_cast<WaylandKeyboard*>(data);
     self->delegate_->OnKeyboardFocusChanged(window, /*focused=*/true);
   }
+
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  if (auto* window = wl::RootWindowFromWlSurface(surface)) {
+    window->HandleKeyboardEnter();
+
+    // Required for webOS and AGL which don't support activation update via
+    // surface configure event
+    window->HandleActivationChanged(true);
+  }
+  ///@}
 }
 
 void WaylandKeyboard::Leave(void* data,
@@ -156,6 +183,17 @@ void WaylandKeyboard::Leave(void* data,
 
   // Upon window focus lose, reset the key repeat timers.
   self->auto_repeat_handler_.StopKeyRepeat();
+
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  if (auto* window = wl::RootWindowFromWlSurface(surface)) {
+    window->HandleKeyboardLeave();
+
+    // Required for webOS and AGL which don't support activation update via
+    // surface configure event
+    window->HandleActivationChanged(false);
+  }
+  ///@}
 }
 
 void WaylandKeyboard::Key(void* data,
@@ -262,6 +300,17 @@ void WaylandKeyboard::DispatchKey(unsigned int key,
                                   int device_id,
                                   int flags,
                                   KeyEventKind kind) {
+#if defined(OS_WEBOS)
+  // Must be performed before conversion to DOM codes to avoid LG media keys
+  // wrong interpreting
+  uint32_t lg_code = KeycodeConverterWebOS::LGKeyCodeFromEvdev(key);
+  if (lg_code) {
+    delegate_->OnKeyboardLGKeyEvent(down ? ET_KEY_PRESSED : ET_KEY_RELEASED,
+                                    lg_code, timestamp, device_id);
+    return;
+  }
+#endif
+
   DomCode dom_code = KeycodeConverter::EvdevCodeToDomCode(key);
   if (dom_code == ui::DomCode::NONE)
     return;

@@ -10,6 +10,11 @@
 #include "base/component_export.h"
 #include "ui/base/ime/text_input_type.h"
 
+///@name USE_NEVA_APPRUNTIME
+///@{
+#include "ui/base/ime/linux/neva/linux_input_method_context_neva.h"
+///@}
+
 namespace gfx {
 class Rect;
 class Range;
@@ -51,7 +56,12 @@ class COMPONENT_EXPORT(UI_BASE_IME_LINUX) LinuxInputMethodContext {
 };
 
 // An interface of callback functions called from LinuxInputMethodContext.
-class COMPONENT_EXPORT(UI_BASE_IME_LINUX) LinuxInputMethodContextDelegate {
+class COMPONENT_EXPORT(UI_BASE_IME_LINUX) LinuxInputMethodContextDelegate
+    ///@name USE_NEVA_APPRUNTIME
+    ///@{
+    : public NevaLinuxInputMethodContextDelegate
+    ///@}
+    {
  public:
   virtual ~LinuxInputMethodContextDelegate() {}
 

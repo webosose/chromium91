@@ -1448,6 +1448,9 @@ void FeatureInfo::InitializeFeatures() {
     validators_.g_l_state.AddValue(GL_COVERAGE_MODULATION_CHROMIUM);
   }
 
+#if defined(USE_NEVA_APPRUNTIME)
+  if (!workarounds_.disable_texture_rg)
+#endif
   if ((gl_version_info_->is_es3 || gl_version_info_->is_desktop_core_profile ||
        gfx::HasExtension(extensions, "GL_EXT_texture_rg") ||
        gfx::HasExtension(extensions, "GL_ARB_texture_rg")) &&

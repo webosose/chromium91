@@ -294,7 +294,11 @@ namespace content {
 
 namespace {
 
+#if defined(OS_WEBOS)
+const int kExtraCharsBeforeAndAfterSelection = 500;
+#else
 const int kExtraCharsBeforeAndAfterSelection = 100;
+#endif
 const size_t kMaxURLLogChars = 1024;
 
 const blink::PreviewsState kDisabledPreviewsBits =
@@ -967,7 +971,7 @@ void FillMiscNavigationParams(
   navigation_params->is_cross_browsing_context_group_navigation =
       commit_params.is_cross_browsing_instance;
 
-#if defined(OS_ANDROID)
+#if defined(OS_ANDROID) || defined(USE_NEVA_APPRUNTIME)
   // Only android webview uses this.
   navigation_params->grant_load_local_resources =
       commit_params.can_load_local_resources;
@@ -1974,6 +1978,9 @@ RenderFrameImpl::RenderFrameImpl(CreateParams params)
           this,
           base::BindRepeating(&RenderFrameImpl::RequestOverlayRoutingToken,
                               base::Unretained(this))),
+#if defined(USE_NEVA_MEDIA)
+      frame_media_controller_impl_(this),
+#endif
       devtools_frame_token_(params.devtools_frame_token) {
   DCHECK(RenderThread::IsMainThread());
   blink_interface_registry_ = std::make_unique<BlinkInterfaceRegistryImpl>(
@@ -4288,6 +4295,26 @@ void RenderFrameImpl::AbortClientNavigation() {
 }
 
 void RenderFrameImpl::DidChangeSelection(bool is_empty_selection) {
+#if defined(USE_NEVA_APPRUNTIME)
+  if (is_empty_selection &&
+      !GetLocalRootWebFrameWidget()->HandlingInputEvent() &&
+      !GetLocalRootWebFrameWidget()->HasImeEventGuard()) {
+    WebRange selection =
+        frame_->GetInputMethodController()->GetSelectionOffsets();
+    if (selection.IsNull())
+      return;
+
+    gfx::Range range =
+        gfx::Range(selection.StartOffset(), selection.EndOffset());
+    std::u16string text =
+        frame_
+        ->RangeAsText(WebRange(0, kExtraCharsBeforeAndAfterSelection + 1))
+        .Utf16();
+
+    SetSelectedText(text, 0, range);
+  }
+#endif
+
   if (!GetLocalRootWebFrameWidget()->HandlingInputEvent() &&
       !GetLocalRootWebFrameWidget()->HandlingSelectRange())
     return;
@@ -4479,6 +4506,25 @@ void RenderFrameImpl::DidChangeCpuTiming(base::TimeDelta time) {
   for (auto& observer : observers_)
     observer.DidChangeCpuTiming(time);
 }
+
+#if defined(USE_NEVA_APPRUNTIME)
+void RenderFrameImpl::ResetStateToMarkNextPaint() {
+  for (auto& observer : observers_)
+    observer.DidResetStateToMarkNextPaint();
+
+  if (IsMainFrame() && GetWebFrame())
+    GetWebFrame()->ResetStateToMarkNextPaint();
+}
+#endif
+
+#if defined(USE_NEVA_MEDIA)
+content::mojom::FrameVideoWindowFactory*
+RenderFrameImpl::GetFrameVideoWindowFactory() {
+  if (!frame_video_window_factory_.is_bound())
+    GetRemoteAssociatedInterfaces()->GetInterface(&frame_video_window_factory_);
+  return frame_video_window_factory_.get();
+}
+#endif
 
 void RenderFrameImpl::DidObserveLoadingBehavior(
     blink::LoadingBehaviorFlag behavior) {
@@ -4871,6 +4917,11 @@ RenderFrameImpl::MakeDidCommitProvisionalLoadParams(
     // Exclude file: URLs when settings allow them access any origin.
     if (params->origin.scheme() != url::kFileScheme ||
         !GetBlinkPreferences().allow_universal_access_from_file_urls) {
+#if defined(USE_NEVA_APPRUNTIME)
+      if (!(params->origin.scheme() == url::kFileScheme &&
+            !render_view_->GetRendererPreferences().file_security_origin
+                 .empty())) {
+#endif
       if (!params->origin.IsSameOriginWith(url::Origin::Create(params->url))) {
         base::debug::CrashKeyString* url = base::debug::AllocateCrashKeyString(
             "mismatched_url", base::debug::CrashKeySize::Size256);
@@ -4883,6 +4934,9 @@ RenderFrameImpl::MakeDidCommitProvisionalLoadParams(
             origin, params->origin.GetDebugString());
         CHECK(false) << " url:" << params->url << " origin:" << params->origin;
       }
+#if defined(USE_NEVA_APPRUNTIME)
+      }
+#endif
     }
   }
   params->request_id = internal_data->request_id();
@@ -5953,6 +6007,12 @@ void RenderFrameImpl::RegisterMojoInterfaces() {
 
   GetAssociatedInterfaceRegistry()->AddInterface(base::BindRepeating(
       &RenderFrameImpl::BindFrameBindingsControl, weak_factory_.GetWeakPtr()));
+
+#if defined(USE_NEVA_MEDIA)
+  GetAssociatedInterfaceRegistry()->AddInterface(
+      base::BindRepeating(&neva::FrameMediaControllerImpl::Bind,
+                          base::Unretained(&frame_media_controller_impl_)));
+#endif
 
   GetAssociatedInterfaceRegistry()->AddInterface(base::BindRepeating(
       &RenderFrameImpl::BindNavigationClient, weak_factory_.GetWeakPtr()));

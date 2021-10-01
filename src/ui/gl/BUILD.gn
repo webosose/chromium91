@@ -9,6 +9,7 @@ import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/linux/pkg_config.gni")
 import("//build/config/ozone.gni")
 import("//build/config/ui.gni")
+import("//neva/neva.gni")
 import("//testing/test.gni")
 import("//ui/gl/features.gni")
 
@@ -172,6 +173,11 @@ component("gl") {
     # ANGLE includes are used cross-platform.
     "//third_party/angle:includes",
   ]
+
+  if (use_neva_media) {
+    deps += [ "//ui/gl/neva" ]
+  }
+
   public_deps = [
     "//base",
     "//third_party/mesa_headers",

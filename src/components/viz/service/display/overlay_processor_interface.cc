@@ -109,12 +109,17 @@ OverlayProcessorInterface::CreateOverlayProcessor(
   if (!features::IsUsingOzonePlatform())
     return std::make_unique<OverlayProcessorStub>();
 
+#if !defined(USE_NEVA_MEDIA)
+    // Below '#if' block prevents making OverlayProcessorOzone.
+    // So the block is guarded within our directive.
+
 #if !BUILDFLAG(IS_CHROMECAST)
   // In tests and Ozone/X11, we do not expect surfaceless surface support.
   // For chromecast, we always need OverlayProcessorOzone.
   if (!capabilities.supports_surfaceless)
     return std::make_unique<OverlayProcessorStub>();
 #endif  // #if !BUILDFLAG(IS_CHROMECAST)
+#endif  // defined(USE_NEVA_MEDIA)
 
   std::unique_ptr<ui::OverlayCandidatesOzone> overlay_candidates;
   if (!renderer_settings.overlay_strategies.empty()) {
@@ -135,6 +140,9 @@ OverlayProcessorInterface::CreateOverlayProcessor(
 
   return std::make_unique<OverlayProcessorOzone>(
       std::move(overlay_candidates),
+#if defined(USE_NEVA_MEDIA)
+      output_surface->GetSurfaceHandle(),
+#endif
       std::move(renderer_settings.overlay_strategies), sii);
 #elif defined(OS_ANDROID)
   DCHECK(display_controller);

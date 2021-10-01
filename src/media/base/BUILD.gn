@@ -9,6 +9,7 @@ import("//build/config/linux/pkg_config.gni")
 import("//build/config/ozone.gni")
 import("//build/config/ui.gni")
 import("//media/media_options.gni")
+import("//neva/neva.gni")
 import("//testing/libfuzzer/fuzzer_test.gni")
 
 if (is_android) {
@@ -376,6 +377,40 @@ source_set("base") {
     "//ui/events:events_base",
     "//url:url",
   ]
+
+  if (use_neva_media) {
+    # MediaPlayerNeva and MediaPlatformAPI use types in media/base.
+    visibility += [
+      "//media/neva:media_platform_api",
+      "//media/neva:media_player_neva",
+    ]
+
+    sources += [
+      "media_switches_neva.cc",
+      "media_switches_neva.h",
+    ]
+
+    import ("//media/base/neva/build.gni")
+    configs += neva.configs
+    if (!defined(public_configs)) {
+      public_configs = []
+    }
+    public_configs += neva.public_configs
+    deps += neva.deps
+    if (!defined(public_deps)) {
+      public_deps = []
+    }
+    public_deps += neva.public_deps
+    sources += rebase_path(neva.sources, ".")
+  }
+
+  if (use_neva_suspend_media_capture) {
+    visibility += [ "//content/renderer/media/audio/neva" ]
+  }
+
+  if (use_neva_webrtc) {
+    visibility += [ "//media/webrtc:webrtc" ]
+  }
 
   libs = []
   configs += [

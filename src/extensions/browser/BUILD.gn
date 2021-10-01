@@ -5,6 +5,7 @@
 import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/features.gni")
 import("//extensions/buildflags/buildflags.gni")
+import("//neva/neva.gni")
 
 assert(enable_extensions)
 
@@ -434,6 +435,13 @@ source_set("browser_sources") {
     "//extensions/browser/value_store",
     "//ipc",
   ]
+
+  if (use_neva_appruntime) {
+    deps += [
+      "//neva/app_runtime:app_runtime_webview_controller",
+      "//neva/app_runtime/public/mojom:mojom_app_runtime_blink",
+    ]
+  }
 
   if (is_mac) {
     # For LSCopyDisplayNameForURL, path_util.cc.

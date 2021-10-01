@@ -12,6 +12,7 @@
 #include "base/memory/scoped_refptr.h"
 #include "base/run_loop.h"
 #include "build/chromeos_buildflags.h"
+#include "ui/base/cursor/cursor_factory.h"
 #include "ui/base/cursor/mojom/cursor_type.mojom.h"
 #include "ui/base/cursor/ozone/bitmap_cursor_factory_ozone.h"
 #include "ui/base/dragdrop/drag_drop_types.h"
@@ -23,6 +24,7 @@
 #include "ui/gfx/geometry/point_f.h"
 #include "ui/gfx/geometry/size.h"
 #include "ui/gfx/native_widget_types.h"
+#include "ui/gfx/neva/file_utils.h"
 #include "ui/ozone/common/features.h"
 #include "ui/ozone/platform/wayland/common/wayland_util.h"
 #include "ui/ozone/platform/wayland/host/wayland_buffer_manager_host.h"
@@ -467,6 +469,70 @@ void WaylandWindow::HandleToplevelConfigure(int32_t widht,
 void WaylandWindow::HandlePopupConfigure(const gfx::Rect& bounds_dip) {
   NOTREACHED() << "Only shell popups must receive HandlePopupConfigure calls.";
 }
+
+///@name USE_NEVA_APPRUNTIME
+///@{
+void WaylandWindow::HandleStateChanged(PlatformWindowState state) {}
+
+void WaylandWindow::HandleActivationChanged(bool is_activated) {}
+
+void WaylandWindow::HandleKeyboardEnter() {
+  delegate_->OnKeyboardEnter();
+}
+
+void WaylandWindow::HandleKeyboardLeave() {
+  delegate_->OnKeyboardLeave();
+}
+
+void WaylandWindow::OnSurfaceContentChanged() {
+  connection_->ScheduleFlush();
+}
+
+void WaylandWindow::SetInputRegion(const std::vector<gfx::Rect>& regions) {
+  gfx::Rect region;
+
+  for (const auto& reg : regions)
+    region.Union(reg);
+
+  root_surface_->SetInputRegion(region);
+}
+
+void WaylandWindow::SetCustomCursor(neva_app_runtime::CustomCursorType type,
+                                    const std::string& path,
+                                    int hotspot_x,
+                                    int hotspot_y,
+                                    bool allowed_cursor_overriding) {
+  if (allowed_cursor_overriding_ && !allowed_cursor_overriding)
+    return;
+  if (type != neva_app_runtime::CustomCursorType::kPath &&
+      type == cursor_type_ && connection_->cursor() == nullptr)
+    return;
+
+  cursor_type_ = type;
+  allowed_cursor_overriding_ = allowed_cursor_overriding;
+
+  if (type == neva_app_runtime::CustomCursorType::kPath) {
+    SkBitmap* bitmap = gfx::DecodeSkBitmapFromPNG(base::FilePath(path));
+    if (!bitmap) {
+      SetCustomCursor(neva_app_runtime::CustomCursorType::kNotUse, "", 0, 0,
+                      allowed_cursor_overriding);
+      return;
+    }
+
+    // FIXME(neva): Need to add convertion from
+    // neva_app_runtime::CustomCursorType to mojom::CursorType
+    // (ui/base/cursor/mojom/cursor_type.mojom)
+    mojom::CursorType mojom_cursor_type = static_cast<mojom::CursorType>(type);
+    PlatformCursor cursor = CursorFactory::GetInstance()->CreateImageCursor(
+        mojom_cursor_type, *bitmap, gfx::Point(hotspot_x, hotspot_y));
+
+    SetCursor(cursor);
+
+    delete bitmap;
+  }
+}
+
+///@}
 
 void WaylandWindow::UpdateVisualSize(const gfx::Size& size_px) {
   if (visual_size_px_ == size_px)

@@ -128,7 +128,11 @@ class BLINK_MODULES_EXPORT WebMediaPlayerMS
   void ResetCanvasCache();
 
   // Methods to trigger resize event.
+#if !defined(USE_NEVA_WEBRTC)
+  // For NEVA_WEBRTC, WebMediaPlayerWebRTC overrides this function
+  // to track the video size for the hole frame.
   void TriggerResize();
+#endif
 
   // True if the loaded media has a playable video/audio track.
   bool HasVideo() const override;
@@ -174,10 +178,25 @@ class BLINK_MODULES_EXPORT WebMediaPlayerMS
   void OnFrameShown() override;
   void OnIdleTimeout() override;
 
+#if defined(USE_NEVA_WEBRTC)
+  void EnqueueHoleFrame(scoped_refptr<media::VideoFrame>& hole_frame);
+
+  virtual bool HandleVideoFrame(
+      const scoped_refptr<media::VideoFrame>& video_frame) {
+    return false;
+  }
+
+  virtual void TriggerResize();
+  virtual void OnFirstFrameReceived(media::VideoRotation video_rotation,
+                                    bool is_opaque);
+  void OnOpacityChanged(bool is_opaque);
+  virtual void OnRotationChanged(media::VideoRotation video_rotation);
+#else
   void OnFirstFrameReceived(media::VideoRotation video_rotation,
                             bool is_opaque);
   void OnOpacityChanged(bool is_opaque);
   void OnRotationChanged(media::VideoRotation video_rotation);
+#endif
 
   // WebMediaStreamObserver implementation
   void TrackAdded(const WebString& track_id) override;
@@ -194,7 +213,11 @@ class BLINK_MODULES_EXPORT WebMediaPlayerMS
   std::unique_ptr<WebMediaPlayer::VideoFramePresentationMetadata>
   GetVideoFramePresentationMetadata() override;
 
+#if defined(USE_NEVA_WEBRTC)
+ protected:
+#else
  private:
+#endif
   friend class WebMediaPlayerMSTest;
 
 #if defined(OS_WIN)

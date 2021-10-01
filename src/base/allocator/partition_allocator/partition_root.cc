@@ -346,11 +346,18 @@ static void PartitionDumpSlotSpanStats(
   }
 }
 
+#if defined(USE_MEMORY_TRACE)
+template <bool thread_safe>
+void PartitionDumpBucketStats(
+    PartitionBucketMemoryStats* stats_out,
+    const internal::PartitionBucket<thread_safe>* bucket) {
+#else
 template <bool thread_safe>
 static void PartitionDumpBucketStats(
     PartitionBucketMemoryStats* stats_out,
     const internal::PartitionBucket<thread_safe>* bucket) {
   PA_DCHECK(!bucket->is_direct_mapped());
+#endif
   stats_out->is_valid = false;
   // If the active slot span list is empty (==
   // internal::SlotSpanMetadata::get_sentinel_slot_span()), the bucket might

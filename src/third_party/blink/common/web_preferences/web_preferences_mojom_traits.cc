@@ -213,6 +213,9 @@ bool StructTraits<blink::mojom::WebPreferencesDataView,
   out->media_controls_enabled = data.media_controls_enabled();
   out->do_not_update_selection_on_mutating_selection_range =
       data.do_not_update_selection_on_mutating_selection_range();
+#if defined(USE_NEVA_MEDIA)
+  out->max_timeupdate_event_frequency = data.max_timeupdate_event_frequency();
+#endif
   out->autoplay_policy = data.autoplay_policy();
   out->preferred_color_scheme = data.preferred_color_scheme();
   out->preferred_contrast = data.preferred_contrast();

@@ -50,6 +50,15 @@ interface MediaPlayer {
 
   // Suspends the media player when the host frame is closed.
   SuspendForFrameClosed();
+
+  ///@name USE_NEVA_MEDIA
+  ///@{
+  [EnableIf=use_neva_media]
+  RequestActivation();
+
+  [EnableIf=use_neva_media]
+  RequestSuspend();
+  ///@}
 };
 
 // Implemented by MediaWebContentsObserver::MediaPlayerObserverHostImpl in the
@@ -98,6 +107,21 @@ interface MediaPlayerObserver {
 
   // Notifies that a playback seek event happened for the media player.
   OnSeek();
+
+  ///@name USE_NEVA_MEDIA
+  ///@{
+  [EnableIf=use_neva_media]
+  OnMediaCreated(bool will_use_media_resource);
+
+  [EnableIf=use_neva_media]
+  OnMediaActivated();
+
+  [EnableIf=use_neva_media]
+  OnMediaActivationNeeded();
+
+  [EnableIf=use_neva_media]
+  OnMediaSuspended();
+  ///@}
 };
 
 // Implemented by MediaWebContentsObserver::MediaPlayerHostImpl in the browser

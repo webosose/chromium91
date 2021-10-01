@@ -861,6 +861,9 @@ void WebURLLoader::PopulateURLResponse(
   response->SetWasInPrefetchCache(head.was_in_prefetch_cache);
   response->SetWasCookieInRequest(head.was_cookie_in_request);
   response->SetRecursivePrefetchToken(head.recursive_prefetch_token);
+#if defined(USE_FILESCHEME_CODECACHE)
+  response->SetFileLastModifiedTime(head.file_last_modified_time);
+#endif
   response->SetWebBundleURL(KURL(head.web_bundle_url));
 
   SetSecurityStyleAndDetails(KURL(url), head, response, report_security_info);

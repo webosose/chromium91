@@ -125,6 +125,13 @@ VirtualKeyboardController* InputMethodBase::GetVirtualKeyboardController() {
   return keyboard_controller_.get();
 }
 
+///@name USE_NEVA_APPRUNTIME
+///@{
+LinuxInputMethodContext* InputMethodBase::GetInputMethodContext() {
+  return nullptr;
+}
+///@}
+
 bool InputMethodBase::IsTextInputClientFocused(const TextInputClient* client) {
   return client && (client == GetTextInputClient());
 }

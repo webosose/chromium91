@@ -142,6 +142,13 @@ struct PartitionOptions {
   RefCount ref_count;
 };
 
+#if defined(USE_MEMORY_TRACE)
+template <bool thread_safe>
+BASE_EXPORT void PartitionDumpBucketStats(
+    PartitionBucketMemoryStats* stats_out,
+    const internal::PartitionBucket<thread_safe>* bucket);
+#endif
+
 // Never instantiate a PartitionRoot directly, instead use
 // PartitionAllocator.
 template <bool thread_safe>

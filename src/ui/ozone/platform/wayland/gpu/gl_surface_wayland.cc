@@ -71,7 +71,17 @@ EGLConfig GLSurfaceWayland::GetConfig() {
 
 gfx::SwapResult GLSurfaceWayland::SwapBuffers(PresentationCallback callback) {
   UpdateVisualSize();
-  return gl::NativeViewGLSurfaceEGL::SwapBuffers(std::move(callback));
+
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  gfx::SwapResult result =
+      gl::NativeViewGLSurfaceEGL::SwapBuffers(std::move(callback));
+
+  if (window_)
+    window_->OnSurfaceContentChanged();
+
+  return result;
+  ///@}
 }
 
 gfx::SwapResult GLSurfaceWayland::PostSubBuffer(int x,

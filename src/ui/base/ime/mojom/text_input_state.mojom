@@ -73,5 +73,12 @@ struct TextInputState {
 
   // Information of ime text spans at the cursor position.
   array<ImeTextSpanInfo> ime_text_spans_info;
+
+///@name USE_NEVA_APPRUNTIME
+///@{
+  // Specifies the input panel (virtual keyboard) rectangle invoked for the
+  // currently focused input element.
+  gfx.mojom.Rect input_panel_rectangle;
+///@}
 };
 

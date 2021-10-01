@@ -80,6 +80,12 @@ scoped_refptr<media::VideoFrame> CopyFrame(
       return media::VideoFrame::CreateColorFrame(
           frame->visible_rect().size(), 0u, 0x80, 0x80, frame->timestamp());
     }
+#if defined(USE_NEVA_WEBRTC)
+  } else if (frame->storage_type() == media::VideoFrame::STORAGE_OPAQUE) {
+    DCHECK(frame->format() == media::PIXEL_FORMAT_UNKNOWN);
+    new_frame = media::VideoFrame::CreateBlackFrame(frame->natural_size());
+    new_frame->set_timestamp(frame->timestamp());
+#endif
   } else {
     DCHECK(frame->IsMappable());
     DCHECK(frame->format() == media::PIXEL_FORMAT_I420A ||

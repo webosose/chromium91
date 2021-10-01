@@ -18,10 +18,9 @@ import unittest
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_DIR = os.path.join(SCRIPT_DIR, os.pardir)
 sys.path.append(PARENT_DIR)
-import roll_deps  # pylint: disable=wrong-import-position
+import roll_deps
 from roll_deps import CalculateChangedDeps, GetMatchingDepsEntries, \
-  ParseDepsDict, ParseLocalDepsFile, \
-  UpdateDepsFile  # pylint: disable=wrong-import-position
+  ParseDepsDict, ParseLocalDepsFile, UpdateDepsFile
 
 
 TEST_DATA_VARS = {

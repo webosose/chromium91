@@ -354,5 +354,15 @@
     "writeend",
     "writestart",
     "zoom",
+
+///@name USE_NEVA_MEDIA
+///@{
+    "umsmediainfo",
+    "webosmediafocuschange",
+    "broadcasterrormsg",
+    "dvrerrormsg",
+    "updatecamerastate",
+    "pipelinestarted",
+///@}
   ],
 }

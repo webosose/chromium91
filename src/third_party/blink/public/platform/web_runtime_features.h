@@ -89,6 +89,9 @@ class WebRuntimeFeatures {
   BLINK_PLATFORM_EXPORT static void EnableBlockingFocusWithoutUserActivation(
       bool);
   BLINK_PLATFORM_EXPORT static void EnableCacheInlineScriptCode(bool);
+#if defined(USE_FILESCHEME_CODECACHE)
+  BLINK_PLATFORM_EXPORT static void EnableLocalResourceCodeCache(bool);
+#endif
   BLINK_PLATFORM_EXPORT static void EnableCapabilityDelegationPaymentRequest(
       bool enable);
   BLINK_PLATFORM_EXPORT static void EnableClickPointerEvent(bool enable);

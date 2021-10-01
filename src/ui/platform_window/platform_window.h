@@ -14,6 +14,11 @@
 #include "ui/gfx/native_widget_types.h"
 #include "ui/platform_window/platform_window_delegate.h"
 
+///@name USE_NEVA_APPRUNTIME
+///@{
+#include "ui/platform_window/neva/platform_window.h"
+///@}
+
 namespace gfx {
 class ImageSkia;
 class Point;
@@ -27,7 +32,12 @@ using PlatformCursor = void*;
 
 // Generic PlatformWindow interface.
 class COMPONENT_EXPORT(PLATFORM_WINDOW) PlatformWindow
-    : public PropertyHandler {
+    : public PropertyHandler,
+      ///@name USE_NEVA_APPRUNTIME
+      ///@{
+      public neva::PlatformWindow
+      ///@}
+{
  public:
   PlatformWindow();
   ~PlatformWindow() override;

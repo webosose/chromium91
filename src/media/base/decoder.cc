@@ -52,6 +52,10 @@ std::string GetDecoderName(VideoDecoderType type) {
       return "V4L2VideoDecoder";
     case VideoDecoderType::kTesting:
       return "Testing or Mock Video decoder";
+#if defined(USE_NEVA_MEDIA)
+    case VideoDecoderType::kNeva:
+      return "NevaVideoDecoder";
+#endif  // defined(USE_NEVA_MEDIA)
     default:
       NOTREACHED();
       return "VideoDecoderType created through invalid static_cast";
@@ -74,6 +78,10 @@ std::string GetDecoderName(AudioDecoderType type) {
       return "AudioDecoderBroker";
     case AudioDecoderType::kTesting:
       return "Testing or Mock Audio decoder";
+#if defined(USE_NEVA_MEDIA)
+    case AudioDecoderType::kNeva:
+      return "NevaAudioDecoder";
+#endif  // defined(USE_NEVA_MEDIA)
     default:
       NOTREACHED();
       return "VideoDecoderType created through invalid static_cast";

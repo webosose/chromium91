@@ -202,6 +202,13 @@ class CONTENT_EXPORT MediaWebContentsObserver : public WebContentsObserver {
     void OnBufferUnderflow() override;
     void OnSeek() override;
 
+#if defined(USE_NEVA_MEDIA)
+    void OnMediaCreated(bool will_use_media_resource) override;
+    void OnMediaActivated() override;
+    void OnMediaActivationNeeded() override;
+    void OnMediaSuspended() override;
+#endif  // defined(USE_NEVA_MEDIA)
+
    private:
     MediaPlayerId media_player_id_;
     MediaWebContentsObserver* media_web_contents_observer_;

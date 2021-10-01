@@ -1242,8 +1242,9 @@ deps = {
   'src/third_party/libwebm/source':
     Var('chromium_git') + '/webm/libwebm.git' + '@' + '51ca718c3adf0ddedacd7df25fe45f67dc5a9ce1',
 
+  # FIXME(neva): Rolled down during M91 upgrade (original hash: 64994843e652443df2d5201c6ae3fb725097360f)
   'src/third_party/libyuv':
-    Var('chromium_git') + '/libyuv/libyuv.git' + '@' + '64994843e652443df2d5201c6ae3fb725097360f',
+    Var('chromium_git') + '/libyuv/libyuv.git' + '@' + '19bbedfd3e37329900d34e104021f04d7205ad78',
 
   'src/third_party/lighttpd': {
       'url': Var('chromium_git') + '/chromium/deps/lighttpd.git' + '@' + Var('lighttpd_revision'),
@@ -3891,6 +3892,72 @@ hooks = [
                '--bucket', 'chromium-webrtc-resources',
                '-d', 'src/third_party/opus/tests/resources'],
   },
+  #@name USE_NEVA_APPRUNTIME
+  #@{
+  # Apply icu time zone fix
+  {
+    'name': 'Apply_icu_timezone_fix',
+    'pattern': '.',
+    'action': ['git', '-C', 'src/third_party/icu', 'am',
+               '../../neva/patches/0001-webos-Change-the-default-timezone-link.patch']
+  },
+  # Apply use non-icu database fix
+  {
+    'name': 'Apply_use_non_icu_database_fix',
+    'pattern': '.',
+    'action': ['git', '-C', 'src/v8', 'am',
+               '../neva/patches/0001-webos-Allow-to-use-v8-non-ICU-timezone-database.patch']
+  },
+  # Apply more accurate trace of heap growing factor
+  {
+    'name': 'Apply_more_accurate_trace_of_heap_growing_factor',
+    'pattern': '.',
+    'action': ['git', '-C', 'src/v8', 'am',
+               '../neva/patches/0002-v8-Trace-heap-growing-factor-more-accurately.patch']
+  },
+  # Apply v8 snapshot report exceptions to console
+  {
+    'name': 'Apply_v8_snapshot_report_exceptions_to_console',
+    'pattern': '.',
+    'action': ['git', '-C', 'src/v8', 'am',
+               '../neva/patches/0003-op-upsable-v8-snapshot-Report-exceptions-to-console-.patch']
+  },
+  # Apply Add LTTng tracepoints support
+  {
+    'name': 'Apply_add_lttng_tracepoints_support',
+    'pattern': '.',
+    'action': ['git', '-C', 'src/v8', 'am',
+               '../neva/patches/0004-Add-LTTng-tracepoints-support.patch']
+  },
+  # Apply Make v8 heap constraints configurable
+  {
+    'name': 'Apply_make_v8_heap_constraints_configurable',
+    'pattern': '.',
+    'action': ['git', '-C', 'src/v8', 'am',
+               '../neva/patches/0005-op-upsable-v8-memory-Make-v8-heap-constraints-config.patch']
+  },
+  # Apply 'Refactor neva content decryption module' patch
+  {
+    'name': 'Apply_refactor_neva_content_decryption_module',
+    'pattern': '.',
+    'action': ['git', '-C', 'src/media/cdm/api', 'am',
+               '../../../neva/patches/0001-cdm-Refactor-neva-content-decryption-module.patch']
+  },
+  # Apply 'GCC-suppress-invalid-offsetof-warnings' patch
+  {
+    'name': 'Apply_GCC-suppress-invalid-offsetof-warnings',
+    'pattern': '.',
+    'action': ['git', '-C', 'src/net/third_party/quiche/src', 'am',
+               '../../../../neva/patches/0001-GCC-suppress-invalid-offsetof-warnings.patch']
+  },
+  # Apply 'gpu-Disable-GL_EXT_texture_rg-on-Mali-G-series' patch
+  {
+    'name': 'Apply_gpu-Disable-GL_EXT_texture_rg-on-Mali-G-series',
+    'pattern': '.',
+    'action': ['git', '-C', 'src/third_party/skia', 'am',
+               '../../neva/patches/0001-gpu-Disable-GL_EXT_texture_rg-on-Mali-G-series.patch']
+  },
+  #@}
   {
     'name': 'apache_mac',
     'pattern': '\\.sha1',

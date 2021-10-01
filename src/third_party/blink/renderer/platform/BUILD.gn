@@ -18,6 +18,7 @@ import("//third_party/blink/renderer/config.gni")
 import("//third_party/blink/renderer/platform/platform_generated.gni")
 import("//third_party/webrtc/webrtc.gni")
 import("//v8/gni/v8.gni")
+import("//neva/neva.gni")
 
 # Most targets in this file are private actions so use that as the default.
 visibility = [
@@ -1768,6 +1769,10 @@ component("platform") {
     sources += [ "text/mac/hyphenation_mac.cc" ]
   } else {
     sources += [ "text/hyphenation/hyphenation_null.cc" ]
+  }
+
+  if (use_memory_trace) {
+    deps += [ "//third_party/blink/renderer/platform/neva" ]
   }
 
   if (enable_av1_decoder) {

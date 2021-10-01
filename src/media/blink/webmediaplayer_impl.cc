@@ -1549,6 +1549,15 @@ void WebMediaPlayerImpl::SetCdmInternal(
   CdmContext* cdm_context = cdm_context_ref->GetCdmContext();
   DCHECK(cdm_context);
 
+#if defined(USE_NEVA_MEDIA)
+  // We give |key_system_| information to CdmContext. Usually(chromium)
+  // CdmContext doesn't need to know key system. But in webOS, sometimes we need
+  // to branch out according to current key system. Key system information in
+  // CdmContext is very useful because CdmContext is shared across all related
+  // components such as external renderer, decrypting demuxer stream, cdm, etc.
+  cdm_context->set_key_system(key_system_);
+#endif
+
   // Keep the reference to the CDM, as it shouldn't be destroyed until
   // after the pipeline is done with the |cdm_context|.
   pending_cdm_context_ref_ = std::move(cdm_context_ref);
@@ -2906,7 +2915,11 @@ scoped_refptr<VideoFrame> WebMediaPlayerImpl::GetCurrentFrameFromCompositor()
 
 void WebMediaPlayerImpl::UpdatePlayState() {
   DCHECK(main_task_runner_->BelongsToCurrentThread());
+#if defined(USE_NEVA_MEDIA)
+  bool can_auto_suspend = false;
+#else
   bool can_auto_suspend = !disable_pipeline_auto_suspend_;
+#endif
   // For streaming videos, we only allow suspending at the very beginning of the
   // video, and only if we know the length of the video. (If we don't know
   // the length, it might be a dynamically generated video, and suspending
@@ -3543,6 +3556,14 @@ bool WebMediaPlayerImpl::IsBackgroundOptimizationCandidate() const {
 }
 
 void WebMediaPlayerImpl::UpdateBackgroundVideoOptimizationState() {
+#if defined(USE_NEVA_MEDIA)
+  // Disable background optimization.
+  // This feature makes a trouble when it is combined with neva's
+  // suspend/resume logic. This feature prevents decoding by disabling
+  // demuxer stream. But it is not recovered after shown so that pipeline
+  // became freezing.
+  return;
+#else
   if (IsHidden()) {
     if (ShouldPausePlaybackWhenHidden()) {
       PauseVideoIfNeeded();
@@ -3566,6 +3587,7 @@ void WebMediaPlayerImpl::UpdateBackgroundVideoOptimizationState() {
     is_background_status_change_cancelled_ = true;
     EnableVideoTrackIfNeeded();
   }
+#endif  // defined(USE_NEVA_MEDIA)
 }
 
 void WebMediaPlayerImpl::PauseVideoIfNeeded() {

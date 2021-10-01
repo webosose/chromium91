@@ -64,9 +64,11 @@ gpu::VideoDecodeAcceleratorCapabilities GetDecoderCapabilitiesInternal(
   GpuVideoAcceleratorUtil::InsertUniqueDecodeProfiles(
       V4L2VideoDecodeAccelerator::GetSupportedProfiles(),
       &capabilities.supported_profiles);
+#if !defined(USE_NEVA_V4L2_CODEC)
   GpuVideoAcceleratorUtil::InsertUniqueDecodeProfiles(
       V4L2SliceVideoDecodeAccelerator::GetSupportedProfiles(),
       &capabilities.supported_profiles);
+#endif  // !defined(USE_NEVA_V4L2_CODEC)
 #endif
 #elif defined(OS_MAC)
   capabilities.supported_profiles =
@@ -146,7 +148,9 @@ GpuVideoDecodeAcceleratorFactory::CreateVDA(
     &GpuVideoDecodeAcceleratorFactory::CreateVaapiVDA,
 #elif BUILDFLAG(USE_V4L2_CODEC)
     &GpuVideoDecodeAcceleratorFactory::CreateV4L2VDA,
+#if !defined(USE_NEVA_V4L2_CODEC)
     &GpuVideoDecodeAcceleratorFactory::CreateV4L2SliceVDA,
+#endif  // !defined(USE_NEVA_V4L2_CODEC)
 #endif
 
 #if defined(OS_MAC)
@@ -207,6 +211,9 @@ GpuVideoDecodeAcceleratorFactory::CreateV4L2VDA(
   return decoder;
 }
 
+#if !defined(USE_NEVA_V4L2_CODEC)
+// Slice Video Decoder is implemented in linux v5.3.x
+// But in webOS and AGL, linux kernel 4.x is used.
 std::unique_ptr<VideoDecodeAccelerator>
 GpuVideoDecodeAcceleratorFactory::CreateV4L2SliceVDA(
     const gpu::GpuDriverBugWorkarounds& /*workarounds*/,
@@ -221,6 +228,7 @@ GpuVideoDecodeAcceleratorFactory::CreateV4L2SliceVDA(
   }
   return decoder;
 }
+#endif  // !defined(USE_NEVA_V4L2_CODEC)
 #endif
 
 #if defined(OS_MAC)

@@ -14,6 +14,11 @@ import "third_party/blink/public/mojom/browser_interface_broker.mojom";
 import "third_party/blink/public/mojom/user_agent/user_agent_metadata.mojom";
 import "ui/gfx/geometry/mojom/geometry.mojom";
 
+///@name USE_NEVA_APPRUNTIME
+///@{
+import "mojo/public/mojom/base/memory_pressure_level.mojom";
+///@}
+
 struct UpdateScrollbarThemeParams {
   // TODO(avi): Update these to optional values when optional numeric types are
   // allowed. (https://crbug.com/657632)
@@ -139,6 +144,18 @@ interface Renderer {
   // Tells the renderer process of a change in visibility or background state.
   SetProcessState(RenderProcessBackgroundState background_state,
                   RenderProcessVisibleState visible_state);
+
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  // Tells the renderer process to suspend.
+  ProcessSuspend();
+
+  // Tells the renderer process to resume.
+  ProcessResume();
+
+  // Called when the system is low on memory.
+  OnSystemMemoryPressureLevelChanged(mojo_base.mojom.MemoryPressureLevel level);
+  ///@}
 
   // Tells the scheduler about "keep-alive" state which can be due to:
   // service workers, shared workers, or fetch keep-alive.

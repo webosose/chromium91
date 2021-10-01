@@ -113,7 +113,11 @@ void AddV4L2GpuPermissions(
     static constexpr size_t MAX_V4L2_DECODERS = 5;
     static const base::FilePath::CharType kDevicePath[] =
         FILE_PATH_LITERAL("/dev/");
+#if defined(USE_NEVA_V4L2_CODEC)
+    static const base::FilePath::CharType kVideoDecBase[] = "video1";
+#else
     static const base::FilePath::CharType kVideoDecBase[] = "video-dec";
+#endif
     static const base::FilePath::CharType kMediaDecBase[] = "media-dec";
     for (size_t i = 0; i < MAX_V4L2_DECODERS; i++) {
       std::ostringstream decoderPath;

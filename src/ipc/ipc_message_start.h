@@ -25,6 +25,10 @@ enum IPCMessageStart {
   EncryptedMediaMsgStart,
   GinJavaBridgeMsgStart,
   ChromeUtilityPrintingMsgStart,
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  OzoneGpuMsgStart,
+  ///@}
   ExtensionsGuestViewMsgStart,
   GuestViewMsgStart,
   MediaPlayerDelegateMsgStart,

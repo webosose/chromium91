@@ -228,6 +228,10 @@ void SetRuntimeFeaturesFromChromiumFeatures() {
     {wf::EnableBrowserVerifiedUserActivationMouse,
      features::kBrowserVerifiedUserActivationMouse},
     {wf::EnableCacheInlineScriptCode, features::kCacheInlineScriptCode},
+#if defined(USE_FILESCHEME_CODECACHE)
+    {wf::EnableLocalResourceCodeCache,
+     blink::features::kLocalResourceCodeCache},
+#endif
     {wf::EnableCapabilityDelegationPaymentRequest,
      features::kCapabilityDelegationPaymentRequest},
     {wf::EnableClickPointerEvent, features::kClickPointerEvent},

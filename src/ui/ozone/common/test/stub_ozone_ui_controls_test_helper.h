@@ -15,6 +15,10 @@ OzoneUIControlsTestHelper* CreateOzoneUIControlsTestHelperScenic();
 OzoneUIControlsTestHelper* CreateOzoneUIControlsTestHelperHeadless();
 OzoneUIControlsTestHelper* CreateOzoneUIControlsTestHelperCast();
 
+#if defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+OzoneUIControlsTestHelper* CreateOzoneUIControlsTestHelperWayland_external();
+#endif
+
 }  // namespace ui
 
 #endif  // UI_OZONE_COMMON_TEST_STUB_OZONE_UI_CONTROLS_TEST_HELPER_H_

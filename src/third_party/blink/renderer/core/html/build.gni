@@ -559,6 +559,13 @@ blink_core_sources_html = [
   "window_name_collection.h",
 ]
 
+import("//neva/neva.gni")
+if (use_neva_media) {
+  blink_core_sources_html += [ "media/neva/html_media_element.h" ]
+} else {
+  blink_core_sources_html += [ "media/neva/html_media_element_stub.h" ]
+}
+
 # Optimizing the HTML parser for speed yields significant gains in performance
 # in parser-heavy scenarios. See https://crbug.com/787512.
 blink_core_hot_sources_html = [

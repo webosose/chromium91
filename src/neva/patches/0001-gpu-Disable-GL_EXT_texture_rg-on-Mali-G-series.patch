@@ -1,0 +1,109 @@
+From a8d4685e9ca85d558a0f289ea1de7371d84b4b2b Mon Sep 17 00:00:00 2001
+From: Jose Dapena Paz <j.dapena@lgepartner.com>
+Date: Tue, 16 Mar 2021 13:07:35 +0100
+Subject: [PATCH] [gpu] Disable GL_EXT_texture_rg on Mali G series.
+
+:Release Notes:
+Prevent webpage rendering error caused by Mali GPU driver error.
+
+:Detailed Notes:
+In some cases, glCopyTexSubImage2D fails when it is used to copy a
+GL_R8 buffer from another texture. As we isolated to see only this bug
+in Mali G.* GPU driver, we introduce a specific workaround for that
+case, that disables usage of GL_EXT_texture_rg.
+
+:Testing Performed:
+1. Launch a webapp. on o20 starfish
+$ luna-send -n 1 -f luna://com.webos.applicationManager/launch
+'{"id":"com.webos.app.test.jitsi"}'
+
+2. Side-load www.amazon.com
+3. Scroll up and down after the page is loaded.
+The initial page is rendered normally and rendering result
+is not disappared to white screen.
+
+:QA Notes:
+
+:Issues Addressed:
+[NEVA-6264] [TV] The YouTube video is played, but the background screen appears white on the screen
+
+Change-Id: I63767c9ff8e8ca1d66f9ddc4978766911765f800
+Originally-Reviewed-on: http://gpro.lge.com/c/webos-pro/chromium87/+/306314
+diff --git a/include/gpu/GrDriverBugWorkaroundsAutogen.h b/include/gpu/GrDriverBugWorkaroundsAutogen.h
+index 4db9479b25..06fc7f8d65 100644
+--- a/include/gpu/GrDriverBugWorkaroundsAutogen.h
++++ b/include/gpu/GrDriverBugWorkaroundsAutogen.h
+@@ -42,4 +42,6 @@
+          unbind_attachments_on_bound_render_fbo_delete) \
+   GPU_OP(UNFOLD_SHORT_CIRCUIT_AS_TERNARY_OPERATION,     \
+          unfold_short_circuit_as_ternary_operation)     \
++  GPU_OP(DISABLE_TEXTURE_RG,                            \
++         disable_texture_rg)                            \
+ // The End
+diff --git a/src/gpu/gl/GrGLCaps.cpp b/src/gpu/gl/GrGLCaps.cpp
+index 7d31c86bec..3b181e10c1 100644
+--- a/src/gpu/gl/GrGLCaps.cpp
++++ b/src/gpu/gl/GrGLCaps.cpp
+@@ -1477,7 +1477,7 @@ void GrGLCaps::initFormatTable(const GrGLContextInfo& ctxInfo, const GrGLInterfa
+     }
+
+     // Format: R8
+-    {
++    if (!fDriverBugWorkarounds.disable_texture_rg) {
+         FormatInfo& info = this->getFormatInfo(GrGLFormat::kR8);
+         info.fFormatType = FormatType::kNormalizedFixedPoint;
+         info.fInternalFormatForRenderbuffer = GR_GL_R8;
+@@ -2163,7 +2163,7 @@ void GrGLCaps::initFormatTable(const GrGLContextInfo& ctxInfo, const GrGLInterfa
+     }
+
+     // Format: R16F
+-    {
++    if (!fDriverBugWorkarounds.disable_texture_rg) {
+         FormatInfo& info = this->getFormatInfo(GrGLFormat::kR16F);
+         info.fFormatType = FormatType::kFloat;
+         info.fInternalFormatForRenderbuffer = GR_GL_R16F;
+@@ -2409,7 +2409,7 @@ void GrGLCaps::initFormatTable(const GrGLContextInfo& ctxInfo, const GrGLInterfa
+     }
+
+     // Format: RG8
+-    {
++    if (!fDriverBugWorkarounds.disable_texture_rg) {
+         FormatInfo& info = this->getFormatInfo(GrGLFormat::kRG8);
+         info.fFormatType = FormatType::kNormalizedFixedPoint;
+         info.fInternalFormatForRenderbuffer = GR_GL_RG8;
+@@ -2809,7 +2809,7 @@ void GrGLCaps::initFormatTable(const GrGLContextInfo& ctxInfo, const GrGLInterfa
+     }
+
+     // Format: R16
+-    {
++    if (!fDriverBugWorkarounds.disable_texture_rg) {
+         FormatInfo& info = this->getFormatInfo(GrGLFormat::kR16);
+         info.fFormatType = FormatType::kNormalizedFixedPoint;
+         info.fInternalFormatForRenderbuffer = GR_GL_R16;
+@@ -2877,7 +2877,7 @@ void GrGLCaps::initFormatTable(const GrGLContextInfo& ctxInfo, const GrGLInterfa
+     }
+
+     // Format: RG16
+-    {
++    if (!fDriverBugWorkarounds.disable_texture_rg) {
+         FormatInfo& info = this->getFormatInfo(GrGLFormat::kRG16);
+         info.fFormatType = FormatType::kNormalizedFixedPoint;
+         info.fInternalFormatForTexImageOrStorage =
+@@ -3012,7 +3012,7 @@ void GrGLCaps::initFormatTable(const GrGLContextInfo& ctxInfo, const GrGLInterfa
+     }
+
+     // Format:RG16F
+-    {
++    if (!fDriverBugWorkarounds.disable_texture_rg) {
+         bool rg16FTextureSupport = false;
+         bool rg16FRenderTargetSupport = false;
+         if (GR_IS_GR_GL(standard)) {
+diff --git a/src/gpu/gpu_workaround_list.txt b/src/gpu/gpu_workaround_list.txt
+index 5d96845a1b..e967e2ded3 100644
+--- a/src/gpu/gpu_workaround_list.txt
++++ b/src/gpu/gpu_workaround_list.txt
+@@ -16,3 +16,4 @@ rewrite_do_while_loops
+ unbind_attachments_on_bound_render_fbo_delete
+ unfold_short_circuit_as_ternary_operation
+ disable_dual_source_blending_support
++disable_texture_rg

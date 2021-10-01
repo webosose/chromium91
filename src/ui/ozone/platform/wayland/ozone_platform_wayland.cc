@@ -58,10 +58,19 @@
 #include "ui/ozone/platform/wayland/gpu/drm_render_node_handle.h"
 #endif
 
+#if defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+#include "ui/ozone/public/gpu_platform_support.h"
+#endif
+
 #if BUILDFLAG(USE_GTK)
 #include "ui/gtk/gtk_ui_delegate.h"  // nogncheck
 #include "ui/ozone/platform/wayland/host/gtk_ui_delegate_wayland.h"  //nogncheck
 #endif
+
+#if defined(USE_NEVA_MEDIA)
+#include "ui/ozone/common/neva/video_window_controller_impl.h"
+#include "ui/ozone/common/neva/video_window_provider_mojo.h"
+#endif  // defined(USE_NEVA_MEDIA)
 
 namespace ui {
 
@@ -86,6 +95,12 @@ class OzonePlatformWayland : public OzonePlatform {
   InputController* GetInputController() override {
     return input_controller_.get();
   }
+
+#if defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+  GpuPlatformSupport* GetGpuPlatformSupport() override {
+    return gpu_platform_support_.get();
+  }
+#endif
 
   GpuPlatformSupportHost* GetGpuPlatformSupportHost() override {
     return buffer_manager_connector_ ? buffer_manager_connector_.get()
@@ -198,6 +213,9 @@ class OzonePlatformWayland : public OzonePlatform {
 
   void InitializeGPU(const InitParams& args) override {
     buffer_manager_ = std::make_unique<WaylandBufferManagerGpu>();
+#if defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+    gpu_platform_support_.reset(CreateStubGpuPlatformSupport());
+#endif
     surface_factory_ = std::make_unique<WaylandSurfaceFactory>(
         connection_.get(), buffer_manager_.get());
     overlay_manager_ = std::make_unique<WaylandOverlayManager>();
@@ -217,6 +235,11 @@ class OzonePlatformWayland : public OzonePlatform {
       }
     }
 #endif
+
+#if defined(USE_NEVA_MEDIA)
+    video_window_controller_ = std::make_unique<VideoWindowControllerImpl>();
+    video_window_controller_->Initialize(base::ThreadTaskRunnerHandle::Get());
+#endif  // defined(USE_NEVA_MEDIA)
   }
 
   const PlatformProperties& GetPlatformProperties() override {
@@ -280,12 +303,46 @@ class OzonePlatformWayland : public OzonePlatform {
             &OzonePlatformWayland::CreateWaylandBufferManagerGpuBinding,
             base::Unretained(this)),
         base::SequencedTaskRunnerHandle::Get());
+
+#if defined(USE_NEVA_MEDIA)
+    // This is called from GPU main thread and we want to get callback with GPU
+    // main thread.
+    binders->Add(base::BindRepeating(
+                     &OzonePlatformWayland::CreateVideoWindowConnectorBinding,
+                     base::Unretained(this)),
+                 base::ThreadTaskRunnerHandle::Get());
+
+    binders->Add(
+        base::BindRepeating(
+            &OzonePlatformWayland::CreateVideoWindowProviderClientBinding,
+            base::Unretained(this)),
+        base::ThreadTaskRunnerHandle::Get());
+#endif  // defined(USE_NEVA_MEDIA)
   }
 
   void CreateWaylandBufferManagerGpuBinding(
       mojo::PendingReceiver<ozone::mojom::WaylandBufferManagerGpu> receiver) {
     buffer_manager_->AddBindingWaylandBufferManagerGpu(std::move(receiver));
   }
+
+#if defined(USE_NEVA_MEDIA)
+  void CreateVideoWindowConnectorBinding(
+      mojo::PendingReceiver<mojom::VideoWindowConnector> receiver) {
+    video_window_controller_->Bind(std::move(receiver));
+  }
+
+  void CreateVideoWindowProviderClientBinding(
+      mojo::PendingReceiver<mojom::VideoWindowProviderClient> receiver) {
+    video_window_provider_mojo_ = std::make_unique<VideoWindowProviderMojo>(
+        video_window_controller_.get(), std::move(receiver));
+    video_window_controller_->SetVideoWindowProvider(
+        video_window_provider_mojo_.get());
+  }
+
+  VideoWindowGeometryManager* GetVideoWindowGeometryManager() override {
+    return video_window_controller_.get();
+  }
+#endif  // defined(USE_NEVA_MEDIA)
 
   void PostMainMessageLoopStart(
       base::OnceCallback<void()> shutdown_cb) override {
@@ -304,6 +361,9 @@ class OzonePlatformWayland : public OzonePlatform {
   std::unique_ptr<CursorFactory> cursor_factory_;
   std::unique_ptr<InputController> input_controller_;
   std::unique_ptr<GpuPlatformSupportHost> gpu_platform_support_host_;
+#if defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+  std::unique_ptr<GpuPlatformSupport> gpu_platform_support_;
+#endif
   std::unique_ptr<WaylandInputMethodContextFactory>
       input_method_context_factory_;
   std::unique_ptr<WaylandBufferManagerConnector> buffer_manager_connector_;
@@ -312,6 +372,11 @@ class OzonePlatformWayland : public OzonePlatform {
   // Objects, which solely live in the GPU process.
   std::unique_ptr<WaylandBufferManagerGpu> buffer_manager_;
   std::unique_ptr<WaylandOverlayManager> overlay_manager_;
+
+#if defined(USE_NEVA_MEDIA)
+  std::unique_ptr<VideoWindowControllerImpl> video_window_controller_;
+  std::unique_ptr<VideoWindowProviderMojo> video_window_provider_mojo_;
+#endif  // defined(USE_NEVA_MEDIA)
 
   // Provides supported buffer formats for native gpu memory buffers
   // framework.

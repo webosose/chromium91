@@ -109,6 +109,12 @@ gfx::RectF OverlayProcessorUsingStrategy::Strategy::GetPrimaryPlaneDisplayRect(
 OverlayProcessorUsingStrategy::OverlayProcessorUsingStrategy()
     : OverlayProcessorInterface() {}
 
+#if defined(USE_NEVA_MEDIA)
+OverlayProcessorUsingStrategy::OverlayProcessorUsingStrategy(
+    gpu::SurfaceHandle surface_handle)
+    : OverlayProcessorInterface(), neva_processor_(surface_handle) {}
+#endif
+
 OverlayProcessorUsingStrategy::~OverlayProcessorUsingStrategy() = default;
 
 gfx::Rect OverlayProcessorUsingStrategy::GetPreviousFrameOverlaysBoundingRect()
@@ -166,7 +172,20 @@ void OverlayProcessorUsingStrategy::ProcessForOverlays(
           render_passes, &surface_damage_rect_list, output_surface_plane,
           candidates, content_bounds);
     }
+#if defined(USE_NEVA_MEDIA)
+    // TODO(neva, sync-to-87): RenderPassList changed to AggregatedRenderPassList.
+    // We don't investigate this change yet. Need to confirm NevaLayerOverlay
+    // works as before.
+    neva_processor_.Process(resource_provider,
+                            gfx::RectF(render_passes->back()->output_rect),
+                            render_passes, &overlay_damage_rect_, damage_rect);
+
+  } else {
+    neva_processor_.ClearOverlayState();
   }
+#else
+  }
+#endif
 
   DCHECK(candidates->empty() || success);
 

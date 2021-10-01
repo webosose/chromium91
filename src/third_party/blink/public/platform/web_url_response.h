@@ -335,6 +335,10 @@ class WebURLResponse {
   BLINK_PLATFORM_EXPORT void SetRecursivePrefetchToken(
       const base::Optional<base::UnguessableToken>&);
 
+#if defined(USE_FILESCHEME_CODECACHE)
+  BLINK_PLATFORM_EXPORT void SetFileLastModifiedTime(base::Time);
+#endif
+
   // Whether this resource is from a MHTML archive.
   BLINK_PLATFORM_EXPORT bool FromArchive() const;
 

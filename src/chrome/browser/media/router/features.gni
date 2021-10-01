@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/config/chrome_build.gni")
+import("//neva/neva.gni")
 
 declare_args() {
   # TODO(crbug.com/702997): Exclude openscreen in NaCl, since there is no packet
@@ -11,6 +12,6 @@ declare_args() {
   # NOTE: This option refers to the inclusion of code for the Open Screen
   # Protocol, not the entire openscreen library.
   enable_openscreen =
-      !is_nacl &&
+      !is_nacl && !is_webos &&
       (target_os == "linux" || target_os == "chromeos" || target_os == "mac")
 }

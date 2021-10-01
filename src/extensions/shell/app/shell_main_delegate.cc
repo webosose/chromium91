@@ -53,6 +53,10 @@
 #include "extensions/shell/app/shell_crash_reporter_client.h"
 #endif
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "ui/base/ui_base_paths.h"
+#endif  // defined(USE_NEVA_APPRUNTIME)
+
 namespace {
 
 // TODO(crbug.com/1052397): Revisit the macro expression once build flag switch
@@ -120,10 +124,20 @@ void InitLogging() {
 // Returns the path to the extensions_shell_and_test.pak file.
 base::FilePath GetResourcesPakFilePath() {
   base::FilePath extensions_shell_and_test_pak_path;
+#if defined(USE_CBE)
+  base::PathService::Get(base::DIR_ASSETS, &extensions_shell_and_test_pak_path);
+#else
   base::PathService::Get(base::DIR_MODULE, &extensions_shell_and_test_pak_path);
+#endif  // defined(USE_CBE)
+#if defined(OS_WEBOS)
+  const char resources_pak_name[] = "webos_content.pak";
+#elif defined(USE_NEVA_APPRUNTIME)
+  const char resources_pak_name[] = "app_runtime_content.pak";
+#else
+  const char resources_pak_name[] = "extensions_shell_and_test.pak";
+#endif
   extensions_shell_and_test_pak_path =
-      extensions_shell_and_test_pak_path.AppendASCII(
-          "extensions_shell_and_test.pak");
+      extensions_shell_and_test_pak_path.AppendASCII(resources_pak_name);
   return extensions_shell_and_test_pak_path;
 }
 
@@ -167,6 +181,16 @@ void ShellMainDelegate::PreSandboxStartup() {
   if (ProcessNeedsResourceBundle(process_type))
     ui::ResourceBundle::InitSharedInstanceWithPakPath(
         GetResourcesPakFilePath());
+#if defined(USE_NEVA_APPRUNTIME)
+  base::FilePath locales_dir;
+#if defined(USE_CBE)
+  base::PathService::Get(base::DIR_ASSETS, &locales_dir);
+#else
+  base::PathService::Get(base::DIR_MODULE, &locales_dir);
+#endif  // defined(USE_CBE)
+  base::PathService::Override(ui::DIR_LOCALES,
+                              locales_dir.AppendASCII("neva_locales"));
+#endif  // defined(USE_NEVA_APPRUNTIME)
 }
 
 content::ContentClient* ShellMainDelegate::CreateContentClient() {

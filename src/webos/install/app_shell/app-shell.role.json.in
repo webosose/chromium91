@@ -1,0 +1,56 @@
+{
+    "exeName":"@@EXENAME@@",
+    "trustLevel":"oem",
+    "type": "privileged",
+    "allowedNames": [
+        "com.webos.app.enactbrowser*",
+        "com.webos.chromium.memory*",
+        "com.webos.media.client.*",
+        "com.webos.settingsservice.client*",
+        ""
+    ],
+    "permissions": [
+        {
+            "service":"com.webos.app.enactbrowser*",
+            "inbound":["*"],
+            "outbound":["*"]
+        },
+        {
+            "service":"com.webos.chromium.memory.*",
+            "inbound":[
+              "com.webos.service.memorymanager",
+              "com.palm.bus"
+            ],
+            "outbound":[
+              "com.webos.service.memorymanager",
+              "com.palm.bus"
+            ]
+        },
+        {
+            "service":"com.webos.media.client.*",
+            "inbound":["com.webos.media"],
+            "outbound":["com.webos.media"]
+        },
+        {
+            "service":"com.webos.settingsservice.client*",
+            "outbound":["com.webos.settingsservice"]
+        },
+        {
+            "service":"",
+            "inbound":[
+              "com.webos.applicationManager",
+              "com.webos.settingsservice",
+              "com.webos.service.videosinkmanager",
+              "com.webos.service.admanager.service",
+              "com.webos.service.tv.display"
+            ],
+            "outbound":[
+              "com.webos.applicationManager",
+              "com.webos.settingsservice",
+              "com.webos.service.videosinkmanager",
+              "com.webos.service.admanager.service",
+              "com.webos.service.tv.display"
+            ]
+        }
+    ]
+}

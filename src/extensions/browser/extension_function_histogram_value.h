@@ -1611,6 +1611,11 @@ enum HistogramValue {
   LANGUAGESETTINGSPRIVATE_SETTRANSLATETARGETLANGUAGE = 1548,
   LANGUAGESETTINGSPRIVATE_GETNEVERTRANSLATELANGUAGES = 1549,
   ACTION_GETUSERSETTINGS = 1550,
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  WEBVIEWINTERNAL_RESUME = 1551,
+  WEBVIEWINTERNAL_SUSPEND = 1552,
+  ///@}
   // Last entry: Add new entries above, then run:
   // python tools/metrics/histograms/update_extension_histograms.py
   ENUM_BOUNDARY

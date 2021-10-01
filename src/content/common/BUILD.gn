@@ -8,6 +8,7 @@ import("//build/config/ui.gni")
 import("//content/public/common/zygote/features.gni")
 import("//ipc/features.gni")
 import("//mojo/public/tools/bindings/mojom.gni")
+import("//neva/neva.gni")
 import("//ppapi/buildflags/buildflags.gni")
 import("//sandbox/features.gni")
 import("//tools/ipc_fuzzer/ipc_fuzzer.gni")
@@ -262,6 +263,10 @@ source_set("common") {
     "//content/public/common:interfaces",
   ]
 
+  if (use_lttng) {
+    deps += [ "//content/common/neva/lttng:lttng" ]
+  }
+
   if (is_android) {
     sources += [
       "android/cpu_time_metrics.cc",
@@ -422,6 +427,10 @@ group("for_content_tests") {
 mojom("mojo_bindings") {
   # This interface is internal to content.
   visibility = [ "//content/*" ]
+
+  if (use_neva_appruntime) {
+    visibility += [ "//neva/app_runtime" ]
+  }
 
   # indexed_db.mojom used a native typemap that was not available in Java.
   # indexed_db.mojom was removed in an earlier commit.  This should be removed
@@ -665,6 +674,12 @@ mojom("mojo_bindings") {
             [ "//third_party/blink/public/platform/mac/web_scrollbar_theme.h" ]
         traits_public_deps = [ "//third_party/blink/public:blink_headers" ]
       },
+    ]
+  }
+
+  if (use_neva_media) {
+    sources += [
+      "media/neva/frame_media_controller.mojom",
     ]
   }
 

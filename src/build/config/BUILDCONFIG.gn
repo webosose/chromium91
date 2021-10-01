@@ -163,6 +163,14 @@ declare_args() {
   is_component_build = is_debug && current_os != "ios"
 }
 
+declare_args() {
+  # Added for using cross toolchain (for example WEBOS uses cross toolchain)
+  is_cross_linux_build = false
+
+  # Use clang for host compilation.
+  is_host_clang = true
+}
+
 assert(!(is_debug && is_official_build), "Can't do official debug builds")
 
 # ==============================================================================
@@ -189,6 +197,12 @@ if (host_toolchain == "") {
       host_toolchain = "//build/toolchain/linux:clang_$host_cpu"
     } else if (is_clang) {
       host_toolchain = "//build/toolchain/linux:clang_$host_cpu"
+    } else if (is_cross_linux_build) {
+      if (is_host_clang) {
+        host_toolchain = "//build/toolchain/linux:clang_$host_cpu"
+      } else {
+        host_toolchain = "//build/toolchain/cros:host"
+      }
     } else {
       host_toolchain = "//build/toolchain/linux:$host_cpu"
     }
@@ -226,6 +240,8 @@ if (target_os == "android") {
   # See comments in build/toolchain/cros/BUILD.gn about board compiles.
   if (is_clang) {
     _default_toolchain = "//build/toolchain/linux:clang_$target_cpu"
+  } else if (is_cross_linux_build) {
+    _default_toolchain = "//build/toolchain/cros:target"
   } else {
     _default_toolchain = "//build/toolchain/linux:$target_cpu"
   }
@@ -314,6 +330,7 @@ is_posix = !is_win && !is_fuchsia
 
 # Holds all configs used for running the compiler.
 default_compiler_configs = [
+  "//neva:config",
   "//build/config:feature_flags",
   "//build/config/compiler:afdo",
   "//build/config/compiler:afdo_optimize_size",

@@ -36,6 +36,10 @@
 #include "ui/gfx/display_color_spaces.h"
 #include "ui/gfx/geometry/rect.h"
 
+#if defined(USE_NEVA_MEDIA)
+#include "ui/gfx/geometry/point_f.h"
+#endif
+
 namespace blink {
 
 struct BLINK_COMMON_EXPORT ScreenInfo {
@@ -76,6 +80,10 @@ struct BLINK_COMMON_EXPORT ScreenInfo {
   //   bars. Note that if the monitor is not the primary display monitor,
   //   some of the rectangle's coordinates may be negative values".
   gfx::Rect available_rect;
+
+#if defined(USE_NEVA_MEDIA)
+  gfx::PointF additional_contents_scale{1.f, 1.f};
+#endif
 
   // This is the orientation 'type' or 'name', as in landscape-primary or
   // portrait-secondary for examples.

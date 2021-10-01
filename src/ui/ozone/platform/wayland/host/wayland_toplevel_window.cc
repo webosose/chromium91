@@ -22,6 +22,10 @@
 #include "ui/ozone/platform/wayland/host/wayland_zaura_shell.h"
 #include "ui/platform_window/extensions/wayland_extension.h"
 
+#if defined(USE_NEVA_MEDIA)
+#include "ui/platform_window/neva/ui_utils.h"
+#endif  // defined(USE_NEVA_MEDIA)
+
 #if BUILDFLAG(IS_CHROMEOS_LACROS)
 // TODO(jamescook): The nogncheck is to work around false-positive failures on
 // the code search bot. Remove after https://crrev.com/c/2432137 lands.
@@ -122,6 +126,18 @@ void WaylandToplevelWindow::Hide() {
   // tooltips, and release resources.
   connection()->buffer_manager_host()->ResetSurfaceContents(root_surface());
 }
+
+#if defined(USE_NEVA_MEDIA)
+void WaylandToplevelWindow::Close() {
+  WaylandWindow::Close();
+
+  // Video window is associated with top-level
+  // window(PlatformWindowType::kWindow). So we only pass closed event at here.
+  if (connection()->video_window_provider()) {
+    connection()->video_window_provider()->OwnerWidgetClosed(GetWidget());
+  }
+}
+#endif  // defined(USE_NEVA_MEDIA)
 
 bool WaylandToplevelWindow::IsVisible() const {
   // X and Windows return true if the window is minimized. For consistency, do
@@ -231,6 +247,31 @@ bool WaylandToplevelWindow::ShouldUseNativeFrame() const {
                                   ->connection()
                                   ->xdg_decoration_manager_v1();
 }
+
+///@name USE_NEVA_APPRUNTIME
+///@{
+void WaylandToplevelWindow::HandleStateChanged(PlatformWindowState state) {
+  state_ = state;
+  delegate()->OnWindowStateChanged(state_);
+
+#if defined(USE_NEVA_MEDIA)
+  // Video window is associated with top-level
+  // window(PlatformWindowType::kWindow). So we only pass changed widget state
+  // at here.
+  if (connection()->video_window_provider()) {
+    connection()->video_window_provider()->OwnerWidgetStateChanged(
+        GetWidget(), ToWidgetState(state));
+  }
+#endif  // defined(USE_NEVA_MEDIA)
+}
+
+void WaylandToplevelWindow::HandleActivationChanged(bool is_activated) {
+  if (is_active_ != is_activated) {
+    is_active_ = is_activated;
+    delegate()->OnActivationChanged(is_active_);
+  }
+}
+///@}
 
 base::Optional<std::vector<gfx::Rect>> WaylandToplevelWindow::GetWindowShape()
     const {
@@ -369,6 +410,26 @@ void WaylandToplevelWindow::UpdateVisualSize(const gfx::Size& size_px) {
 
 bool WaylandToplevelWindow::OnInitialize(
     PlatformWindowInitProperties properties) {
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  // TODO(neva): Both WAM and wam-demo need the shell surface
+  // to exist upon window creation, otherwise it will crash on early calling
+  // to, for instance, 'SetWindowProperty()'.
+  // Direct calling to CreateShellSurface() (instead of the below explicit
+  // shell surface creation) prevents the XDGSurfaceWrapperImpl::ConfigureV6()
+  // callback from being invoked by Weston upon the surface creation due to a
+  // couple of extra calls to the shell surface ('UnSetFullscreen()' and
+  // 'UnSetMaximized()' also wrapped into the dedicated factory method) during
+  // the init stage, which makes Weston unresponsive to the client code.
+  // To be revised later on.
+  ShellObjectFactory factory;
+  shell_toplevel_ = factory.CreateShellToplevelWrapper(connection(), this);
+  if (!shell_toplevel_) {
+    LOG(ERROR) << "Failed to create a ShellToplevel.";
+    return false;
+  }
+  ///@}
+
 #if BUILDFLAG(IS_CHROMEOS_LACROS)
   auto token = base::UnguessableToken::Create();
   window_unique_id_ =

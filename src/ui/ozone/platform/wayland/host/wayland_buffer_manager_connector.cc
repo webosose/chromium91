@@ -65,6 +65,16 @@ void WaylandBufferManagerConnector::OnGpuServiceLaunchedOnUI(
       base::BindOnce(
           &WaylandBufferManagerConnector::OnBufferManagerHostPtrBinded,
           base::Unretained(this), std::move(pending_remote)));
+
+#if defined(USE_NEVA_MEDIA)
+  // WaylandBufferManagerConnector is only owner of |binder_| so that we have to
+  // pass bound mojom::VideoWindowProviderClient at here.
+  mojo::Remote<mojom::VideoWindowProviderClient> provider_client_remote;
+  binder_.Run(mojom::VideoWindowProviderClient::Name_,
+              provider_client_remote.BindNewPipeAndPassReceiver().PassPipe());
+  buffer_manager_host_->BindVideoWindowProviderClient(
+      std::move(provider_client_remote));
+#endif  // defined(USE_NEVA_MEDIA)
 }
 
 void WaylandBufferManagerConnector::OnBufferManagerHostPtrBinded(

@@ -299,6 +299,9 @@ bool ProcessedLocalAudioSource::EnsureSourceIsStarted() {
   // We need to set the AGC control before starting the stream.
   new_source->SetAutomaticGainControl(true);
   source_ = std::move(new_source);
+#if defined(USE_NEVA_SUSPEND_MEDIA_CAPTURE)
+  Platform::Current()->AddSourceToAudioCapturerSourceManager(source_.get());
+#endif
   source_->Start();
 
   // Register this source with the WebRtcAudioDeviceImpl.
@@ -313,6 +316,10 @@ void ProcessedLocalAudioSource::EnsureSourceIsStopped() {
   if (!source_)
     return;
 
+#if defined(USE_NEVA_SUSPEND_MEDIA_CAPTURE)
+  Platform::Current()->RemoveSourceFromAudioCapturerSourceManager(
+      source_.get());
+#endif
   scoped_refptr<media::AudioCapturerSource> source_to_stop(std::move(source_));
 
   if (WebRtcAudioDeviceImpl* rtc_audio_device =

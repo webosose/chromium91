@@ -22,7 +22,12 @@ class COMPONENT_EXPORT(UI_BASE_IME_LINUX) InputMethodAuraLinux
     : public InputMethodBase,
       public LinuxInputMethodContextDelegate {
  public:
-  explicit InputMethodAuraLinux(internal::InputMethodDelegate* delegate);
+  explicit InputMethodAuraLinux(internal::InputMethodDelegate* delegate,
+                                ///@name USE_NEVA_APPRUNTIME
+                                ///@{
+                                unsigned handle = 0
+                                ///@}
+                                );
   InputMethodAuraLinux(const InputMethodAuraLinux&) = delete;
   InputMethodAuraLinux& operator=(const InputMethodAuraLinux&) = delete;
   ~InputMethodAuraLinux() override;
@@ -35,6 +40,11 @@ class COMPONENT_EXPORT(UI_BASE_IME_LINUX) InputMethodAuraLinux
   void OnCaretBoundsChanged(const TextInputClient* client) override;
   void CancelComposition(const TextInputClient* client) override;
   bool IsCandidatePopupOpen() const override;
+
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  LinuxInputMethodContext* GetInputMethodContext() override;
+  ///@}
 
   // Overriden from ui::LinuxInputMethodContextDelegate
   void OnCommit(const std::u16string& text) override;
@@ -51,6 +61,11 @@ class COMPONENT_EXPORT(UI_BASE_IME_LINUX) InputMethodAuraLinux
                                 TextInputClient* focused) override;
 
  private:
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  friend class InputMethodAuraLinuxNeva;
+  ///@}
+
   // Continues to dispatch the ET_KEY_PRESSED event to the client.
   // This needs to be called "before" committing the result string or
   // the composition string.

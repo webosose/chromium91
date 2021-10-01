@@ -1625,6 +1625,10 @@ void WebView::ApplyWebPreferences(const web_pref::WebPreferences& prefs,
 #endif  // defined(OS_ANDROID)
   settings->SetForceDarkModeEnabled(prefs.force_dark_mode_enabled);
 
+#if defined(USE_NEVA_MEDIA)
+  settings->SetMaxTimeupdateEventFrequency(prefs.max_timeupdate_event_frequency);
+#endif
+
   settings->SetAccessibilityAlwaysShowFocus(prefs.always_show_focus);
   settings->SetAutoplayPolicy(prefs.autoplay_policy);
   settings->SetViewportEnabled(prefs.viewport_enabled);
@@ -3096,6 +3100,10 @@ void WebViewImpl::UpdateFontRenderingFromRendererPrefs() {
   }
 #endif  // (defined(OS_LINUX) || BUILDFLAG(IS_CHROMEOS_LACROS)) &&
         // !defined(OS_ANDROID)
+#if defined(USE_NEVA_APPRUNTIME)
+  WebFontRenderStyle::SetAllowFakeBoldText(
+      renderer_preferences_.allow_fake_bold_text);
+#endif
 #endif  // defined(OS_WIN)
 #endif  // !defined(OS_MAC)
 }

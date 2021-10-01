@@ -1472,6 +1472,29 @@ void NavigationRequest::BeginNavigation() {
   }
 #endif
 
+#if defined(USE_NEVA_APPRUNTIME)
+  if (GetURL().SchemeIsFile()) {
+    bool initiator_scheme_is_file = false;
+
+    if (!browser_initiated_) {
+      // Only relevant for webOS whitelisting implementation
+      initiator_scheme_is_file =
+          GetInitiatorOrigin().value().GetURL().SchemeIsFile();
+    }
+
+    if (!GetContentClient()->browser()->IsFileSchemeNavigationAllowed(
+            GetURL().path(), frame_tree_node_->frame_tree_node_id(),
+            browser_initiated_, initiator_scheme_is_file)) {
+      StartNavigation(false);
+      OnRequestFailedInternal(
+          network::URLLoaderCompletionStatus(net::ERR_ACCESS_DENIED),
+          false /*skip_throttles*/, base::nullopt /*error_page_content*/,
+          false /*collapse_frame*/);
+      return;
+    }
+  }
+#endif
+
   // Check Content Security Policy before the NavigationThrottles run. This
   // gives CSP a chance to modify requests that NavigationThrottles would
   // otherwise block. Similarly, the NavigationHandle is created afterwards, so
@@ -2661,6 +2684,21 @@ void NavigationRequest::OnResponseStarted(
       !is_download && (!response_head_->headers.get() ||
                        (response_head_->headers->response_code() != 204 &&
                         response_head_->headers->response_code() != 205));
+
+#if defined(USE_NEVA_APPRUNTIME)
+  if (response_head_->headers.get() &&
+      response_head_->headers->response_code() >= 400) {
+    WebContents* web_contents =
+        frame_tree_node_->current_frame_host()->AccessibilityWebContents();
+    const bool has_policy = web_contents->DecidePolicyForResponse(
+        frame_tree_node_->IsMainFrame(),
+        response_head_->headers->response_code(),
+        common_params_->url.spec(),
+        response_head_->headers->GetStatusText());
+    if (has_policy)
+      response_should_be_rendered_ = false;
+  }
+#endif
 
   // Response that will not commit should be marked as aborted in the
   // NavigationHandle.

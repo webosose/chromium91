@@ -13,6 +13,12 @@
 #include "third_party/blink/public/common/page/launching_process_state.h"
 #include "third_party/blink/public/platform/platform.h"
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "base/command_line.h"
+#include "base/strings/string_number_conversions.h"
+#include "third_party/blink/public/common/switches.h"
+#endif  // defined(USE_NEVA_APPRUNTIME)
+
 namespace blink {
 
 namespace {
@@ -28,6 +34,18 @@ base::TimeDelta FreezePurgeMemoryAllPagesFrozenDelay() {
 }
 
 int MinTimeToPurgeAfterBackgroundedInSeconds() {
+#if defined(USE_NEVA_APPRUNTIME)
+  int delay;
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kMinTimeToPurgeAfterBackgroundedInSeconds) &&
+      base::StringToInt(
+          base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
+              switches::kMinTimeToPurgeAfterBackgroundedInSeconds),
+          &delay)) {
+    return delay;
+  }
+#endif  // defined(USE_NEVA_APPRUNTIME)
+
   static const base::FeatureParam<int>
       kMinTimeToPurgeAfterBackgroundedInMinutes{
           &blink::features::kPurgeRendererMemoryWhenBackgrounded,
@@ -37,6 +55,18 @@ int MinTimeToPurgeAfterBackgroundedInSeconds() {
 }
 
 int MaxTimeToPurgeAfterBackgroundedInSeconds() {
+#if defined(USE_NEVA_APPRUNTIME)
+  int delay;
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kMaxTimeToPurgeAfterBackgroundedInSeconds) &&
+      base::StringToInt(
+          base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
+              switches::kMaxTimeToPurgeAfterBackgroundedInSeconds),
+          &delay)) {
+    return delay;
+  }
+#endif  // defined(USE_NEVA_APPRUNTIME)
+
   static const base::FeatureParam<int>
       kMaxTimeToPurgeAfterBackgroundedInMinutes{
           &blink::features::kPurgeRendererMemoryWhenBackgrounded,

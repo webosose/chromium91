@@ -57,6 +57,12 @@
 #include "third_party/blink/renderer/platform/weborigin/kurl.h"
 #include "third_party/blink/renderer/platform/wtf/threading_primitives.h"
 
+#if defined(USE_NEVA_MEDIA)
+#include "third_party/blink/renderer/core/html/media/neva/html_media_element.h"
+#else
+#include "third_party/blink/renderer/core/html/media/neva/html_media_element_stub.h"
+#endif
+
 namespace cc {
 class Layer;
 }
@@ -100,7 +106,15 @@ class CORE_EXPORT HTMLMediaElement
       public ActiveScriptWrappable<HTMLMediaElement>,
       public ExecutionContextLifecycleStateObserver,
       public media::mojom::blink::MediaPlayer,
+      ///@name USE_NEVA_MEDIA
+      ///@{
+      public neva::HTMLMediaElement<HTMLMediaElement>,
+      ///@}
+#if defined(USE_NEVA_MEDIA)
+      private neva::HTMLMediaElementExtendingWebMediaPlayerClient<HTMLMediaElement> {
+#else
       private WebMediaPlayerClient {
+#endif
   DEFINE_WRAPPERTYPEINFO();
   USING_PRE_FINALIZER(HTMLMediaElement, Dispose);
 
@@ -407,6 +421,18 @@ class CORE_EXPORT HTMLMediaElement
   void UpdateLayoutObject();
 
  private:
+  ///@name USE_NEVA_MEDIA
+  ///@{
+  template <typename>
+  friend class neva::HTMLMediaElement;
+  ///@}
+#if defined(USE_NEVA_MEDIA)
+  using neva::HTMLMediaElement<HTMLMediaElement>::ScheduleEvent;
+
+  template <typename>
+  friend class neva::HTMLMediaElementExtendingWebMediaPlayerClient;
+#endif
+
   // Friend class for testing.
   friend class ContextMenuControllerTest;
   friend class HTMLMediaElementTest;
@@ -518,6 +544,10 @@ class CORE_EXPORT HTMLMediaElement
   void SetPowerExperimentState(bool enabled) override;
   void SetAudioSinkId(const String&) override;
   void SuspendForFrameClosed() override;
+#if defined(USE_NEVA_MEDIA)
+  void RequestActivation() override;
+  void RequestSuspend() override;
+#endif  // defined(USE_NEVA_MEDIA)
 
   void LoadTimerFired(TimerBase*);
   void ProgressEventTimerFired(TimerBase*);

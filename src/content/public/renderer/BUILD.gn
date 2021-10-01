@@ -4,6 +4,7 @@
 
 import("//build/config/features.gni")
 import("//media/media_options.gni")
+import("//neva/neva.gni")
 import("//ppapi/buildflags/buildflags.gni")
 
 # See //content/BUILD.gn for how this works.
@@ -85,6 +86,17 @@ target(link_target_type, "renderer_sources") {
     # include headers from each other.
     "//content/renderer",
   ]
+
+  if (use_neva_appruntime) {
+    deps += [
+      "//neva/injection/public/renderer",
+      "//neva/injection/renderer:resources"
+    ]
+  }
+
+  if (use_neva_media) {
+    deps += [ "//content/public/common:frame_video_window_factory_mojom" ]
+  }
 
   if (is_android) {
     sources += [ "seccomp_sandbox_status_android.h" ]

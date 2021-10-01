@@ -19,8 +19,12 @@ class VIZ_SERVICE_EXPORT OverlayProcessorOzone
  public:
   OverlayProcessorOzone(
       std::unique_ptr<ui::OverlayCandidatesOzone> overlay_candidates,
+#if defined(USE_NEVA_MEDIA)
+      gpu::SurfaceHandle surface_handle,
+#endif
       std::vector<OverlayStrategy> available_strategies,
       gpu::SharedImageInterface* shared_image_interface);
+
   ~OverlayProcessorOzone() override;
 
   bool IsOverlaySupported() const override;

@@ -95,6 +95,9 @@ int UtilityMain(const MainFunctionParams& parameters) {
   // Seccomp-BPF policy.
   auto sandbox_type =
       sandbox::policy::SandboxTypeFromCommandLine(parameters.command_line);
+#if defined(OS_WEBOS)
+  if (!sandbox::policy::IsUnsandboxedSandboxType(sandbox_type))
+#endif
   if (parameters.zygote_child ||
       sandbox_type == sandbox::policy::SandboxType::kNetwork ||
 #if BUILDFLAG(IS_CHROMEOS_ASH)

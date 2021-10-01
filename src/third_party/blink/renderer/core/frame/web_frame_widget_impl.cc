@@ -2347,6 +2347,12 @@ void WebFrameWidgetImpl::SetHandlingInputEvent(bool handling) {
   widget_base_->input_handler().set_handling_input_event(handling);
 }
 
+#if defined(USE_NEVA_APPRUNTIME)
+bool WebFrameWidgetImpl::HasImeEventGuard() const {
+  return widget_base_->HasImeEventGuard();
+}
+#endif
+
 void WebFrameWidgetImpl::ProcessInputEventSynchronouslyForTesting(
     const WebCoalescedInputEvent& event,
     HandledEventCallback callback) {
@@ -3222,7 +3228,14 @@ uint64_t WebFrameWidgetImpl::GetScrollableContainerIdAt(
 
 bool WebFrameWidgetImpl::ShouldHandleImeEvents() {
   if (ForMainFrame()) {
+#if defined(USE_NEVA_APPRUNTIME)
+    // TODO(neva): Since Enact-based Browser doesn't set initial focus
+    // all main frame IME events are blocked.
+    // Such case must be handled on .js-side, this is temporary solution.
+    return true;
+#else
     return HasFocus();
+#endif
   } else {
     // TODO(ekaramad): main frame widget returns true only if it has focus.
     // We track page focus in all WebViews on the page but the WebFrameWidgets

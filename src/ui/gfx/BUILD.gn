@@ -5,6 +5,7 @@
 import("//build/config/ozone.gni")
 import("//build/config/ui.gni")
 import("//device/vr/buildflags/buildflags.gni")
+import("//neva/neva.gni")
 import("//testing/libfuzzer/fuzzer_test.gni")
 import("//testing/test.gni")
 
@@ -276,6 +277,20 @@ component("gfx") {
       "skia_vector_animation.cc",
       "skia_vector_animation.h",
       "skia_vector_animation_observer.h",
+    ]
+  }
+
+  if (use_neva_appruntime) {
+    sources += [
+      "neva/file_utils.cc",
+      "neva/file_utils.h",
+    ]
+  }
+
+  if (use_neva_media) {
+    sources += [
+      "neva/video_utils.cc",
+      "neva/video_utils.h",
     ]
   }
 

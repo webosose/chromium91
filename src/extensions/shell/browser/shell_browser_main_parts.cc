@@ -83,6 +83,24 @@
 #include "ui/events/devices/x11/touch_factory_x11.h"  // nogncheck
 #endif
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "components/web_cache/browser/web_cache_manager.h"
+#include "neva/app_runtime/browser/app_runtime_shared_memory_manager.h"
+#endif
+
+///@name USE_NEVA_APPRUNTIME
+///@{
+#include "ui/views/linux_ui/linux_ui.h"
+
+#if defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+#include "ozone/ui/webui/ozone_webui.h"
+#endif  // defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+
+#if defined(USE_OZONE)
+#include "ui/ozone/public/ozone_platform.h"
+#endif  // defined(USE_OZONE)
+///@}
+
 using base::CommandLine;
 using content::BrowserContext;
 
@@ -98,6 +116,32 @@ void CrashForTest() {
   int* bad_pointer = nullptr;
   *bad_pointer = 0;
 }
+
+///@name USE_NEVA_APPRUNTIME
+///@{
+void InitializeUI() {
+#if defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+  // Initialization of input method factory
+  views::LinuxUI::SetInstance(BuildWebUI());
+#endif  // defined(OZONE_PLATFORM_WAYLAND_EXTERNAL)
+}
+
+bool IsWayland() {
+#if defined(USE_OZONE)
+  return ui::OzonePlatform::IsWayland();
+#else  // defined(USE_OZONE)
+  return false;
+#endif  // !defined(USE_OZONE)
+}
+
+bool IsWaylandExternal() {
+#if defined(USE_OZONE)
+  return ui::OzonePlatform::IsWaylandExternal();
+#else  // defined(USE_OZONE)
+  return false;
+#endif  // !defined(USE_OZONE)
+}
+///@}
 
 }  // namespace
 
@@ -152,17 +196,42 @@ void ShellBrowserMainParts::PostMainMessageLoopStart() {
   // app_shell doesn't need GTK, so the fake input method context can work.
   // See crbug.com/381852 and revision fb69f142.
   // TODO(michaelpg): Verify this works for target environments.
-  ui::InitializeInputMethodForTesting();
+
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  // For Ozone/Wayland platforms do not use a stub to initialize the input
+  // method.
+  if (!IsWayland() && !IsWaylandExternal())
+  ///@}
+    ui::InitializeInputMethodForTesting();
 
   bluez::BluezDBusManager::Initialize(nullptr /* system_bus */);
 #else
   ui::InitializeInputMethodForTesting();
 #endif
+#if defined(USE_NEVA_APPRUNTIME)
+  app_runtime_mem_manager_.reset(
+      new neva_app_runtime::AppRuntimeSharedMemoryManager);
+#endif
 }
 
 int ShellBrowserMainParts::PreEarlyInitialization() {
+  ///@name USE_NEVA_APPRUNTIME
+  ///@{
+  if (IsWaylandExternal())
+    InitializeUI();
+  ///@}
   return content::RESULT_CODE_NORMAL_EXIT;
 }
+
+///@name USE_NEVA_APPRUNTIME
+///@{
+void ShellBrowserMainParts::ToolkitInitialized() {
+  if (IsWaylandExternal())
+    views::LinuxUI::instance()->Initialize();
+
+}
+///@}
 
 int ShellBrowserMainParts::PreCreateThreads() {
   // TODO(jamescook): Initialize ash::CrosSettings here?
@@ -257,6 +326,10 @@ int ShellBrowserMainParts::PreMainMessageLoopRun() {
   } else {
     browser_main_delegate_->Start(browser_context_.get());
   }
+
+#if defined(USE_NEVA_APPRUNTIME)
+  web_cache::WebCacheManager::GetInstance();
+#endif
 
   desktop_controller_->PreMainMessageLoopRun();
 

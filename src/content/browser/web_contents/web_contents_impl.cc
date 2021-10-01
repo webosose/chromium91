@@ -2505,6 +2505,13 @@ const blink::web_pref::WebPreferences WebContentsImpl::ComputeWebPreferences() {
   prefs.strict_powerful_feature_restrictions = command_line.HasSwitch(
       switches::kEnableStrictPowerfulFeatureRestrictions);
 
+#if defined(USE_NEVA_MEDIA)
+  if (command_line.HasSwitch(switches::kMaxTimeupdateEventFrequency))
+    prefs.max_timeupdate_event_frequency = atoi(
+        command_line.GetSwitchValueASCII(switches::kMaxTimeupdateEventFrequency)
+            .c_str());
+#endif
+
   prefs.fake_no_alloc_direct_call_for_testing_enabled =
       command_line.HasSwitch(switches::kEnableFakeNoAllocDirectCallForTesting);
 
@@ -2711,6 +2718,26 @@ std::unique_ptr<WebContents> WebContentsImpl::Clone() {
   return tc;
 }
 
+
+#if defined(USE_NEVA_APPRUNTIME)
+void WebContentsImpl::Observe(int type,
+                              const NotificationSource& source,
+                              const NotificationDetails& details) {
+  OPTIONAL_TRACE_EVENT1("content", "WebContentsImpl::Observe", "type", type);
+  switch (type) {
+
+    case NOTIFICATION_RENDERER_PROCESS_CREATED: {
+      RenderProcessHost* process_host = Source<RenderProcessHost>(source).ptr();
+      if (process_host)
+        RenderProcessCreated(process_host);
+      break;
+    }
+    default:
+      NOTREACHED();
+  }
+}
+#endif
+
 WebContents* WebContentsImpl::GetWebContents() {
   return this;
 }
@@ -2754,6 +2781,12 @@ void WebContentsImpl::Init(const WebContents::CreateParams& params) {
   CHECK(view_.get());
 
   view_->CreateView(params.context);
+
+#if defined(USE_NEVA_APPRUNTIME)
+  registrar_.Add(this,
+                 NOTIFICATION_RENDERER_PROCESS_CREATED,
+                 NotificationService::AllBrowserContextsAndSources());
+#endif
 
   screen_orientation_provider_ =
       std::make_unique<ScreenOrientationProvider>(this);
@@ -7269,6 +7302,12 @@ void WebContentsImpl::SetFocusedFrame(FrameTreeNode* node,
     // This is an outermost WebContents.
     SetAsFocusedWebContentsIfNecessary();
   }
+
+#if defined(USE_NEVA_APPRUNTIME)
+  // Added for neva app-runtime frame focused notification
+  if (delegate_)
+    delegate_->DidFrameFocused();
+#endif
 }
 
 void WebContentsImpl::DidCallFocus() {
@@ -8561,6 +8600,63 @@ void WebContentsImpl::SetVisibilityForChildViews(bool visible) {
                         "visible", visible);
   GetMainFrame()->SetVisibilityForChildViews(visible);
 }
+
+#if defined(USE_NEVA_APPRUNTIME)
+bool WebContentsImpl::IsInspectablePage() const {
+  return inspectable_page_;
+}
+
+void WebContentsImpl::SetInspectablePage(bool inspectable) {
+  inspectable_page_ = inspectable;
+}
+
+void WebContentsImpl::RenderProcessCreated(
+    RenderProcessHost* render_process_host) {
+  observers_.NotifyObservers(&WebContentsObserver::RenderProcessCreated,
+                             render_process_host->GetProcess().Handle());
+}
+
+bool WebContentsImpl::DecidePolicyForResponse(bool is_main_frame,
+                                              int status_code,
+                                              const std::string& url,
+                                              const std::string& status_text) {
+  if (!delegate_)
+    return false;
+  return delegate_->DecidePolicyForResponse(is_main_frame, status_code, url,
+                                            status_text);
+}
+
+void WebContentsImpl::DropAllPeerConnections(
+    blink::mojom::DropPeerConnectionReason reason) {
+  LOG(INFO) << "WebContentsImpl::DropAllPeerConnections()";
+
+  drop_peer_connection_request_id_++;
+
+  for (auto* render_frame_host : GetAllFrames()) {
+    render_frame_host->DropAllPeerConnections(base::BindOnce(
+        &WebContentsImpl::OnDidDropAllPeerConnections,
+        weak_factory_.GetWeakPtr(), reason, drop_peer_connection_request_id_));
+  }
+}
+
+void WebContentsImpl::OnDidDropAllPeerConnections(
+    blink::mojom::DropPeerConnectionReason reason,
+    int request_id) {
+  LOG(INFO) << "WebContentsImpl::OnDidDropAllPeerConnections()";
+
+  // TODO(neva, sync-to-91):
+  // We only notify once per each request. Previously PeerConnectionTracker
+  // resides in RenderProcessHost, which means single instance per renderer
+  // process. But now PeerConnectionTracker reside in each RenderFrameHost.
+  // So this callback may run multiple times. To make backwark compatible,
+  // we notify only for first response from any render frame.
+  if (request_id != last_processed_drop_peer_connection_request_id_) {
+    last_processed_drop_peer_connection_request_id_ = request_id;
+    observers_.NotifyObservers(&WebContentsObserver::DidDropAllPeerConnections,
+                               reason);
+  }
+}
+#endif  // defined(USE_NEVA_APPRUNTIME)
 
 void WebContentsImpl::OnNativeThemeUpdated(ui::NativeTheme* observed_theme) {
   OPTIONAL_TRACE_EVENT0("content", "WebContentsImpl::OnNativeThemeUpdated");

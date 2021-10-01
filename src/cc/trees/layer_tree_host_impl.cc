@@ -136,6 +136,12 @@
 #include "ui/gfx/geometry/vector2d_f.h"
 #include "ui/gfx/skia_util.h"
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "base/command_line.h"
+#include "base/neva/base_switches.h"
+#include "base/strings/string_number_conversions.h"
+#endif
+
 using ScrollThread = cc::InputHandler::ScrollThread;
 
 namespace cc {
@@ -433,6 +439,9 @@ LayerTreeHostImpl::LayerTreeHostImpl(
       dark_mode_filter_(dark_mode_filter),
       rendering_stats_instrumentation_(rendering_stats_instrumentation),
       micro_benchmark_controller_(this),
+#if defined(USE_NEVA_APPRUNTIME)
+      low_memory_policy_(cached_managed_memory_policy_),
+#endif
       task_graph_runner_(task_graph_runner),
       id_(id),
       consecutive_frame_with_damage_count_(settings.damaged_frame_limit),
@@ -475,6 +484,21 @@ LayerTreeHostImpl::LayerTreeHostImpl(
         FROM_HERE, base::BindRepeating(&LayerTreeHostImpl::OnMemoryPressure,
                                        base::Unretained(this)));
   }
+
+#if defined(USE_NEVA_APPRUNTIME)
+  base::CommandLine& cmd_line = *base::CommandLine::ForCurrentProcess();
+  if (cmd_line.HasSwitch(
+          ::switches::kTileManagerLowMemPolicyBytesLimitReductionFactor)) {
+    size_t bytes_limit_reduction_factor;
+    if (base::StringToSizeT(
+            cmd_line.GetSwitchValueASCII(
+                ::switches::kTileManagerLowMemPolicyBytesLimitReductionFactor),
+            &bytes_limit_reduction_factor))
+      bytes_limit_reduction_factor_ = bytes_limit_reduction_factor;
+    low_memory_policy_.bytes_limit_when_visible /=
+        bytes_limit_reduction_factor_;
+  }
+#endif
 
   SetDebugState(settings.initial_debug_state);
   compositor_frame_reporting_controller_->SetDroppedFrameCounter(
@@ -1928,6 +1952,12 @@ void LayerTreeHostImpl::NotifyAllTileTasksCompleted() {
     // executes (within worker context's cleanup).
     if (image_decode_cache_)
       image_decode_cache_->SetShouldAggressivelyFreeResources(true);
+
+#if defined(USE_NEVA_APPRUNTIME)
+    if (resource_pool_ && settings_.use_aggressive_release_policy)
+      resource_pool_->InvalidateResources();
+#endif
+
     SetContextVisibility(false);
   }
 }
@@ -1989,6 +2019,10 @@ void LayerTreeHostImpl::SetManagedMemoryPolicy(
 
   ManagedMemoryPolicy old_policy = ActualManagedMemoryPolicy();
   cached_managed_memory_policy_ = policy;
+#if defined(USE_NEVA_APPRUNTIME)
+  low_memory_policy_ = cached_managed_memory_policy_;
+  low_memory_policy_.bytes_limit_when_visible /= bytes_limit_reduction_factor_;
+#endif
   ManagedMemoryPolicy actual_policy = ActualManagedMemoryPolicy();
 
   if (old_policy == actual_policy)
@@ -2109,6 +2143,14 @@ void LayerTreeHostImpl::ReclaimResources(
   if (!visible_ && layer_tree_frame_sink_->context_provider()) {
     auto* gl = layer_tree_frame_sink_->context_provider()->ContextGL();
     gl->ShallowFlushCHROMIUM();
+
+#if defined(USE_NEVA_APPRUNTIME)
+    // Note(Neva): memory optimization
+    // It needs to force flush gpu channel host to free up the gpu memory.
+    auto* sii =
+        layer_tree_frame_sink_->context_provider()->SharedImageInterface();
+    sii->Flush();
+#endif
   }
 }
 
@@ -3335,6 +3377,13 @@ void LayerTreeHostImpl::OnMemoryPressure(
     resource_pool_->OnMemoryPressure(level);
 
   tile_manager_.decoded_image_tracker().UnlockAllImages();
+#if defined(USE_NEVA_APPRUNTIME)
+  if (visible_ && bytes_limit_reduction_factor_ > 1) {
+    UpdateTileManagerMemoryPolicy(low_memory_policy_);
+    SetFullViewportDamage();
+    SetNeedsRedraw();
+  }
+#endif
 }
 
 void LayerTreeHostImpl::SetVisible(bool visible) {
@@ -3352,7 +3401,12 @@ void LayerTreeHostImpl::SetVisible(bool visible) {
     dropped_frame_counter_.ResetPendingFrames(now);
   }
   DidVisibilityChange(this, visible_);
-  UpdateTileManagerMemoryPolicy(ActualManagedMemoryPolicy());
+#if defined(USE_NEVA_APPRUNTIME)
+  if (!visible && settings_.use_aggressive_release_policy)
+    UpdateTileManagerMemoryPolicy(ManagedMemoryPolicy(0));
+  else
+#endif
+    UpdateTileManagerMemoryPolicy(ActualManagedMemoryPolicy());
 
   // If we just became visible, we have to ensure that we draw high res tiles,
   // to prevent checkerboard/low res flashes.
@@ -3371,7 +3425,13 @@ void LayerTreeHostImpl::SetVisible(bool visible) {
       SetNeedsRedraw();
     }
   } else {
-    EvictAllUIResources();
+#if defined(USE_NEVA_APPRUNTIME)
+    if (settings_.use_aggressive_release_policy)
+      ReleaseTreeResources();
+    else
+#endif
+      EvictAllUIResources();
+
     // Call PrepareTiles to evict tiles when we become invisible.
     PrepareTiles();
     tile_manager_.decoded_image_tracker().UnlockAllImages();

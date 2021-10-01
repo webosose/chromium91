@@ -3701,6 +3701,15 @@
       "features": [
         "check_ycbcr_studio_g22_left_p709_for_nv12_support"
       ]
+    },
+    {
+      "id": 9999,
+      "description": "The Mali-Gxx driver fails with glCopyTexSubImage2D using GL_R8",
+      "gl_vendor": "ARM.*",
+      "gl_renderer": "Mali-G.*",
+      "features": [
+        "disable_texture_rg"
+      ]
     }
   ]
 }

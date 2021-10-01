@@ -247,6 +247,11 @@ class NET_EXPORT HttpResponseInfo {
   // through to query name.
   std::vector<std::string> dns_aliases;
 
+#if defined(USE_FILESCHEME_CODECACHE)
+  // For file schemes, the last modified time needed to validate its code cache
+  base::Time file_last_modified_time;
+#endif
+
   static std::string ConnectionInfoToString(ConnectionInfo connection_info);
 };
 

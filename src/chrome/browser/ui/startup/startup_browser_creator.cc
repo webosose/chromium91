@@ -98,7 +98,6 @@
 #if BUILDFLAG(IS_CHROMEOS_LACROS)
 #include "chromeos/lacros/lacros_chrome_service_impl.h"
 #endif
-
 #if defined(TOOLKIT_VIEWS) && defined(USE_X11)
 #include "ui/events/devices/x11/touch_factory_x11.h"  // nogncheck
 #endif

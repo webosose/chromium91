@@ -135,6 +135,11 @@ class LocalStorageImpl : public base::trace_event::MemoryDumpProvider,
   void OnGotMetaData(GetUsageCallback callback,
                      std::vector<DomStorageDatabase::KeyValuePair> data);
 
+#if defined(USE_NEVA_APPRUNTIME)
+  void RetrieveStorageUsageForOrigin(GetUsageCallback callback,
+                                     url::Origin origin);
+#endif
+
   void OnGotStorageUsageForShutdown(
       std::vector<mojom::StorageUsageInfoPtr> usage);
   void OnOriginsDeleted(leveldb::Status status);
@@ -195,6 +200,10 @@ class LocalStorageImpl : public base::trace_event::MemoryDumpProvider,
 
   // Name of an extra histogram to log open results to, if not null.
   const char* open_result_histogram_ = nullptr;
+
+#if defined(USE_NEVA_APPRUNTIME)
+  size_t storage_size_limit_ = 0;
+#endif
 
   mojo::Receiver<mojom::LocalStorageControl> control_receiver_{this};
 

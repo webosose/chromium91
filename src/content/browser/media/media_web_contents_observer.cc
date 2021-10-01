@@ -28,6 +28,10 @@
 #include "third_party/blink/public/platform/web_fullscreen_video_status.h"
 #include "ui/gfx/geometry/size.h"
 
+#if defined(USE_NEVA_MEDIA)
+#include "content/public/browser/neva/media_state_manager.h"
+#endif
+
 namespace content {
 
 namespace {
@@ -164,6 +168,10 @@ void MediaWebContentsObserver::WebContentsDestroyed() {
 
   session_controllers_manager_.reset();
   fullscreen_player_.reset();
+
+#if defined(USE_NEVA_MEDIA)
+  MediaStateManager::GetInstance()->OnWebContentsDestroyed(web_contents());
+#endif
 }
 
 void MediaWebContentsObserver::RenderFrameDeleted(
@@ -212,6 +220,10 @@ void MediaWebContentsObserver::RenderFrameDeleted(
   // Cancel any pending callbacks for players from this frame.
   use_after_free_checker_.check();
   per_frame_factory_.erase(render_frame_host);
+
+#if defined(USE_NEVA_MEDIA)
+  MediaStateManager::GetInstance()->OnRenderFrameDeleted(render_frame_host);
+#endif
 }
 
 void MediaWebContentsObserver::MaybeUpdateAudibleState() {
@@ -386,6 +398,54 @@ void MediaWebContentsObserver::MediaPlayerObserverHostImpl::OnSeek() {
   media_web_contents_observer_->web_contents_impl()->MediaPlayerSeek(
       media_player_id_);
 }
+
+#if defined(USE_NEVA_MEDIA)
+void MediaWebContentsObserver::MediaPlayerObserverHostImpl::OnMediaCreated(
+    bool will_use_media_resource) {
+  RenderFrameHost* rfh =
+      RenderFrameHost::FromID(media_player_id_.frame_routing_id);
+
+  if (!rfh)
+    return;
+
+  MediaStateManager::GetInstance()->OnMediaCreated(
+      rfh, media_player_id_.delegate_id, will_use_media_resource);
+}
+
+void MediaWebContentsObserver::MediaPlayerObserverHostImpl::OnMediaActivated() {
+  RenderFrameHost* rfh =
+      RenderFrameHost::FromID(media_player_id_.frame_routing_id);
+
+  if (!rfh)
+    return;
+
+  MediaStateManager::GetInstance()->OnMediaActivated(
+      rfh, media_player_id_.delegate_id);
+}
+
+void MediaWebContentsObserver::MediaPlayerObserverHostImpl::
+    OnMediaActivationNeeded() {
+  RenderFrameHost* rfh =
+      RenderFrameHost::FromID(media_player_id_.frame_routing_id);
+
+  if (!rfh)
+    return;
+
+  MediaStateManager::GetInstance()->OnMediaActivationRequested(
+      rfh, media_player_id_.delegate_id);
+}
+
+void MediaWebContentsObserver::MediaPlayerObserverHostImpl::OnMediaSuspended() {
+  RenderFrameHost* rfh =
+      RenderFrameHost::FromID(media_player_id_.frame_routing_id);
+
+  if (!rfh)
+    return;
+
+  MediaStateManager::GetInstance()->OnMediaSuspended(
+      rfh, media_player_id_.delegate_id);
+}
+#endif  // defined(USE_NEVA_MEDIA)
 
 void MediaWebContentsObserver::MediaPlayerObserverHostImpl::OnMediaPlaying() {
   PlayerInfo* player_info =
@@ -598,6 +658,11 @@ void MediaWebContentsObserver::OnMediaPlayerAdded(
             *observer->fullscreen_player_ == player_id) {
           observer->fullscreen_player_.reset();
         }
+#if defined(USE_NEVA_MEDIA)
+        MediaStateManager::GetInstance()->OnMediaDestroyed(
+            RenderFrameHost::FromID(player_id.frame_routing_id),
+            player_id.delegate_id);
+#endif
         observer->web_contents_impl()->MediaDestroyed(player_id);
       },
       base::Unretained(this), player_id));

@@ -47,6 +47,9 @@ BLINK_COMMON_EXPORT extern const base::Feature kTopLevelAwait;
 BLINK_COMMON_EXPORT extern const base::Feature kEditingNG;
 BLINK_COMMON_EXPORT extern const base::Feature kLayoutNG;
 BLINK_COMMON_EXPORT extern const base::Feature kLayoutNGTable;
+#if defined(USE_FILESCHEME_CODECACHE)
+BLINK_COMMON_EXPORT extern const base::Feature kLocalResourceCodeCache;
+#endif
 BLINK_COMMON_EXPORT extern const base::Feature kMixedContentAutoupgrade;
 BLINK_COMMON_EXPORT extern const base::Feature kNavigationPredictor;
 BLINK_COMMON_EXPORT extern const base::Feature kNavigatorPluginsEmpty;

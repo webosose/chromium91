@@ -10,6 +10,7 @@ import("//build/config/ui.gni")
 import("//content/public/common/zygote/features.gni")
 import("//media/media_options.gni")
 import("//mojo/public/tools/bindings/mojom.gni")
+import("//neva/neva.gni")
 import("//ppapi/buildflags/buildflags.gni")
 import("//third_party/webrtc/webrtc.gni")
 
@@ -283,6 +284,18 @@ source_set("common_sources") {
   if (use_clang_profiling_inside_sandbox) {
     sources += [ "profiling_utils.h" ]
   }
+
+  #@name USE_NEVA_APPRUNTIME
+  #@{
+  sources += [
+    "content_neva_switches.cc",
+    "content_neva_switches.h",
+  ]
+  #@}
+
+  if (use_neva_media) {
+    deps += [ ":frame_video_window_factory_mojom" ]
+  }
 }
 
 _common_param_traits_headers = [ "common_param_traits_macros.h" ]
@@ -385,4 +398,11 @@ mojom("trust_tokens_mojo_bindings") {
 
 mojom("renderer_type") {
   sources = [ "media_playback_renderer_type.mojom" ]
+}
+
+if (use_neva_media) {
+  mojom("frame_video_window_factory_mojom") {
+    sources = [ "neva/frame_video_window_factory.mojom" ]
+    deps = [ "//ui/platform_window:mojom" ]
+  }
 }

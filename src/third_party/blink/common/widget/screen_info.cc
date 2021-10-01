@@ -19,6 +19,9 @@ bool ScreenInfo::operator==(const ScreenInfo& other) const {
          is_monochrome == other.is_monochrome &&
          display_frequency == other.display_frequency && rect == other.rect &&
          available_rect == other.available_rect &&
+#if defined(USE_NEVA_MEDIA)
+         additional_contents_scale == other.additional_contents_scale &&
+#endif
          orientation_type == other.orientation_type &&
          orientation_angle == other.orientation_angle &&
          is_extended == other.is_extended && is_primary == other.is_primary &&

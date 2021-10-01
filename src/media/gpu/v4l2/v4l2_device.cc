@@ -797,8 +797,10 @@ size_t V4L2WritableBufferRef::BufferId() const {
 void V4L2WritableBufferRef::SetConfigStore(uint32_t config_store) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   DCHECK(buffer_data_);
-
+#if !defined(USE_NEVA_V4L2_CODEC)
+  // config_store is not defined in linux main-stream.
   buffer_data_->v4l2_buffer_.config_store = config_store;
+#endif
 }
 
 V4L2ReadableBuffer::V4L2ReadableBuffer(const struct v4l2_buffer& v4l2_buffer,
@@ -940,11 +942,14 @@ V4L2Queue::V4L2Queue(scoped_refptr<V4L2Device> dev,
     VPLOGF(1) << "Request support checks's VIDIOC_REQBUFS ioctl failed.";
     return;
   }
-
+#if !defined(USE_NEVA_V4L2_CODEC)
+  // V4L2_BUF_CAP_SUPPORTS_REQUESTS is defined in linux v4.20
+  // But webOS and AGL uses previous version.
   if (reqbufs.capabilities & V4L2_BUF_CAP_SUPPORTS_REQUESTS) {
     supports_requests_ = true;
     DVLOGF(4) << "Queue supports request API.";
   }
+#endif
 }
 
 V4L2Queue::~V4L2Queue() {
@@ -1237,6 +1242,15 @@ bool V4L2Queue::QueueBuffer(struct v4l2_buffer* v4l2_buffer,
   int ret = device_->Ioctl(VIDIOC_QBUF, v4l2_buffer);
   if (ret) {
     VPQLOGF(1) << "VIDIOC_QBUF failed";
+#if defined(USE_NEVA_V4L2_CODEC)
+    // Sometimes, VIDIOC_QBUF fails becasue of buffer length
+    // in decode driver before detecting output resolution.
+    // After resolution is detected, output buffers are reallocated
+    // and there is no more length issue.
+    if (type_ == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE &&
+        v4l2_buffer->m.planes->length < 2048)
+      return true;
+#endif
     return false;
   }
 
@@ -1468,6 +1482,12 @@ scoped_refptr<V4L2Device> V4L2Device::Create() {
 // static
 uint32_t V4L2Device::VideoCodecProfileToV4L2PixFmt(VideoCodecProfile profile,
                                                    bool slice_based) {
+#if defined(USE_NEVA_V4L2_CODEC)
+  if (profile >= H264PROFILE_MIN && profile <= H264PROFILE_MAX && !slice_based)
+    return V4L2_PIX_FMT_H264;
+  LOG(ERROR) << "Unknown profile: " << GetProfileName(profile);
+  return 0;
+#else
   if (profile >= H264PROFILE_MIN && profile <= H264PROFILE_MAX) {
     if (slice_based)
       return V4L2_PIX_FMT_H264_SLICE;
@@ -1487,6 +1507,7 @@ uint32_t V4L2Device::VideoCodecProfileToV4L2PixFmt(VideoCodecProfile profile,
     DVLOGF(1) << "Unsupported profile: " << GetProfileName(profile);
     return 0;
   }
+#endif
 }
 
 namespace {
@@ -1509,6 +1530,9 @@ VideoCodecProfile V4L2ProfileToVideoCodecProfile(VideoCodec codec,
           return H264PROFILE_HIGH;
       }
       break;
+#if !defined(USE_NEVA_V4L2_CODEC)
+    // Below PROFILE definitions are defined in linux v4.19.
+    // But webOS uses previous version.
     case kCodecVP8:
       switch (v4l2_profile) {
         case V4L2_MPEG_VIDEO_VP8_PROFILE_0:
@@ -1527,6 +1551,7 @@ VideoCodecProfile V4L2ProfileToVideoCodecProfile(VideoCodec codec,
           return VP9PROFILE_PROFILE2;
       }
       break;
+#endif
     default:
       VLOGF(2) << "Unsupported codec: " << GetCodecName(codec);
   }
@@ -1546,12 +1571,16 @@ std::vector<VideoCodecProfile> V4L2Device::V4L2PixFmtToVideoCodecProfiles(
       case kCodecH264:
         query_id = V4L2_CID_MPEG_VIDEO_H264_PROFILE;
         break;
+#if !defined(USE_NEVA_V4L2_CODEC)
+      // Below PROFILE definitions are defined in linux v4.19.
+      // But webOS uses previous version.
       case kCodecVP8:
         query_id = V4L2_CID_MPEG_VIDEO_VP8_PROFILE;
         break;
       case kCodecVP9:
         query_id = V4L2_CID_MPEG_VIDEO_VP9_PROFILE;
         break;
+#endif
       default:
         return false;
     }
@@ -1581,7 +1610,11 @@ std::vector<VideoCodecProfile> V4L2Device::V4L2PixFmtToVideoCodecProfiles(
   std::vector<VideoCodecProfile> profiles;
   switch (pix_fmt) {
     case V4L2_PIX_FMT_H264:
+#if !defined(USE_NEVA_V4L2_CODEC)
+    // Slice Video Decoder is implemented in linux v5.3.
+    // But in webOS and AGL, linux 4.x is used.
     case V4L2_PIX_FMT_H264_SLICE:
+#endif
       if (!get_supported_profiles(kCodecH264, &profiles)) {
         DLOG(WARNING) << "Driver doesn't support QUERY H264 profiles, "
                       << "use default values, Base, Main, High";
@@ -1593,11 +1626,18 @@ std::vector<VideoCodecProfile> V4L2Device::V4L2PixFmtToVideoCodecProfiles(
       }
       break;
     case V4L2_PIX_FMT_VP8:
+#if !defined(USE_NEVA_V4L2_CODEC)
+    // V4L2_PIX_FMT_VP8_FRAME is implemented in linux v5.x.
+    // But in webOS and AGL, linux 4.x is used.
     case V4L2_PIX_FMT_VP8_FRAME:
+#endif
       profiles = {VP8PROFILE_ANY};
       break;
     case V4L2_PIX_FMT_VP9:
+#if !defined(USE_NEVA_V4L2_CODEC)
+    // V4L2_PIX_FMT_VP9_FRAME is not implemented in linux main-sream.
     case V4L2_PIX_FMT_VP9_FRAME:
+#endif
       if (!get_supported_profiles(kCodecVP9, &profiles)) {
         DLOG(WARNING) << "Driver doesn't support QUERY VP9 profiles, "
                       << "use default values, Profile0";
@@ -2220,6 +2260,9 @@ bool V4L2Request::ApplyCtrls(struct v4l2_ext_controls* ctrls) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   DCHECK_NE(ctrls, nullptr);
 
+#if !defined(USE_NEVA_V4L2_CODEC)
+  // V4L2_CTRL_WHICH_REQUEST_VAL is implemented in v4.20
+  // But in webOS and AGL, previous linux is used.
   if (!request_fd_.is_valid()) {
     VPLOGF(1) << "Invalid request";
     return false;
@@ -2227,7 +2270,7 @@ bool V4L2Request::ApplyCtrls(struct v4l2_ext_controls* ctrls) {
 
   ctrls->which = V4L2_CTRL_WHICH_REQUEST_VAL;
   ctrls->request_fd = request_fd_.get();
-
+#endif
   return true;
 }
 
@@ -2235,6 +2278,8 @@ bool V4L2Request::ApplyQueueBuffer(struct v4l2_buffer* buffer) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   DCHECK_NE(buffer, nullptr);
 
+#if !defined(USE_NEVA_V4L2_CODEC)
+  // V4L2_BUF_FLAG_REQUEST_FD is not implemented in linux main-sream.
   if (!request_fd_.is_valid()) {
     VPLOGF(1) << "Invalid request";
     return false;
@@ -2242,19 +2287,25 @@ bool V4L2Request::ApplyQueueBuffer(struct v4l2_buffer* buffer) {
 
   buffer->flags |= V4L2_BUF_FLAG_REQUEST_FD;
   buffer->request_fd = request_fd_.get();
-
+#endif
   return true;
 }
 
 bool V4L2Request::Submit() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
+#if defined(USE_NEVA_V4L2_CODEC)
+  // MEDIA_REQUEST_IOC_QUEUE is implemented in v4.20
+  // But in webOS and AGL, previous linux is used.
+  return false;
+#else
   if (!request_fd_.is_valid()) {
     VPLOGF(1) << "No valid request file descriptor to submit request.";
     return false;
   }
 
   return HANDLE_EINTR(ioctl(request_fd_.get(), MEDIA_REQUEST_IOC_QUEUE)) == 0;
+#endif
 }
 
 bool V4L2Request::IsCompleted() {
@@ -2291,6 +2342,11 @@ bool V4L2Request::WaitForCompletion(int poll_timeout_ms) {
 
 bool V4L2Request::Reset() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+#if defined(USE_NEVA_V4L2_CODEC)
+  // MEDIA_REQUEST_IOC_REINIT is implemented in v4.20
+  // But in webOS and AGL, previous linux is used.
+  return false;
+#else
 
   if (!request_fd_.is_valid()) {
     VPLOGF(1) << "Invalid request";
@@ -2304,6 +2360,7 @@ bool V4L2Request::Reset() {
   }
 
   return true;
+#endif
 }
 
 V4L2RequestRefBase::V4L2RequestRefBase(V4L2RequestRefBase&& req_base) {
@@ -2378,6 +2435,11 @@ V4L2RequestsQueue::~V4L2RequestsQueue() {
 base::Optional<base::ScopedFD> V4L2RequestsQueue::CreateRequestFD() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
+#if defined(USE_NEVA_V4L2_CODEC)
+  // MEDIA_IOC_REQUEST_ALLOC is implemented in v4.20
+  // But in webOS and AGL, previous linux is used.
+  return base::nullopt;
+#else
   int request_fd;
   int ret = HANDLE_EINTR(
         ioctl(media_fd_.get(), MEDIA_IOC_REQUEST_ALLOC, &request_fd));
@@ -2387,6 +2449,7 @@ base::Optional<base::ScopedFD> V4L2RequestsQueue::CreateRequestFD() {
   }
 
   return base::ScopedFD(request_fd);
+#endif
 }
 
 base::Optional<V4L2RequestRef> V4L2RequestsQueue::GetFreeRequest() {

@@ -10,6 +10,7 @@
 import("//build/config/chromecast_build.gni")
 import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/v8_target_cpu.gni")
+import("//neva/neva.gni")
 import("//v8/gni/v8.gni")
 
 declare_args() {
@@ -17,6 +18,7 @@ declare_args() {
   # Disable in mac and win cross builds since building Blink twice is slow.
   use_v8_context_snapshot =
       !is_chromeos_ash && !is_android && !is_chromecast && !is_fuchsia &&
+      !is_webos && !is_webos_lite &&
       !(host_os == "mac" && current_cpu == "x86") &&
       v8_target_cpu == target_cpu &&
       !(host_toolchain == default_toolchain && is_msan) &&

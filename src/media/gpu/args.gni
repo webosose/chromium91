@@ -4,6 +4,7 @@
 
 import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/ui.gni")
+import("//neva/neva.gni")
 
 declare_args() {
   # Indicates if V4L plugin is used.
@@ -11,7 +12,7 @@ declare_args() {
 
   # Indicates if Video4Linux2 codec is used. This is used for all CrOS
   # platforms which have v4l2 hardware encoder / decoder.
-  use_v4l2_codec = false
+  use_v4l2_codec = false || use_neva_v4l2_codec
 
   # Indicates if Video4Linux2 AML encoder is used. This is used for AML
   # platforms which have v4l2 hardware encoder
