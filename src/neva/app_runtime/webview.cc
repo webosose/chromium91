@@ -1099,13 +1099,14 @@ void WebView::DidStartNavigation(content::NavigationHandle* navigation_handle) {
 
 void WebView::DidFinishNavigation(
     content::NavigationHandle* navigation_handle) {
+  NEVA_DCHECK(navigation_handle);
   if (!navigation_handle)
     return;
 
   if (navigation_handle->GetNetErrorCode() != net::OK) {
-    DidFailLoad(navigation_handle->GetRenderFrameHost(),
-                navigation_handle->GetURL(),
-                navigation_handle->GetNetErrorCode());
+    if (navigation_handle->IsInMainFrame())
+      DispatchNetError(navigation_handle->GetURL(),
+                       navigation_handle->GetNetErrorCode());
     if (navigation_handle->IsErrorPage())
       webview_delegate_->DidErrorPageLoadedFromNetErrorHelper();
     return;
@@ -1122,20 +1123,24 @@ void WebView::DidFinishNavigation(
   UpdateViewportScaleFactor();
 }
 
+void WebView::DispatchNetError(const GURL& url, int error_code) {
+  if (!webview_delegate_)
+    return;
+  std::string url_string = url.spec();
+  if (error_code == net::ERR_ABORTED)
+    webview_delegate_->LoadAborted(url_string);
+  else
+    webview_delegate_->LoadFailed(url_string, error_code, std::string());
+}
+
 void WebView::DidFailLoad(content::RenderFrameHost* render_frame_host,
                           const GURL& validated_url,
                           int error_code) {
-  std::string url = validated_url.spec();
-  if (webview_delegate_ &&
-      (!render_frame_host ||
-       static_cast<content::RenderFrameHostImpl*>(render_frame_host)
-           ->frame_tree_node()
-           ->IsMainFrame())) {
-    if (error_code == net::ERR_ABORTED)
-      webview_delegate_->LoadAborted(url);
-    else
-      webview_delegate_->LoadFailed(url, error_code,
-                                    std::string(""));
+  CHECK(render_frame_host);
+  if (static_cast<content::RenderFrameHostImpl*>(render_frame_host)
+          ->frame_tree_node()
+          ->IsMainFrame()) {
+    DispatchNetError(validated_url, error_code);
   }
 }
 

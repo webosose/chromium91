@@ -281,6 +281,7 @@ class WebView : public content::WebContentsDelegate,
   void SetDisallowScrollbarsInMainFrame(bool disallow);
   void GrantLoadLocalResources();
   void FinishLoadCallback(const std::string& url);
+  void DispatchNetError(const GURL& url, int error_code);
 #if defined(USE_NEVA_EXTENSIONS)
   void LoadExtensionFromUrl(const GURL& url);
 #endif
