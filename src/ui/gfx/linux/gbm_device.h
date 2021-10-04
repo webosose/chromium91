@@ -5,7 +5,9 @@
 #ifndef UI_GFX_LINUX_GBM_DEVICE_H_
 #define UI_GFX_LINUX_GBM_DEVICE_H_
 
+#if !defined(USE_NEVA_V4L2_CODEC)
 #include <gbm.h>
+#endif
 #include <memory>
 
 #include "base/files/file.h"

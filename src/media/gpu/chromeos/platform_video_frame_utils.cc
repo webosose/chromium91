@@ -32,7 +32,9 @@
 #include "ui/gfx/linux/drm_util_linux.h"
 #include "ui/gfx/linux/gbm_buffer.h"
 #include "ui/gfx/linux/gbm_device.h"
+#if !defined(USE_NEVA_V4L2_CODEC)
 #include "ui/gfx/linux/gbm_util.h"
+#endif
 #include "ui/gfx/linux/gbm_wrapper.h"
 #include "ui/gfx/linux/native_pixmap_dmabuf.h"
 #include "ui/gfx/native_pixmap.h"

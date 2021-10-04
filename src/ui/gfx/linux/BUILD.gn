@@ -4,9 +4,10 @@
 
 import("//build/config/ozone.gni")
 import("//build/config/ui.gni")
+import("//neva/neva.gni")
 
 assert(use_x11 || ozone_platform_drm || ozone_platform_wayland ||
-       ozone_platform_x11)
+       ozone_platform_x11 || use_neva_v4l2_codec)
 
 source_set("drm") {
   sources = [
@@ -44,6 +45,10 @@ source_set("gbm") {
     "//ui/gfx:memory_buffer",
     "//ui/gfx/geometry:geometry",
   ]
+
+  if (use_neva_v4l2_codec) {
+    deps-= ["//third_party/minigbm"]
+  }
 }
 
 if (use_x11 || ozone_platform_x11) {
