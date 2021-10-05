@@ -139,7 +139,12 @@ void LocalStorageTrackerImpl::OnAccessOrigin(
   if (origin.SchemeIsFile()) {
     origin_actual = GURL(std::string("file://").append(app_id));
   } else {
-    origin_actual = origin;
+    if (!origin.has_scheme() || !origin.has_host()) {
+      VLOG(1) << "OnAccessOrigin: no scheme or host: " << origin;
+      std::move(callback).Run();
+      return;
+    }
+    origin_actual = origin.GetOrigin();
   }
 
   AppToStatusMap::iterator it_app = apps_.find(app_id);
