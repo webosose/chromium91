@@ -117,8 +117,7 @@ void DisplayScheduler::OnRootFrameMissing(bool missing) {
 }
 
 #if defined(USE_NEVA_APPRUNTIME)
-void DisplayScheduler::OnSurfaceActivated(SurfaceId surface_id,
-                                          bool is_first_contentful_paint,
+void DisplayScheduler::OnSurfaceActivated(bool is_first_contentful_paint,
                                           bool did_reset_container_state,
                                           bool seen_first_contentful_paint) {
   if (use_viz_fmp_with_timeout_) {
@@ -196,15 +195,17 @@ void DisplayScheduler::OnSurfaceActivated(SurfaceId surface_id,
   }
 }
 
-void DisplayScheduler::NotifyPendingActivation() {
-  if (visible_ && !first_surface_activated_) {
-    seen_first_surface_activation_ = true;
-    first_surface_activated_ = true;
-    pending_first_surface_activation_ = false;
-  }
+void DisplayScheduler::NotifyPendingActivation(
+    bool is_first_contentful_paint,
+    bool did_reset_container_state,
+    bool seen_first_contentful_paint) {
+  OnSurfaceActivated(is_first_contentful_paint, did_reset_container_state,
+                     seen_first_contentful_paint);
 }
 
 void DisplayScheduler::NotifyFirstSurfaceActivation() {
+  TRACE_EVENT_INSTANT0("viz", "DisplayScheduler::NotifyFirstSurfaceActivation",
+                       TRACE_EVENT_SCOPE_PROCESS);
   notify_first_activation_eventually_task_.Cancel();
   // set true in case call comes from notify_first_activation_eventually_task_
   seen_first_surface_activation_ = true;

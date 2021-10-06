@@ -34,11 +34,12 @@ class VIZ_SERVICE_EXPORT DisplayDamageTracker : public SurfaceObserver {
     virtual void OnRootFrameMissing(bool missing) = 0;
     virtual void OnPendingSurfacesChanged() = 0;
 #if defined(USE_NEVA_APPRUNTIME)
-    virtual void OnSurfaceActivated(SurfaceId surface_id,
-                                    bool is_first_contentful_paint,
+    virtual void OnSurfaceActivated(bool is_first_contentful_paint,
                                     bool did_reset_container_state,
                                     bool seen_first_contentful_paint) {}
-    virtual void NotifyPendingActivation() {}
+    virtual void NotifyPendingActivation(bool is_first_contentful_paint,
+                                         bool did_reset_container_state,
+                                         bool seen_first_contentful_paint) {}
 #endif
   };
 
@@ -131,7 +132,12 @@ class VIZ_SERVICE_EXPORT DisplayDamageTracker : public SurfaceObserver {
   bool root_frame_missing_ = true;
 #if defined(USE_NEVA_APPRUNTIME)
   FrameSinkId frame_sink_id_;
-  base::flat_set<SurfaceId> pending_activations_;
+  struct PendingSurfaceActivationState {
+    bool is_first_contentful_paint;
+    bool did_reset_container_state;
+    bool seen_first_contentful_paint;
+  };
+  base::flat_map<SurfaceId, PendingSurfaceActivationState> pending_activations_;
 #endif
 
   bool expecting_root_surface_damage_because_of_resize_ = false;

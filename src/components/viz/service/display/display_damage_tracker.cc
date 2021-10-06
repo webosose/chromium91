@@ -49,17 +49,16 @@ void DisplayDamageTracker::SetFrameSinkId(const FrameSinkId& frame_sink_id) {
 }
 
 void DisplayDamageTracker::MaybeNotifyPendingActivations() {
-  bool was_activated = false;
-  for (auto const& surface : pending_activations_) {
-    if (surface_manager_->IsOrContainsFrameSink(frame_sink_id_,
-                                                surface.frame_sink_id())) {
-      was_activated = true;
-      pending_activations_.erase(surface);
+  for (auto const& pending_activation : pending_activations_) {
+    if (surface_manager_->IsOrContainsFrameSink(
+            frame_sink_id_, pending_activation.first.frame_sink_id())) {
+      for (auto& observer : observers_)
+        observer.NotifyPendingActivation(
+            pending_activation.second.is_first_contentful_paint,
+            pending_activation.second.did_reset_container_state,
+            pending_activation.second.seen_first_contentful_paint);
+      pending_activations_.erase(pending_activation.first);
     }
-  }
-  if (was_activated) {
-    for (auto& observer : observers_)
-      observer.NotifyPendingActivation();
   }
 }
 #endif
@@ -173,11 +172,29 @@ void DisplayDamageTracker::OnSurfaceActivatedEx(
     bool seen_first_contentful_paint) {
   if (!surface_manager_->IsOrContainsFrameSink(frame_sink_id_,
                                                surface_id.frame_sink_id())) {
-    pending_activations_.insert(surface_id);
+    auto it = pending_activations_.find(surface_id);
+    if (it == pending_activations_.end()) {
+      pending_activations_[surface_id] = {is_first_contentful_paint,
+                                          did_reset_container_state,
+                                          seen_first_contentful_paint};
+    } else {
+      if (did_reset_container_state) {
+        it->second.is_first_contentful_paint = false;
+        it->second.seen_first_contentful_paint = false;
+        it->second.did_reset_container_state = true;
+      } else if (is_first_contentful_paint) {
+        it->second.is_first_contentful_paint = true;
+        it->second.seen_first_contentful_paint = false;
+        it->second.did_reset_container_state = false;
+      } else if (seen_first_contentful_paint &&
+                 !it->second.is_first_contentful_paint) {
+        it->second.seen_first_contentful_paint = true;
+      }
+    }
     return;
   }
   for (auto& observer : observers_) {
-    observer.OnSurfaceActivated(surface_id, is_first_contentful_paint,
+    observer.OnSurfaceActivated(is_first_contentful_paint,
                                 did_reset_container_state,
                                 seen_first_contentful_paint);
   }
@@ -185,11 +202,16 @@ void DisplayDamageTracker::OnSurfaceActivatedEx(
 
 void DisplayDamageTracker::OnSurfaceMarkedForDestruction(
     const SurfaceId& surface_id) {
+#if defined(USE_NEVA_APPRUNTIME)
+  auto pending_activation_it = pending_activations_.find(surface_id);
+  if (pending_activation_it != pending_activations_.end())
+    pending_activations_.erase(pending_activation_it);
+#endif
+
   auto it = surface_states_.find(surface_id);
   if (it == surface_states_.end())
     return;
   surface_states_.erase(it);
-
   NotifyPendingSurfacesChanged();
 }
 

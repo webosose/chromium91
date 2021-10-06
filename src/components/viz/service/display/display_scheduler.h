@@ -52,11 +52,12 @@ class VIZ_SERVICE_EXPORT DisplayScheduler : public DisplaySchedulerBase {
   void OnRootFrameMissing(bool missing) override;
   void OnPendingSurfacesChanged() override;
 #if defined(USE_NEVA_APPRUNTIME)
-  void OnSurfaceActivated(SurfaceId surface_id,
-                          bool is_first_contentful_paint,
+  void OnSurfaceActivated(bool is_first_contentful_paint,
                           bool did_reset_container_state,
                           bool seen_first_contentful_paint) override;
-  void NotifyPendingActivation() override;
+  void NotifyPendingActivation(bool is_first_contentful_paint,
+                               bool did_reset_container_state,
+                               bool seen_first_contentful_paint) override;
   void RenderProcessGone() override;
 #endif
 
