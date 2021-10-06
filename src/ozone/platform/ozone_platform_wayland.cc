@@ -155,6 +155,10 @@ class OzonePlatformWayland : public OzonePlatform {
       LOG(FATAL) << "failed to initialize display hardware";
   }
 
+  void PreEarlyInitialize() override {
+    setenv("EGL_PLATFORM", "wayland", 0);
+  }
+
   const PlatformProperties& GetPlatformProperties() override {
     static base::NoDestructor<OzonePlatform::PlatformProperties> properties;
     static bool initialised = false;
