@@ -17,6 +17,7 @@
 #ifndef THIRD_PARTY_BLINK_PUBLIC_PLATFORM_NEVA_WEB_MEDIA_PLAYER_H_
 #define THIRD_PARTY_BLINK_PUBLIC_PLATFORM_NEVA_WEB_MEDIA_PLAYER_H_
 
+#include "base/optional.h"
 #include "third_party/blink/public/platform/web_string.h"
 #include "ui/gfx/geometry/rect.h"
 
@@ -30,6 +31,13 @@ class WebMediaPlayer {
     RenderModeHole,
     RenderModeTexture,
     RenderModeDefault = RenderModeHole,
+  };
+
+// Originally defined in blink::WebMediaPlayer.
+  enum Preload {
+    kPreloadNone,
+    kPreloadMetaData,
+    kPreloadAuto,
   };
 
   enum MediaEventType {
@@ -61,6 +69,18 @@ class WebMediaPlayer {
   virtual void Suspend() {}
   virtual void OnMediaActivationPermitted() {}
   virtual void OnMediaPlayerObserverConnectionEstablished() {}
+
+protected:
+  struct PendingRequest {
+    base::Optional<bool> pending_load_;
+    base::Optional<Preload> pending_preload_;
+    base::Optional<bool> pending_play_;
+    // Seek gets pending if another seek is in progress or has no permit. Only
+    // last pending seek will have effect.
+    base::Optional<base::TimeDelta> pending_seek_time_;
+    base::Optional<double> pending_rate_;
+    base::Optional<double> pending_volume_;
+  };
 };
 
 }  // namespace neva

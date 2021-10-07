@@ -272,6 +272,8 @@ class MEDIA_BLINK_EXPORT WebMediaPlayerNeva
   }
 
  private:
+  void ProcessPendingRequests();
+
   // void OnPipelinePlaybackStateChanged(bool playing);
   void UpdatePlayingState(bool is_playing);
 
@@ -361,11 +363,6 @@ class MEDIA_BLINK_EXPORT WebMediaPlayerNeva
 
   bool is_negative_playback_rate_ = false;
 
-  // Seek gets pending if another seek is in progress. Only last pending seek
-  // will have effect.
-  bool pending_seek_;
-  base::TimeDelta pending_seek_time_;
-
   // Internal seek state.
   bool seeking_;
   base::TimeDelta seek_time_;
@@ -442,8 +439,9 @@ class MEDIA_BLINK_EXPORT WebMediaPlayerNeva
   bool audio_disabled_ = false;
 
   bool has_first_frame_ = false;
-  bool pending_load_media_ = false;
-  base::Optional<Preload> pending_preload_ = base::nullopt;
+
+  PendingRequest pending_request_;
+
   WebMediaPlayerParamsNeva::CreateVideoWindowCB create_video_window_cb_;
   base::Optional<ui::VideoWindowInfo> video_window_info_ = base::nullopt;
   mojo::Remote<ui::mojom::VideoWindow> video_window_remote_;

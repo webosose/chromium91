@@ -160,10 +160,14 @@ void WebMediaPlayerMSE::Play() {
   DCHECK(main_task_runner_->BelongsToCurrentThread());
   if (!has_activation_permit_) {
     status_on_suspended_ = PlayingStatus;
+    pending_request_.pending_play_ = true;
     if (!client_->IsSuppressedMediaPlay())
       client_->DidMediaActivationNeeded();
     return;
   }
+
+  pending_request_.pending_play_ = base::nullopt;
+
   media::WebMediaPlayerImpl::Play();
 }
 
@@ -177,18 +181,45 @@ void WebMediaPlayerMSE::Pause() {
   media::WebMediaPlayerImpl::Pause();
 }
 
-void WebMediaPlayerMSE::SetRate(double rate) {
+void WebMediaPlayerMSE::Seek(double seconds) {
   DCHECK(main_task_runner_->BelongsToCurrentThread());
   if (!has_activation_permit_) {
+    pending_request_.pending_seek_time_ =
+        base::TimeDelta::FromSecondsD(seconds);
     if (!client_->IsSuppressedMediaPlay())
       client_->DidMediaActivationNeeded();
     return;
   }
+
+  pending_request_.pending_seek_time_ = base::nullopt;
+
+  media::WebMediaPlayerImpl::Seek(seconds);
+}
+
+void WebMediaPlayerMSE::SetRate(double rate) {
+  DCHECK(main_task_runner_->BelongsToCurrentThread());
+  if (!has_activation_permit_) {
+    pending_request_.pending_rate_ = rate;
+    if (!client_->IsSuppressedMediaPlay())
+      client_->DidMediaActivationNeeded();
+    return;
+  }
+
+ pending_request_.pending_rate_ = base::nullopt;
+
   media::WebMediaPlayerImpl::SetRate(rate);
 }
 
 void WebMediaPlayerMSE::SetVolume(double volume) {
   DCHECK(main_task_runner_->BelongsToCurrentThread());
+  if (!has_activation_permit_) {
+    pending_request_.pending_volume_ = volume;
+    if (!client_->IsSuppressedMediaPlay())
+      client_->DidMediaActivationNeeded();
+    return;
+  }
+
+  pending_request_.pending_volume_ = base::nullopt;
 
   media::WebMediaPlayerImpl::SetVolume(volume);
 }
@@ -352,10 +383,10 @@ bool WebMediaPlayerMSE::EnsureVideoWindowCreated() {
 }
 
 void WebMediaPlayerMSE::ContinuePlayerWithWindowId() {
-  if (pending_load_media_) {
+  if (pending_request_.pending_load_) {
     WebMediaPlayerImpl::Load(pending_load_type_, pending_source_,
                              pending_cors_mode_, pending_is_cache_disabled_);
-    pending_load_media_ = false;
+    pending_request_.pending_load_ = base::nullopt;
   }
 }
 
@@ -445,9 +476,25 @@ void WebMediaPlayerMSE::OnMediaActivationPermitted() {
     return;
   }
 
-  Play();
-  client_->ResumePlayback();
+  ProcessPendingRequests();
+
   client_->DidMediaActivated();
+}
+
+void WebMediaPlayerMSE::ProcessPendingRequests() {
+  if (pending_request_.pending_rate_)
+    SetRate(pending_request_.pending_rate_.value());
+
+  if (pending_request_.pending_volume_)
+    SetVolume(pending_request_.pending_volume_.value());
+
+  if (pending_request_.pending_seek_time_)
+    Seek(pending_request_.pending_seek_time_->InSecondsF());
+
+  if (pending_request_.pending_play_) {
+    Play();
+    client_->ResumePlayback();
+  }
 }
 
 void WebMediaPlayerMSE::OnMediaPlayerObserverConnectionEstablished() {
@@ -491,6 +538,8 @@ void WebMediaPlayerMSE::OnResumed() {
     client_->ResumePlayback();
   status_on_suspended_ = UnknownStatus;
 
+  ProcessPendingRequests();
+
   if (HasVideo()) {
     if (RenderTexture())
       video_frame_provider_->SetFrameType(VideoFrameProviderImpl::kTexture);
@@ -506,7 +555,7 @@ void WebMediaPlayerMSE::OnResumed() {
 void WebMediaPlayerMSE::OnLoadPermitted() {
 #if defined(USE_GAV)
   if (!EnsureVideoWindowCreated()) {
-    pending_load_media_ = true;
+    pending_request_.pending_load_ = true;
     return;
   }
 #endif

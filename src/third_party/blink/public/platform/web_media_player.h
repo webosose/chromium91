@@ -90,12 +90,13 @@ class WebMediaPlayer {
     kReadyStateHaveFutureData,
     kReadyStateHaveEnoughData,
   };
-
+#if !defined(USE_NEVA_MEDIA)
   enum Preload {
     kPreloadNone,
     kPreloadMetaData,
     kPreloadAuto,
   };
+#endif
 
   enum CorsMode {
     kCorsModeUnspecified,

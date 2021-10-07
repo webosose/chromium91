@@ -185,7 +185,6 @@ WebMediaPlayerNeva::WebMediaPlayerNeva(
       delegate_id_(0),
       defer_load_cb_(params->defer_load_cb()),
       buffered_(static_cast<size_t>(1)),
-      pending_seek_(false),
       seeking_(false),
       did_loading_progress_(false),
       create_media_player_neva_cb_(
@@ -296,6 +295,22 @@ blink::WebMediaPlayer::LoadTiming WebMediaPlayerNeva::Load(
   return LoadTiming::kDeferred;
 }
 
+void WebMediaPlayerNeva::ProcessPendingRequests() {
+  if (pending_request_.pending_rate_)
+    SetRate(pending_request_.pending_rate_.value());
+
+  if (pending_request_.pending_volume_)
+    SetVolume(pending_request_.pending_volume_.value());
+
+  if (pending_request_.pending_seek_time_)
+    Seek(pending_request_.pending_seek_time_->InSecondsF());
+
+  if (pending_request_.pending_play_) {
+    Play();
+    client_->ResumePlayback();
+  }
+}
+
 void WebMediaPlayerNeva::UpdatePlayingState(bool is_playing) {
   NEVA_VLOGTF(1);
   if (is_playing == is_playing_)
@@ -367,10 +382,10 @@ void WebMediaPlayerNeva::LoadMedia() {
 
 #if defined(USE_GAV)
   if (!EnsureVideoWindowCreated()) {
-    pending_load_media_ = true;
+    pending_request_.pending_load_ = true;
     return;
   }
-  pending_load_media_ = false;
+  pending_request_.pending_load_ = base::nullopt;
 #endif
 
   player_api_->Initialize(
@@ -397,10 +412,13 @@ void WebMediaPlayerNeva::Play() {
   if (!has_activation_permit_) {
     NEVA_LOGTF(INFO) << "block to play on suspended";
     status_on_suspended_ = PlayingStatus;
+    pending_request_.pending_play_ = true;
     if (!client_->IsSuppressedMediaPlay())
       client_->DidMediaActivationNeeded();
     return;
   }
+
+  pending_request_.pending_play_ = base::nullopt;
 
   UpdatePlayingState(true);
   player_api_->Start();
@@ -445,22 +463,28 @@ void WebMediaPlayerNeva::Seek(double seconds) {
   DCHECK(main_task_runner_->BelongsToCurrentThread());
   NEVA_VLOGTF(1);
 
-  playback_completed_ = false;
-
-  // TODO(neva): We may need ConvertSecondsToTimestamp here
-  // See RP's webmediaplayer_util.h.
   base::TimeDelta new_seek_time = base::TimeDelta::FromSecondsD(seconds);
+
+  if (!has_activation_permit_) {
+    LOG(INFO) << "block to Seek on suspended";
+    pending_request_.pending_seek_time_ = new_seek_time;
+    if (!client_->IsSuppressedMediaPlay())
+      client_->DidMediaActivationNeeded();
+    return;
+  }
+
+  pending_request_.pending_seek_time_ = base::nullopt;
+
+  playback_completed_ = false;
 
   if (seeking_) {
     if (new_seek_time == seek_time_) {
       // Suppress all redundant seeks if unrestricted by media source
       // demuxer API.
-      pending_seek_ = false;
       return;
     }
 
-    pending_seek_ = true;
-    pending_seek_time_ = new_seek_time;
+    pending_request_.pending_seek_time_ = new_seek_time;
 
     return;
   }
@@ -481,11 +505,14 @@ void WebMediaPlayerNeva::SetRate(double rate) {
   rate = std::max(kMinRate, std::min(rate, kMaxRate));
 
   if (!has_activation_permit_) {
-    NEVA_LOGTF(INFO) << "block to setRate on suspended";
+    NEVA_LOGTF(INFO) << "block to SetRate on suspended";
+    pending_request_.pending_rate_ = rate;
     if (!client_->IsSuppressedMediaPlay())
       client_->DidMediaActivationNeeded();
     return;
   }
+
+  pending_request_.pending_rate_ = base::nullopt;
 
   interpolator_.SetPlaybackRate(rate);
   player_api_->SetRate(rate);
@@ -495,6 +522,17 @@ void WebMediaPlayerNeva::SetRate(double rate) {
 void WebMediaPlayerNeva::SetVolume(double volume) {
   DCHECK(main_task_runner_->BelongsToCurrentThread());
   NEVA_VLOGTF(1);
+
+ if (!has_activation_permit_) {
+    LOG(INFO) << "block to SetVolume on suspended";
+    pending_request_.pending_volume_ = volume;
+    if (!client_->IsSuppressedMediaPlay())
+      client_->DidMediaActivationNeeded();
+    return;
+  }
+
+  pending_request_.pending_volume_ = base::nullopt;
+
   volume_ = volume;
   player_api_->SetVolume(volume_);
 }
@@ -521,10 +559,10 @@ void WebMediaPlayerNeva::SetPreload(Preload preload) {
   DCHECK(main_task_runner_->BelongsToCurrentThread());
   NEVA_VLOGTF(1);
   if (!EnsureVideoWindowCreated()) {
-    pending_preload_ = preload;
+    pending_request_.pending_preload_ = preload;
     return;
   }
-  pending_preload_ = base::nullopt;
+  pending_request_.pending_preload_ = base::nullopt;
   switch (preload) {
     case WebMediaPlayer::kPreloadNone:
       player_api_->SetPreload(MediaPlayerNeva::PreloadNone);
@@ -577,8 +615,9 @@ double WebMediaPlayerNeva::CurrentTime() const {
   // If the player is processing a seek, return the seek time.
   // Blink may still query us if updatePlaybackState() occurs while seeking.
   if (Seeking()) {
-    return pending_seek_ ? pending_seek_time_.InSecondsF()
-                         : seek_time_.InSecondsF();
+    return pending_request_.pending_seek_time_
+               ? pending_request_.pending_seek_time_->InSecondsF()
+               : seek_time_.InSecondsF();
   }
 
   double current_time =
@@ -818,9 +857,8 @@ void WebMediaPlayerNeva::OnBufferingUpdate(int percentage) {
 void WebMediaPlayerNeva::OnSeekComplete(const base::TimeDelta& current_time) {
   DCHECK(main_task_runner_->BelongsToCurrentThread());
   seeking_ = false;
-  if (pending_seek_) {
-    pending_seek_ = false;
-    Seek(pending_seek_time_.InSecondsF());
+  if (pending_request_.pending_seek_time_) {
+    Seek(pending_request_.pending_seek_time_->InSecondsF());
     return;
   }
   interpolator_.SetBounds(current_time, current_time, base::TimeTicks::Now());
@@ -1146,8 +1184,8 @@ void WebMediaPlayerNeva::OnMediaActivationPermitted() {
     return;
   }
 
-  Play();
-  GetClient()->ResumePlayback();
+  ProcessPendingRequests();
+
   client_->DidMediaActivated();
 }
 
@@ -1192,6 +1230,8 @@ void WebMediaPlayerNeva::Resume() {
     client_->ResumePlayback();
     status_on_suspended_ = UnknownStatus;
   }
+
+  ProcessPendingRequests();
 
   client_->DidMediaActivated();
 }
@@ -1277,9 +1317,9 @@ bool WebMediaPlayerNeva::EnsureVideoWindowCreated() {
 }
 
 void WebMediaPlayerNeva::ContinuePlayerWithWindowId() {
-  if (pending_preload_)
-    SetPreload(pending_preload_.value());
-  if (pending_load_media_)
+  if (pending_request_.pending_preload_)
+    SetPreload(pending_request_.pending_preload_.value());
+  if (pending_request_.pending_load_)
     LoadMedia();
 }
 

@@ -78,7 +78,7 @@ class MEDIA_BLINK_EXPORT WebMediaPlayerMSE
   void Play() override;
 
   void Pause() override;
-
+  void Seek(double seconds) override;
   void SetRate(double rate) override;
 
   void SetVolume(double volume) override;
@@ -120,6 +120,7 @@ class MEDIA_BLINK_EXPORT WebMediaPlayerMSE
     PausedStatus,
   };
 
+  void ProcessPendingRequests();
   void OnResumed();
   void OnSuspended();
   void OnVideoSizeChanged(const gfx::Size& coded_size,
@@ -162,7 +163,8 @@ class MEDIA_BLINK_EXPORT WebMediaPlayerMSE
   bool has_activation_permit_ = false;
   bool require_media_resource_ = true;
 
-  bool pending_load_media_ = false;
+  PendingRequest pending_request_;
+
   WebMediaPlayerParamsNeva::CreateVideoWindowCB create_video_window_cb_;
   base::Optional<ui::VideoWindowInfo> video_window_info_ = base::nullopt;
   mojo::Remote<ui::mojom::VideoWindow> video_window_remote_;
