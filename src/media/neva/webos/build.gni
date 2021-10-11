@@ -46,6 +46,8 @@ media_player_neva_webos = {
     sources += [
       "$_dir/media_util.cc",
       "$_dir/media_util.h",
+      "$_dir/umediaclient_extension.cc",
+      "$_dir/umediaclient_extension.h",
       "$_dir/umedia_info_util_webos.cc",
       "$_dir/umedia_info_util_webos.h",
       "$_dir/umediaclient_impl.cc",
@@ -53,7 +55,12 @@ media_player_neva_webos = {
     ]
 
     if (use_gst_media) {
+      sources -= [
+        "$_dir/umediaclient_extension.cc",
+      ]
       sources += [
+        "$_dir/umediaclient_extension_stub.cc",
+        "$_dir/umediaclient_extension_stub.h",
         "$_dir/umedia_info_util_webos_gmp.cc",
         "$_dir/umedia_info_util_webos_gmp.h",
       ]

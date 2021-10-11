@@ -36,6 +36,7 @@ class SingleThreadTaskRunner;
 
 namespace media {
 class LunaServiceClient;
+class UMediaClientExtension;
 
 class UMediaClientImpl : public WebOSMediaClient,
                          public uMediaServer::uMediaClient,
@@ -253,6 +254,7 @@ class UMediaClientImpl : public WebOSMediaClient,
   std::string previous_user_defined_changed_;
   std::string previous_media_video_data_;
   std::string updated_payload_;
+  std::unique_ptr<UMediaClientExtension> umediaclient_extension_;
 
   mutable base::Lock lock_;
   media::Ranges<base::TimeDelta> seekable_ranges_;

@@ -28,6 +28,7 @@
 #include "media/base/video_util.h"
 #include "media/neva/webos/media_util.h"
 #include "media/neva/webos/webos_media_pipeline_error.h"
+#include "media/neva/webos/umediaclient_extension.h"
 #include "media/neva/webos/umedia_info_util_webos.h"
 #include "neva/logging.h"
 #include "third_party/jsoncpp/source/include/json/json.h"
@@ -73,7 +74,9 @@ UMediaClientImpl::UMediaClientImpl(
 #if defined(USE_GST_MEDIA)
       luna_service_client_(app_id),
 #endif
-      app_id_(app_id) {
+      app_id_(app_id),
+      umediaclient_extension_(
+          UMediaClientExtension::Create(AsWeakPtr(), main_task_runner)) {
   // NOTE: AsWeakPtr() will create new valid WeakPtr even after it is
   // invalidated.
   // On our case, UMediaClientImpl will invalidate weakptr on its dtor
@@ -381,7 +384,7 @@ void UMediaClientImpl::DispatchPlaying() {
   }
   NEVA_DVLOGTF(2);
 
-  // SystemMediaManager needs this call to connect audio sink right before
+  // UMediaClientExtension needs this call to connect audio sink right before
   // playing.
   SetPlaybackVolume(volume_, true);
 
