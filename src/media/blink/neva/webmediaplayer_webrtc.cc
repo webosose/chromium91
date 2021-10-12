@@ -43,13 +43,6 @@ namespace media {
   (DCHECK(main_task_runner_->BelongsToCurrentThread()), \
    media::BindToCurrentLoop(base::Bind(function, weak_ptr_this_)))
 
-namespace {
-
-// Any reasonable size, will be overridden by the decoder anyway.
-const gfx::Size kDefaultSize(640, 480);
-
-}  // namespace
-
 WebMediaPlayerWebRTC::WebMediaPlayerWebRTC(
     blink::WebLocalFrame* frame,
     blink::WebMediaPlayerClient* client,
@@ -394,7 +387,7 @@ void WebMediaPlayerWebRTC::HandleEncodedFrame(
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
 
   if (!media_platform_api_) {
-    StartMediaPipeline();
+    StartMediaPipeline(encoded_frame);
   }
 
   {
@@ -415,7 +408,8 @@ void WebMediaPlayerWebRTC::HandleEncodedFrame(
   }
 }
 
-void WebMediaPlayerWebRTC::StartMediaPipeline() {
+void WebMediaPlayerWebRTC::StartMediaPipeline(
+    const scoped_refptr<media::VideoFrame>& input_frame) {
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
 
   if (media_platform_api_)
@@ -452,16 +446,17 @@ void WebMediaPlayerWebRTC::StartMediaPipeline() {
 
   media_task_runner_->PostTask(
       FROM_HERE, base::BindOnce(&WebMediaPlayerWebRTC::InitMediaPlatformAPI,
-                                weak_ptr_this_));
+                                weak_ptr_this_, input_frame));
 }
 
-void WebMediaPlayerWebRTC::InitMediaPlatformAPI() {
+void WebMediaPlayerWebRTC::InitMediaPlatformAPI(
+const scoped_refptr<media::VideoFrame>& input_frame) {
   DCHECK(media_task_runner_->BelongsToCurrentThread());
 
   // audio data handling and rendering path is separate. We are leaving
   // it to be taken care by Chromium now. So, we dont need any audio config
   AudioDecoderConfig audio_config;
-  VideoDecoderConfig video_config = GetVideoConfig();
+  VideoDecoderConfig video_config = GetVideoConfig(input_frame);
 
   NEVA_LOGTF(INFO) << ": natural_size: "
                    << video_config.natural_size().ToString();
@@ -698,6 +693,15 @@ void WebMediaPlayerWebRTC::OnPipelineError(PipelineStatus status) {
   NEVA_VLOGTF(1) << ": delegate_id_: " << delegate_id_
                  << " status : " << status;
 
+  if (main_render_task_runner_ &&
+      !main_render_task_runner_->BelongsToCurrentThread()) {
+    main_render_task_runner_->PostTask(
+        FROM_HERE,
+        base::BindOnce(&WebMediaPlayerWebRTC::OnPipelineError,
+                       weak_ptr_this_, status));
+    return;
+  }
+
   if (is_loading_) {
     is_loading_ = false;
     client_->DidMediaActivated();
@@ -750,7 +754,8 @@ void WebMediaPlayerWebRTC::EnqueueHoleFrame(
   }
 }
 
-VideoDecoderConfig WebMediaPlayerWebRTC::GetVideoConfig() {
+VideoDecoderConfig WebMediaPlayerWebRTC::GetVideoConfig(
+    const scoped_refptr<media::VideoFrame>& video_frame) {
   VideoCodecProfile profile = media::VIDEO_CODEC_PROFILE_UNKNOWN;
   switch (codec_) {
     case media::kCodecH264:
@@ -772,10 +777,9 @@ VideoDecoderConfig WebMediaPlayerWebRTC::GetVideoConfig() {
 
   media::VideoDecoderConfig video_config(
       codec_, profile, media::VideoDecoderConfig::AlphaMode::kIsOpaque,
-      media::VideoColorSpace(), media::kNoTransformation, kDefaultSize,
-      gfx::Rect(kDefaultSize),
-      // kDefaultSize, media::EmptyExtraData(), media::Unencrypted());
-      kDefaultSize, media::EmptyExtraData(),
+      media::VideoColorSpace(), media::kNoTransformation,
+      video_frame->coded_size(), video_frame->visible_rect(),
+      video_frame->natural_size(), media::EmptyExtraData(),
       media::EncryptionScheme::kUnencrypted);
   video_config.set_live_stream(true);
   return video_config;

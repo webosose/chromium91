@@ -119,8 +119,10 @@ class MEDIA_BLINK_EXPORT WebMediaPlayerWebRTC
 
   void HandleEncodedFrame(const scoped_refptr<media::VideoFrame>& frame);
 
-  void StartMediaPipeline();
-  void InitMediaPlatformAPI();
+  void StartMediaPipeline(const scoped_refptr<media::VideoFrame>& input_frame);
+  void InitMediaPlatformAPI(
+      const scoped_refptr<media::VideoFrame>& input_frame);
+
   void ReleaseMediaPlatformAPI();
 
   void OnPipelineFeed();
@@ -145,7 +147,8 @@ class MEDIA_BLINK_EXPORT WebMediaPlayerWebRTC
   void OnPipelineError(PipelineStatus status);
 
   void EnqueueHoleFrame(const scoped_refptr<media::VideoFrame>& output_frame);
-  VideoDecoderConfig GetVideoConfig();
+  VideoDecoderConfig GetVideoConfig(
+      const scoped_refptr<media::VideoFrame>& video_frame);
   std::unique_ptr<VideoFrameProviderImpl> video_frame_provider_impl_;
 
   const gfx::PointF additional_contents_scale_;

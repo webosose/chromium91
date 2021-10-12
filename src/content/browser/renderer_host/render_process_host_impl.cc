@@ -3473,6 +3473,7 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
 #endif
 #if defined(USE_NEVA_WEBRTC)
     switches::kEnableWebRTCPlatformVideoDecoder,
+    switches::kEnableWebRTCPlatformVideoEncoder,
 #endif
 #if defined(USE_NEVA_APPRUNTIME)
     switches::kEnableSampleInjection,
