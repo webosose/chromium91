@@ -94,6 +94,7 @@ class MediaPlayerUMS : public base::SupportsWeakPtr<MediaPlayerUMS>,
   void SetDisableAudio(bool) override;
   void SetMediaLayerId(const std::string& media_layer_id) override;
   media::Ranges<base::TimeDelta> GetBufferedTimeRanges() const override;
+  bool Send(const std::string& message) const override;
   // End of media::MediaPlayerNeva
 
   // Implement WebOSMediaClient::EventListener

@@ -1428,4 +1428,8 @@ bool UMediaClientImpl::IsMpegDashContents() {
   return false;
 }
 
+bool UMediaClientImpl::Send(const std::string& message) {
+  DCHECK(main_task_runner_->BelongsToCurrentThread());
+  return false;
+}
 }  // namespace media

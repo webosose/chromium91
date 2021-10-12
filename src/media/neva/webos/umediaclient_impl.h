@@ -152,6 +152,7 @@ class UMediaClientImpl : public WebOSMediaClient,
   void InitializeSeeking() { is_seeking_ = false; }
   void ResetEnded() { ended_ = false; }
   bool IsMpegDashContents();
+  bool Send(const std::string& message);
 
  private:
   typedef enum {

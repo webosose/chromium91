@@ -69,6 +69,12 @@ class WebMediaPlayer {
   virtual void Suspend() {}
   virtual void OnMediaActivationPermitted() {}
   virtual void OnMediaPlayerObserverConnectionEstablished() {}
+  // Send custom commands to platform pipeline or player. For example we can
+  // send now subtitle related message to UMediaServer. Command are in JSON
+  // format of 'command' and 'Parameter' pair. Command describes type of
+  // message like 'SetInternalSubtitle' and Parameter describes value of
+  // attributes like 'index'.
+  virtual bool Send(const std::string& message) { return false; }
 
 protected:
   struct PendingRequest {

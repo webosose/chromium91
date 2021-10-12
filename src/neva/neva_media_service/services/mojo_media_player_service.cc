@@ -240,4 +240,9 @@ void MojoMediaPlayerService::OnActiveRegionChanged(
   remote_client_->OnActiveRegionChanged(active_region);
 }
 
+void MojoMediaPlayerService::Send(const std::string& message,
+                                  SendCallback callback) {
+  std::move(callback).Run(media_player_neva_->Send(message));
+}
+
 }  // namespace neva_media

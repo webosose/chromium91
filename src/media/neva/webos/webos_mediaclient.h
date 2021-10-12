@@ -120,6 +120,7 @@ class WebOSMediaClient {
   virtual bool IsSupportedPreload() = 0;
   virtual void SetDisableAudio(bool) = 0;
   virtual void SetMediaLayerId(const std::string& media_layer_id) = 0;
+  virtual bool Send(const std::string& message) { return false; }
 };
 
 }  // namespace media

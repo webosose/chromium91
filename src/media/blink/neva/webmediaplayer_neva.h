@@ -270,6 +270,7 @@ class MEDIA_BLINK_EXPORT WebMediaPlayerNeva
   bool RenderTexture() {
     return render_mode_ == blink::WebMediaPlayer::RenderModeTexture;
   }
+  bool Send(const std::string& message) override;
 
  private:
   void ProcessPendingRequests();

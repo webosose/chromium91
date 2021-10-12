@@ -1352,4 +1352,13 @@ void WebMediaPlayerNeva::OnFrameShown() {
   Resume();
 }
 
+bool WebMediaPlayerNeva::Send(const std::string& message) {
+  DCHECK(main_task_runner_->BelongsToCurrentThread());
+  VLOG(1) << "message:  " <<  message;
+  if (message.empty())
+    return false;
+
+  return player_api_->Send(message);
+}
+
 }  // namespace media
