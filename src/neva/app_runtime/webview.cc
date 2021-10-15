@@ -162,7 +162,7 @@ WebView::WebView(int width, int height, WebViewProfile* profile)
 }
 
 WebView::~WebView() {
-  PushCorsCorbDisabledToIOThread(false);
+  SetCorsCorbDisabled(false);
   web_contents_->SetDelegate(nullptr);
 }
 
@@ -672,7 +672,7 @@ void WebView::UpdatePreferencesAttributeForPrefs(
       preferences->web_security_enabled = enable;
       if (!preferences->web_security_enabled) {
         GrantLoadLocalResources();
-        PushCorsCorbDisabledToIOThread(!preferences->web_security_enabled);
+        SetCorsCorbDisabled(!preferences->web_security_enabled);
       }
       break;
     case Attribute::KeepAliveWebApp:
@@ -725,10 +725,10 @@ void WebView::GrantLoadLocalResources() {
   }
 }
 
-void WebView::PushCorsCorbDisabledToIOThread(bool disabled) {
+void WebView::SetCorsCorbDisabled(bool disabled) {
   if (web_contents_->GetMainFrame() &&
       web_contents_->GetMainFrame()->GetProcess()) {
-    GetAppRuntimeContentBrowserClient()->PushCorsCorbDisabledToIOThread(
+    GetAppRuntimeContentBrowserClient()->SetCorsCorbDisabled(
         web_contents_->GetMainFrame()->GetProcess()->GetID(), disabled);
   }
 }

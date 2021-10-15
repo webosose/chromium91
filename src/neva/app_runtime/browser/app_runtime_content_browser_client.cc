@@ -526,22 +526,10 @@ void AppRuntimeContentBrowserClient::RenderProcessWillLaunch(
 }
 #endif
 
-void AppRuntimeContentBrowserClient::PushCorsCorbDisabledToIOThread(
-    int process_id,
-    bool disabled) {
+void AppRuntimeContentBrowserClient::SetCorsCorbDisabled(int process_id,
+                                                         bool disabled) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  content::GetIOThreadTaskRunner({})->PostTask(
-      FROM_HERE,
-      base::BindOnce(
-          &AppRuntimeContentBrowserClient::SetCorsCorbDisabledOnIOThread,
-          base::Unretained(this), process_id, disabled));
-}
-
-void AppRuntimeContentBrowserClient::SetCorsCorbDisabledOnIOThread(
-    int process_id,
-    bool disabled) {
   if (!GetNetworkService()) {
-    DCHECK_CURRENTLY_ON(BrowserThread::UI);
     return;
   }
 
