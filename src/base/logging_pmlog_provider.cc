@@ -25,7 +25,8 @@
 
 namespace {
 
-const size_t kMaxLogLength = 896;
+constexpr size_t kMaxLogLength = 896;
+constexpr size_t kMaxFileTailSize = 20;
 const char kDefaultMajorLogChannelName[] = "chromium";
 
 const char* const kSeverityLabel[] = {"I", "W", "E", "F"};
@@ -126,10 +127,9 @@ bool PmLogProvider::LogMessage(logging::LogSeverity severity,
 
 #undef PMLOG_CALL
 
-  base::StringPiece filename(file);
-  size_t last_slash_pos = filename.find_last_of("\\/");
-  if (last_slash_pos != base::StringPiece::npos)
-    filename.remove_prefix(last_slash_pos + 1);
+  base::StringPiece file_tail(file);
+  if (file_tail.size() > kMaxFileTailSize)
+    file_tail.remove_prefix(file_tail.size() - kMaxFileTailSize);
 
   std::string escaped_string = base::GetQuotedJSONString(
       base::StringPiece(message).substr(message_start));
@@ -138,13 +138,13 @@ bool PmLogProvider::LogMessage(logging::LogSeverity severity,
   if (severity >= 0) {                                                  \
     PmLogMsg(context, level_suffix, msgid, 0, "%s[%d:%d:%s(%d)] %.*s",  \
              log_severity_name(severity), getpid(),                     \
-             base::PlatformThread::CurrentId(), filename.data(), line,  \
+             base::PlatformThread::CurrentId(), file_tail.data(), line,  \
              std::min(escaped_string.length() - offset, kMaxLogLength), \
              escaped_string.c_str() + offset);                          \
   } else {                                                              \
     PmLogMsg(context, level_suffix, msgid, 0, "V%d[%d:%d:%s(%d)] %.*s", \
              -severity, getpid(), base::PlatformThread::CurrentId(),    \
-             filename.data(), line,                                     \
+             file_tail.data(), line,                                     \
              std::min(escaped_string.length() - offset, kMaxLogLength), \
              escaped_string.c_str() + offset);                          \
   }
