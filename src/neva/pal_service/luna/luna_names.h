@@ -38,7 +38,6 @@ namespace service_name {
 extern const char kChromiumMedia[];
 extern const char kChromiumMemory[];
 extern const char kChromiumPlatformSystem[];
-extern const char kSettingsClient[];
 
 }  // namespace service_name
 

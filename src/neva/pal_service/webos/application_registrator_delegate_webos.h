@@ -30,7 +30,8 @@ namespace webos {
 class ApplicationRegistratorDelegateWebOS
     : public ApplicationRegistratorDelegate {
  public:
-  explicit ApplicationRegistratorDelegateWebOS(std::string application_name,
+  explicit ApplicationRegistratorDelegateWebOS(const std::string& application_id,
+                                               const std::string& application_name,
                                                RepeatingResponse callback);
   ApplicationRegistratorDelegateWebOS(
       const ApplicationRegistratorDelegateWebOS&) = delete;
@@ -46,10 +47,11 @@ class ApplicationRegistratorDelegateWebOS
                   unsigned,
                   const std::string& json);
 
+  const std::string application_id_;
   const std::string application_name_;
   RepeatingResponse callback_;
   Status status_ = Status::kNotInitialized;
-  std::unique_ptr<luna::Client> luna_client_;
+  std::shared_ptr<luna::Client> luna_client_;
 };
 
 }  // namespace webos

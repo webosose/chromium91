@@ -27,18 +27,22 @@
 PlatformRegisterApp::PlatformRegisterApp(content::WebContents* web_contents)
     : content::WebContentsObserver(web_contents), weak_factory_(this) {
   base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
-  if (cmd->HasSwitch(extensions::switches::kWebOSAppId)) {
-    std::string name =
+  if (cmd->HasSwitch(extensions::switches::kWebOSAppId) &&
+      cmd->HasSwitch(extensions::switches::kWebOSLunaServiceName)) {
+    const std::string& application_id =
         cmd->GetSwitchValueASCII(extensions::switches::kWebOSAppId);
+    const std::string& application_name = cmd->GetSwitchValueASCII(
+                  extensions::switches::kWebOSLunaServiceName);
     delegate_ =
         pal::PlatformFactory::Get()->CreateApplicationRegistratorDelegate(
-          std::move(name),
+          application_id,
+          application_name,
           base::BindRepeating(&PlatformRegisterApp::OnMessage,
                               weak_factory_.GetWeakPtr()));
 
     if (delegate_->GetStatus() !=
         pal::ApplicationRegistratorDelegate::Status::kSuccess)
-      LOG(ERROR) << __func__ << "(): no webOS-application identifier specified";
+      LOG(ERROR) << __func__ << "(): error during delegate creation";
   }
 }
 

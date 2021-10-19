@@ -38,10 +38,12 @@ class COMPONENT_EXPORT(PAL_SERVICE) PlatformFactory {
 
   std::unique_ptr<ApplicationRegistratorDelegate>
   CreateApplicationRegistratorDelegate(
-      std::string application_name,
+      const std::string& application_id,
+      const std::string& application_name,
       ApplicationRegistratorDelegate::RepeatingResponse callback);
 
   std::unique_ptr<LanguageTrackerDelegate> CreateLanguageTrackerDelegate(
+      const std::string& application_name,
       LanguageTrackerDelegate::RepeatingResponse callback);
 
   std::unique_ptr<MemoryManagerDelegate> CreateMemoryManagerDelegate();

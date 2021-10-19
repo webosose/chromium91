@@ -40,6 +40,7 @@ extern const char kProcessPerGuestWebView[];
 ///@}
 #if defined(OS_WEBOS)
 extern const char kWebOSAppId[];
+extern const char kWebOSLunaServiceName[];
 #endif
 extern const char kAllowFutureManifestVersion[];
 

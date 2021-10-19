@@ -99,6 +99,12 @@ CHROME_COMPOSITING_FLAGS=" \
   --enable-accelerated-compositing\
   --enable-smooth-scrolling\
 "
+
+CHROME_LS2_NAME_FLAG=""
+if test -n ${LS2_NAME}; then
+  CHROME_LS2_NAME_FLAG="--webos-luna-service-name=${LS2_NAME}"
+fi
+
 CHROME_FLAGS=" \
   --allow-scripts-to-close-windows\
   --always-authorize-plugins\
@@ -129,6 +135,7 @@ CHROME_FLAGS=" \
   --v8-snapshot-blob-path=${APP_FOLDER_PATH}/snapshot_blob.bin\
   --ozone-platform=wayland_external\
 "
+CHROME_FLAGS="${CHROME_FLAGS} ${CHROME_LS2_NAME_FLAG}"
 
 if [ -f /var/luna/preferences/devmode_enabled -a -f /var/luna/preferences/debug_system_apps ]; then
     DEBUG_FLAGS="--remote-debugging-port=9999"

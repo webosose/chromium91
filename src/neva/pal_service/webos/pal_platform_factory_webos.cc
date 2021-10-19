@@ -35,16 +35,18 @@ namespace pal {
 
 std::unique_ptr<ApplicationRegistratorDelegate>
 PlatformFactory::CreateApplicationRegistratorDelegate(
-    std::string application_name,
+    const std::string& application_id,
+    const std::string& application_name,
     ApplicationRegistratorDelegate::RepeatingResponse callback) {
   return std::make_unique<webos::ApplicationRegistratorDelegateWebOS>(
-      std::move(application_name), std::move(callback));
+      application_id, application_name, std::move(callback));
 }
 
 std::unique_ptr<LanguageTrackerDelegate>
 PlatformFactory::CreateLanguageTrackerDelegate(
+    const std::string& application_name,
     LanguageTrackerDelegate::RepeatingResponse callback) {
-  return std::make_unique<webos::LanguageTrackerDelegateWebOS>(
+  return std::make_unique<webos::LanguageTrackerDelegateWebOS>(application_name,
       std::move(callback));
 }
 

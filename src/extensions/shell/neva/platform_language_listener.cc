@@ -16,18 +16,30 @@
 
 #include "extensions/shell/neva/platform_language_listener.h"
 
+#include "base/command_line.h"
 #include "content/public/browser/web_contents.h"
+#include "extensions/common/switches.h"
 #include "neva/pal_service/pal_platform_factory.h"
 #include "neva/pal_service/public/language_tracker_delegate.h"
 #include "third_party/blink/public/mojom/renderer_preferences.mojom.h"
 
 PlatformLanguageListener::PlatformLanguageListener(
     content::WebContents* web_contents)
-    : content::WebContentsObserver(web_contents),
-      weak_factory_(this),
-      delegate_(pal::PlatformFactory::Get()->CreateLanguageTrackerDelegate(
+    : content::WebContentsObserver(web_contents), weak_factory_(this) {
+  base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
+  if (cmd->HasSwitch(extensions::switches::kWebOSLunaServiceName)) {
+    const std::string& application_name =
+        cmd->GetSwitchValueASCII(extensions::switches::kWebOSLunaServiceName);
+
+      delegate_ = pal::PlatformFactory::Get()->CreateLanguageTrackerDelegate(
+          application_name,
           base::BindRepeating(&PlatformLanguageListener::OnLanguageChanged,
-                              weak_factory_.GetWeakPtr()))) {}
+                              weak_factory_.GetWeakPtr()));
+      if (delegate_->GetStatus() !=
+          pal::LanguageTrackerDelegate::Status::kSuccess)
+        LOG(ERROR) << __func__ << "(): error during delegate creation";
+  }
+}
 
 PlatformLanguageListener::~PlatformLanguageListener() = default;
 

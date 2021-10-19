@@ -29,7 +29,8 @@ namespace webos {
 
 class LanguageTrackerDelegateWebOS : public LanguageTrackerDelegate {
  public:
-  explicit LanguageTrackerDelegateWebOS(RepeatingResponse callback);
+  explicit LanguageTrackerDelegateWebOS(const std::string& application_name,
+                                        RepeatingResponse callback);
   LanguageTrackerDelegateWebOS(const LanguageTrackerDelegateWebOS&) = delete;
   LanguageTrackerDelegateWebOS& operator=(const LanguageTrackerDelegateWebOS&) =
       delete;
@@ -45,7 +46,7 @@ class LanguageTrackerDelegateWebOS : public LanguageTrackerDelegate {
   std::string language_string_;
   RepeatingResponse subscription_callback_;
   Status status_ = Status::kNotInitialized;
-  std::unique_ptr<luna::Client> luna_client_;
+  std::shared_ptr<luna::Client> luna_client_;
 };
 
 }  // namespace webos

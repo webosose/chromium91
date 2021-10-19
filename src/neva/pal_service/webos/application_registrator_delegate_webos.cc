@@ -32,19 +32,21 @@ namespace pal {
 namespace webos {
 
 ApplicationRegistratorDelegateWebOS::ApplicationRegistratorDelegateWebOS(
-    std::string application_name,
+    const std::string& application_id,
+    const std::string& application_name,
     RepeatingResponse callback)
-    : application_name_(std::move(application_name)),
+    : application_id_(application_id),
+      application_name_(application_name),
       callback_(std::move(callback)) {
   pal::luna::Client::Params params;
   params.name = application_name_;
-  luna_client_ = pal::luna::CreateClient(params);
+  luna_client_ = pal::luna::GetSharedClient(params);
 
   if (luna_client_ && luna_client_->IsInitialized()) {
     const bool subscribed = luna_client_->SubscribeFromApp(
         luna::GetServiceURI(luna::service_uri::kApplicationManager,
                             kRegisterNativeAppMethod),
-        std::string(kRegisterAppRequest), application_name_,
+        std::string(kRegisterAppRequest), application_id_,
         base::BindRepeating(&ApplicationRegistratorDelegateWebOS::OnResponse,
                             base::Unretained(this)));
     status_ = subscribed ? Status::kSuccess : Status::kFailed;
@@ -69,6 +71,16 @@ void ApplicationRegistratorDelegateWebOS::OnResponse(
   base::Optional<base::Value> root(base::JSONReader::Read(json));
   if (!root || !root->is_dict())
     return;
+
+  base::Optional<bool> return_value = root->FindBoolKey("returnValue");
+
+  if (return_value.has_value() && !return_value.value()) {
+    const std::string* message = root->FindStringKey("errorText");
+    LOG(ERROR) << __func__ << "(): Failed to register application. Error: "
+               << (message ? *message : "");
+
+    return;
+  }
 
   const std::string* message = root->FindStringKey(kMessage);
   if (message)

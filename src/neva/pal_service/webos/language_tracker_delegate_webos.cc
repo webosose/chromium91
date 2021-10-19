@@ -34,11 +34,12 @@ namespace pal {
 namespace webos {
 
 LanguageTrackerDelegateWebOS::LanguageTrackerDelegateWebOS(
+    const std::string& application_name,
     RepeatingResponse callback)
     : subscription_callback_(std::move(callback)) {
   pal::luna::Client::Params params;
-  params.name = luna::service_name::kSettingsClient;
-  luna_client_ = luna::CreateClient(params);
+  params.name = application_name;
+  luna_client_ = luna::GetSharedClient(params);
   if (luna_client_ && luna_client_->IsInitialized()) {
     const bool subscribed = luna_client_->Subscribe(
         luna::GetServiceURI(luna::service_uri::kSettings,
@@ -67,6 +68,16 @@ void LanguageTrackerDelegateWebOS::OnResponse(pal::luna::Client::ResponseStatus,
   base::Optional<base::Value> root(base::JSONReader::Read(json));
   if (!root || !root->is_dict())
     return;
+
+  base::Optional<bool> return_value = root->FindBoolKey("returnValue");
+
+  if (return_value.has_value() && !return_value.value()) {
+    const std::string* message = root->FindStringKey("errorText");
+    LOG(ERROR) << __func__ << "(): Failed to get UI language. Error: "
+               << (message ? *message : "");
+
+    return;
+  }
 
   const base::Value* language = root->FindPath(kUILanguagePath);
   if (language) {

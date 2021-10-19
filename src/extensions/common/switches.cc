@@ -93,6 +93,9 @@ const char kProcessPerGuestWebView[] = "process-per-guest-webview";
 #if defined(OS_WEBOS)
 // Pass application Id to browser
 const char kWebOSAppId[] = "webos-appid";
+
+// Pass luna service name to browser
+const char kWebOSLunaServiceName[] = "webos-luna-service-name";
 #endif
 
 // Mute extension errors while working with new manifest version.
