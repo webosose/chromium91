@@ -42,7 +42,7 @@ declare_args() {
   webos_sysbus_rolesdir = "/usr/share/luna-service2/roles.d/"
   webos_sysbus_containersdir = "/usr/share/luna-service2/containers.d/"
 
-  includedir = "/usr/include/webruntime"
+  includedir = "/usr/include"
   libdir = "/usr/lib"
 
   cbe_data_dir = "$libdir/cbe"
