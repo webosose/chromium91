@@ -35,7 +35,7 @@ class PlatformRegisterApp
 
   explicit PlatformRegisterApp(content::WebContents* web_contents);
   ~PlatformRegisterApp() override;
-  void OnMessage(const std::string& message);
+  void OnMessage(const std::string& message, const base::Value* parameters);
 
  private:
   base::WeakPtrFactory<PlatformRegisterApp> weak_factory_;

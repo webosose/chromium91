@@ -23,6 +23,7 @@
 namespace {
 
 const char kMessage[] = "message";
+const char kParameters[] = "parameters";
 const char kRegisterNativeAppMethod[] = "registerNativeApp";
 const char kRegisterAppRequest[] = R"JSON({"subscribe":true})JSON";
 
@@ -83,8 +84,9 @@ void ApplicationRegistratorDelegateWebOS::OnResponse(
   }
 
   const std::string* message = root->FindStringKey(kMessage);
+  const base::Value* parameters = root->FindDictKey(kParameters);
   if (message)
-    callback_.Run(*message);
+    callback_.Run(*message, parameters);
 }
 
 }  // namespace webos

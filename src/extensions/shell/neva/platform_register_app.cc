@@ -17,12 +17,19 @@
 #include "extensions/shell/neva/platform_register_app.h"
 
 #include "base/command_line.h"
+#include "base/strings/stringprintf.h"
 #include "content/public/browser/web_contents.h"
 #include "extensions/common/switches.h"
 #include "neva/pal_service/pal_platform_factory.h"
 #include "neva/pal_service/public/application_registrator_delegate.h"
 #include "ui/aura/window.h"
 #include "ui/aura/window_tree_host.h"
+
+namespace {
+
+const char kTarget[] = "target";
+
+}  // namespace
 
 PlatformRegisterApp::PlatformRegisterApp(content::WebContents* web_contents)
     : content::WebContentsObserver(web_contents), weak_factory_(this) {
@@ -48,7 +55,8 @@ PlatformRegisterApp::PlatformRegisterApp(content::WebContents* web_contents)
 
 PlatformRegisterApp::~PlatformRegisterApp() = default;
 
-void PlatformRegisterApp::OnMessage(const std::string& message) {
+void PlatformRegisterApp::OnMessage(const std::string& message,
+                                    const base::Value* parameters) {
   content::WebContents* contents = web_contents();
   if (!contents)
     return;
@@ -57,6 +65,23 @@ void PlatformRegisterApp::OnMessage(const std::string& message) {
     aura::Window* top_window = contents->GetTopLevelNativeWindow();
     if (top_window && top_window->GetHost())
       top_window->GetHost()->ToggleFullscreen();
+
+    if (parameters && parameters->is_dict()) {
+      const std::string* target_url = parameters->FindStringKey(kTarget);
+      if (target_url && target_url->size()) {
+        content::RenderFrameHost* rfh = contents->GetMainFrame();
+        if (!rfh)
+          return;
+
+        std::string js_line = base::StringPrintf(
+            R"JS(var e_tab_open = new CustomEvent("webOSRelaunch",
+                {detail: {url: "%s"}});
+                document.dispatchEvent(e_tab_open);)JS",
+            target_url->c_str());
+        rfh->ExecuteJavaScript(base::UTF8ToUTF16(std::move(js_line)),
+                               base::NullCallback());
+      }
+    }
   }
 }
 

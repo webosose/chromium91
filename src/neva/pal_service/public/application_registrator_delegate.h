@@ -20,6 +20,7 @@
 #include <string>
 
 #include "base/callback.h"
+#include "base/values.h"
 
 namespace pal {
 
@@ -27,7 +28,8 @@ class ApplicationRegistratorDelegate {
  public:
   virtual ~ApplicationRegistratorDelegate() {}
 
-  using RepeatingResponse = base::RepeatingCallback<void(const std::string&)>;
+  using RepeatingResponse =
+      base::RepeatingCallback<void(const std::string&, const base::Value*)>;
 
   enum class Status {
     kSuccess = 0,
