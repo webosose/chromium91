@@ -64,6 +64,7 @@
 #include "extensions/common/constants.h"
 #include "extensions/common/extension_messages.h"
 #include "extensions/common/manifest_constants.h"
+#include "extensions/common/value_builder.h"
 #include "extensions/strings/grit/extensions_strings.h"
 #include "ipc/ipc_message_macros.h"
 #include "net/base/escape.h"
@@ -109,33 +110,49 @@ using zoom::ZoomController;
 #if defined(USE_NEVA_APPRUNTIME) && defined(OS_WEBOS)
 namespace {
 
+const char kDevicePixelRatio[] = "devicePixelRatio";
+const char kIdentifier[] = "identifier";
+const char kInitialize[] = "initialize";
+
 class WebViewGuestWebViewControllerDelegate
     : public neva_app_runtime::WebViewControllerDelegate {
  public:
+  WebViewGuestWebViewControllerDelegate(
+      extensions::WebViewGuest* web_view_guest)
+      : web_view_guest_(web_view_guest) {}
+
   void RunCommand(const std::string& name,
                   const std::vector<std::string>& arguments) override {}
 
   std::string RunFunction(const std::string& name,
                           const std::vector<std::string>&) override {
-    if (name == std::string("initialize")) {
-      base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
-      if (cmd->HasSwitch(extensions::switches::kWebOSAppId)) {
-        std::stringstream result_stream;
-        result_stream << "{\"identifier\":\""
-                      << cmd->GetSwitchValueASCII(
-                             extensions::switches::kWebOSAppId)
-                      << "\",\"devicePixelRatio\":2}";
-        return result_stream.str();
-      }
-    } else if (name == std::string("identifier")) {
-      base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
-      if (cmd->HasSwitch(extensions::switches::kWebOSAppId))
-        return cmd->GetSwitchValueASCII(extensions::switches::kWebOSAppId);
-    } else if (name == std::string("devicePixelRatio")) {
-      return std::string("2");
+    if (name == kInitialize) {
+      return extensions::DictionaryBuilder()
+          .Set(kIdentifier, GetIdentifier())
+          .ToJSON();
+    } else if (name == kIdentifier) {
+      return GetIdentifier();
+    } else if (name == kDevicePixelRatio) {
+      return GetDevicePixelRatio();
     }
     return std::string();
   }
+
+ private:
+  std::string GetIdentifier() {
+    base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
+    return cmd->GetSwitchValueASCII(extensions::switches::kWebOSAppId);
+  }
+
+  std::string GetDevicePixelRatio() {
+    float device_scale_factor = web_view_guest_->web_contents()
+                                    ->GetRenderWidgetHostView()
+                                    ->GetDeviceScaleFactor();
+    double page_zoom_factor = web_view_guest_->GetZoom();
+    return std::to_string(device_scale_factor * page_zoom_factor);
+  }
+
+  extensions::WebViewGuest* web_view_guest_ = nullptr;
 };
 
 }  // namespace
@@ -905,16 +922,16 @@ void WebViewGuest::Resume() {
 #if defined(USE_NEVA_APPRUNTIME) && defined(OS_WEBOS)
 void WebViewGuest::RenderFrameCreated(
     content::RenderFrameHost* render_frame_host) {
-  content::WebContents* web_contents =
+  content::WebContents* contents =
       content::WebContents::FromRenderFrameHost(render_frame_host);
   // Only do this for the initial main frame.
-  if (render_frame_host == web_contents->GetMainFrame()) {
+  if (render_frame_host == contents->GetMainFrame()) {
     webview_controller_impl_ =
         std::make_unique<neva_app_runtime::AppRuntimeWebViewControllerImpl>(
-            web_contents);
+            contents);
 
     webview_controller_delegate_ =
-        std::make_unique<WebViewGuestWebViewControllerDelegate>();
+        std::make_unique<WebViewGuestWebViewControllerDelegate>(this);
     webview_controller_impl_->SetDelegate(webview_controller_delegate_.get());
 
     mojo::AssociatedRemote<neva_app_runtime::mojom::AppRuntimeWebViewClient>
