@@ -18,13 +18,20 @@
 
 namespace ui {
 
-std::unique_ptr<KeyboardEvdevNeva>
-KeyboardEvdevNeva::Create(EventModifiers* modifiers,
-                          KeyboardLayoutEngine* keyboard_layout_engine,
-                          const EventDispatchCallback& callback) {
-
-  return std::make_unique<KeyboardEvdevNeva>(modifiers,
-                                             keyboard_layout_engine,
+KeyboardEvdevNeva::KeyboardEvdevNeva(
+    EventModifiers* modifiers,
+    KeyboardLayoutEngine* keyboard_layout_engine,
+    const EventDispatchCallback& callback)
+    : KeyboardEvdev(modifiers, keyboard_layout_engine, callback) {
+#if defined(OS_WEBOS)
+  SetAutoRepeatEnabled(false);
+#endif
+}
+std::unique_ptr<KeyboardEvdevNeva> KeyboardEvdevNeva::Create(
+    EventModifiers* modifiers,
+    KeyboardLayoutEngine* keyboard_layout_engine,
+    const EventDispatchCallback& callback) {
+  return std::make_unique<KeyboardEvdevNeva>(modifiers, keyboard_layout_engine,
                                              callback);
 }
 

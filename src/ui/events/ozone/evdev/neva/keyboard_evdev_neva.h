@@ -27,12 +27,10 @@ class KeyboardEvdevNeva : public KeyboardEvdev {
  public:
   KeyboardEvdevNeva(EventModifiers* modifiers,
                     KeyboardLayoutEngine* keyboard_layout_engine,
-                    const EventDispatchCallback& callback)
-      : KeyboardEvdev(modifiers, keyboard_layout_engine, callback) {}
+                    const EventDispatchCallback& callback);
   KeyboardEvdevNeva(const KeyboardEvdevNeva&) = delete;
   KeyboardEvdevNeva& operator=(const KeyboardEvdevNeva&) = delete;
   virtual ~KeyboardEvdevNeva() {}
-
   static std::unique_ptr<KeyboardEvdevNeva> Create(
       EventModifiers* modifiers,
       KeyboardLayoutEngine* keyboard_layout_engine,
