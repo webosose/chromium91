@@ -806,19 +806,6 @@ int I010ToAR30(const uint16_t* src_y,
                int width,
                int height);
 
-// Convert I010 to AB30.
-LIBYUV_API
-int I010ToAB30(const uint16_t* src_y,
-               int src_stride_y,
-               const uint16_t* src_u,
-               int src_stride_u,
-               const uint16_t* src_v,
-               int src_stride_v,
-               uint8_t* dst_ab30,
-               int dst_stride_ab30,
-               int width,
-               int height);
-
 // Convert H010 to AR30.
 LIBYUV_API
 int H010ToAR30(const uint16_t* src_y,
@@ -829,6 +816,19 @@ int H010ToAR30(const uint16_t* src_y,
                int src_stride_v,
                uint8_t* dst_ar30,
                int dst_stride_ar30,
+               int width,
+               int height);
+
+// Convert I010 to AB30.
+LIBYUV_API
+int I010ToAB30(const uint16_t* src_y,
+               int src_stride_y,
+               const uint16_t* src_u,
+               int src_stride_u,
+               const uint16_t* src_v,
+               int src_stride_v,
+               uint8_t* dst_ab30,
+               int dst_stride_ab30,
                int width,
                int height);
 
@@ -1064,6 +1064,42 @@ int AR30ToAB30(const uint8_t* src_ar30,
                int dst_stride_ab30,
                int width,
                int height);
+
+// Convert AR64 to ARGB.
+LIBYUV_API
+int AR64ToARGB(const uint16_t* src_ar64,
+               int src_stride_ar64,
+               uint8_t* dst_argb,
+               int dst_stride_argb,
+               int width,
+               int height);
+
+// Convert AB64 to ABGR.
+#define AB64ToABGR AR64ToARGB
+
+// Convert AB64 to ARGB.
+LIBYUV_API
+int AB64ToARGB(const uint16_t* src_ab64,
+               int src_stride_ab64,
+               uint8_t* dst_argb,
+               int dst_stride_argb,
+               int width,
+               int height);
+
+// Convert AR64 to ABGR.
+#define AR64ToABGR AB64ToARGB
+
+// Convert AR64 To AB64.
+LIBYUV_API
+int AR64ToAB64(const uint16_t* src_ar64,
+               int src_stride_ar64,
+               uint16_t* dst_ab64,
+               int dst_stride_ab64,
+               int width,
+               int height);
+
+// Convert AB64 To AR64.
+#define AB64ToAR64 AR64ToAB64
 
 // src_width/height provided by capture
 // dst_width/height for clipping determine final size.
@@ -1377,6 +1413,19 @@ int I420ToAR30(const uint8_t* src_y,
                int width,
                int height);
 
+// Convert I420 to AB30.
+LIBYUV_API
+int I420ToAB30(const uint8_t* src_y,
+               int src_stride_y,
+               const uint8_t* src_u,
+               int src_stride_u,
+               const uint8_t* src_v,
+               int src_stride_v,
+               uint8_t* dst_ab30,
+               int dst_stride_ab30,
+               int width,
+               int height);
+
 // Convert H420 to AR30.
 LIBYUV_API
 int H420ToAR30(const uint8_t* src_y,
@@ -1387,6 +1436,19 @@ int H420ToAR30(const uint8_t* src_y,
                int src_stride_v,
                uint8_t* dst_ar30,
                int dst_stride_ar30,
+               int width,
+               int height);
+
+// Convert H420 to AB30.
+LIBYUV_API
+int H420ToAB30(const uint8_t* src_y,
+               int src_stride_y,
+               const uint8_t* src_u,
+               int src_stride_u,
+               const uint8_t* src_v,
+               int src_stride_v,
+               uint8_t* dst_ab30,
+               int dst_stride_ab30,
                int width,
                int height);
 

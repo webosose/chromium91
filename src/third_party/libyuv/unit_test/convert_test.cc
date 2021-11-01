@@ -62,7 +62,7 @@ namespace libyuv {
                   "DST_SUBSAMP_X unsupported");                               \
     static_assert(DST_SUBSAMP_Y == 1 || DST_SUBSAMP_Y == 2,                   \
                   "DST_SUBSAMP_Y unsupported");                               \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                           \
+    const int kWidth = W1280;                                                 \
     const int kHeight = benchmark_height_;                                    \
     const int kSrcHalfWidth = SUBSAMPLE(kWidth, SRC_SUBSAMP_X);               \
     const int kSrcHalfHeight = SUBSAMPLE(kHeight, SRC_SUBSAMP_Y);             \
@@ -137,7 +137,7 @@ namespace libyuv {
                       DST_SUBSAMP_X, DST_SUBSAMP_Y, SRC_DEPTH)                 \
   TESTPLANARTOPI(SRC_FMT_PLANAR, SRC_T, SRC_BPC, SRC_SUBSAMP_X, SRC_SUBSAMP_Y, \
                  FMT_PLANAR, DST_T, DST_BPC, DST_SUBSAMP_X, DST_SUBSAMP_Y,     \
-                 benchmark_width_ - 4, _Any, +, 0, SRC_DEPTH)                  \
+                 benchmark_width_ + 1, _Any, +, 0, SRC_DEPTH)                  \
   TESTPLANARTOPI(SRC_FMT_PLANAR, SRC_T, SRC_BPC, SRC_SUBSAMP_X, SRC_SUBSAMP_Y, \
                  FMT_PLANAR, DST_T, DST_BPC, DST_SUBSAMP_X, DST_SUBSAMP_Y,     \
                  benchmark_width_, _Unaligned, +, 1, SRC_DEPTH)                \
@@ -184,7 +184,7 @@ TESTPLANARTOP(I412, uint16_t, 2, 1, 1, I444, uint8_t, 1, 1, 1, 12)
                         SRC_SUBSAMP_Y, FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y,      \
                         W1280, N, NEG, OFF, PN, OFF_U, OFF_V)                 \
   TEST_F(LibYUVConvertTest, SRC_FMT_PLANAR##To##FMT_PLANAR##_##PN##N) {       \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                           \
+    const int kWidth = W1280;                                                 \
     const int kHeight = benchmark_height_;                                    \
     const int kSizeUV =                                                       \
         SUBSAMPLE(kWidth, SRC_SUBSAMP_X) * SUBSAMPLE(kHeight, SRC_SUBSAMP_Y); \
@@ -270,7 +270,7 @@ TESTPLANARTOP(I412, uint16_t, 2, 1, 1, I444, uint8_t, 1, 1, 1, 12)
                        SRC_SUBSAMP_X, SRC_SUBSAMP_Y, FMT_PLANAR, SUBSAMP_X,    \
                        SUBSAMP_Y)                                              \
   TESTAPLANARTOPI(SRC_FMT_PLANAR, PIXEL_STRIDE, SRC_SUBSAMP_X, SRC_SUBSAMP_Y,  \
-                  FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, benchmark_width_ - 4,      \
+                  FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, benchmark_width_ + 1,      \
                   _Any, +, 0, PN, OFF_U, OFF_V)                                \
   TESTAPLANARTOPI(SRC_FMT_PLANAR, PIXEL_STRIDE, SRC_SUBSAMP_X, SRC_SUBSAMP_Y,  \
                   FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, benchmark_width_,          \
@@ -318,7 +318,7 @@ int I400ToNV21(const uint8_t* src_y,
                   "DST_SUBSAMP_X unsupported");                               \
     static_assert(DST_SUBSAMP_Y == 1 || DST_SUBSAMP_Y == 2,                   \
                   "DST_SUBSAMP_Y unsupported");                               \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                           \
+    const int kWidth = W1280;                                                 \
     const int kHeight = benchmark_height_;                                    \
     const int kSrcHalfWidth = SUBSAMPLE(kWidth, SRC_SUBSAMP_X);               \
     const int kSrcHalfHeight = SUBSAMPLE(kHeight, SRC_SUBSAMP_Y);             \
@@ -386,7 +386,7 @@ int I400ToNV21(const uint8_t* src_y,
                        DST_SUBSAMP_X, DST_SUBSAMP_Y, SRC_DEPTH)               \
   TESTPLANARTOBPI(SRC_FMT_PLANAR, SRC_T, SRC_BPC, SRC_SUBSAMP_X,              \
                   SRC_SUBSAMP_Y, FMT_PLANAR, DST_T, DST_BPC, DST_SUBSAMP_X,   \
-                  DST_SUBSAMP_Y, benchmark_width_ - 4, _Any, +, 0, SRC_DEPTH) \
+                  DST_SUBSAMP_Y, benchmark_width_ + 1, _Any, +, 0, SRC_DEPTH) \
   TESTPLANARTOBPI(SRC_FMT_PLANAR, SRC_T, SRC_BPC, SRC_SUBSAMP_X,              \
                   SRC_SUBSAMP_Y, FMT_PLANAR, DST_T, DST_BPC, DST_SUBSAMP_X,   \
                   DST_SUBSAMP_Y, benchmark_width_, _Unaligned, +, 1,          \
@@ -424,7 +424,7 @@ TESTPLANARTOBP(I212, uint16_t, 2, 2, 1, P212, uint16_t, 2, 2, 1, 12)
                   "DST_SUBSAMP_X unsupported");                                \
     static_assert(DST_SUBSAMP_Y == 1 || DST_SUBSAMP_Y == 2,                    \
                   "DST_SUBSAMP_Y unsupported");                                \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                            \
+    const int kWidth = W1280;                                                  \
     const int kHeight = benchmark_height_;                                     \
     const int kSrcHalfWidth = SUBSAMPLE(kWidth, SRC_SUBSAMP_X);                \
     const int kSrcHalfHeight = SUBSAMPLE(kHeight, SRC_SUBSAMP_Y);              \
@@ -493,7 +493,7 @@ TESTPLANARTOBP(I212, uint16_t, 2, 2, 1, P212, uint16_t, 2, 2, 1, 12)
                          DST_SUBSAMP_X, DST_SUBSAMP_Y, SRC_DEPTH)              \
   TESTBIPLANARTOBPI(SRC_FMT_PLANAR, SRC_T, SRC_BPC, SRC_SUBSAMP_X,             \
                     SRC_SUBSAMP_Y, FMT_PLANAR, DST_T, DST_BPC, DST_SUBSAMP_X,  \
-                    DST_SUBSAMP_Y, benchmark_width_ - 4, _Any, +, 0, 1,        \
+                    DST_SUBSAMP_Y, benchmark_width_ + 1, _Any, +, 0, 1,        \
                     SRC_DEPTH)                                                 \
   TESTBIPLANARTOBPI(SRC_FMT_PLANAR, SRC_T, SRC_BPC, SRC_SUBSAMP_X,             \
                     SRC_SUBSAMP_Y, FMT_PLANAR, DST_T, DST_BPC, DST_SUBSAMP_X,  \
@@ -537,7 +537,7 @@ TESTBIPLANARTOBP(P216, uint16_t, 2, 2, 1, P416, uint16_t, 2, 1, 1, 12)
                   "DST_SUBSAMP_X unsupported");                               \
     static_assert(DST_SUBSAMP_Y == 1 || DST_SUBSAMP_Y == 2,                   \
                   "DST_SUBSAMP_Y unsupported");                               \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                           \
+    const int kWidth = W1280;                                                 \
     const int kHeight = benchmark_height_;                                    \
     const int kSrcHalfWidth = SUBSAMPLE(kWidth, SRC_SUBSAMP_X);               \
     const int kSrcHalfHeight = SUBSAMPLE(kHeight, SRC_SUBSAMP_Y);             \
@@ -606,7 +606,7 @@ TESTBIPLANARTOBP(P216, uint16_t, 2, 2, 1, P416, uint16_t, 2, 1, 1, 12)
                         DST_SUBSAMP_X, DST_SUBSAMP_Y, SRC_DEPTH)               \
   TESTBIPLANARTOPI(SRC_FMT_PLANAR, SRC_T, SRC_BPC, SRC_SUBSAMP_X,              \
                    SRC_SUBSAMP_Y, FMT_PLANAR, DST_T, DST_BPC, DST_SUBSAMP_X,   \
-                   DST_SUBSAMP_Y, benchmark_width_ - 4, _Any, +, 0, SRC_DEPTH) \
+                   DST_SUBSAMP_Y, benchmark_width_ + 1, _Any, +, 0, SRC_DEPTH) \
   TESTBIPLANARTOPI(SRC_FMT_PLANAR, SRC_T, SRC_BPC, SRC_SUBSAMP_X,              \
                    SRC_SUBSAMP_Y, FMT_PLANAR, DST_T, DST_BPC, DST_SUBSAMP_X,   \
                    DST_SUBSAMP_Y, benchmark_width_, _Unaligned, +, 1,          \
@@ -654,7 +654,7 @@ TESTBIPLANARTOP(NV21, uint8_t, 1, 2, 2, I420, uint8_t, 1, 2, 2, 8)
 #define TESTPLANARTOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN, \
                        YALIGN, W1280, N, NEG, OFF)                            \
   TEST_F(LibYUVConvertTest, FMT_PLANAR##To##FMT_B##N) {                       \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                           \
+    const int kWidth = W1280;                                                 \
     const int kHeight = ALIGNINT(benchmark_height_, YALIGN);                  \
     const int kStrideB = ALIGNINT(kWidth * BPP_B, ALIGN);                     \
     const int kStrideUV = SUBSAMPLE(kWidth, SUBSAMP_X);                       \
@@ -702,7 +702,7 @@ TESTBIPLANARTOP(NV21, uint8_t, 1, 2, 2, I420, uint8_t, 1, 2, 2, 8)
 #define TESTPLANARTOB(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN, \
                       YALIGN)                                                \
   TESTPLANARTOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,      \
-                 YALIGN, benchmark_width_ - 4, _Any, +, 0)                   \
+                 YALIGN, benchmark_width_ + 1, _Any, +, 0)                   \
   TESTPLANARTOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,      \
                  YALIGN, benchmark_width_, _Unaligned, +, 1)                 \
   TESTPLANARTOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,      \
@@ -769,12 +769,14 @@ TESTPLANARTOB(J420, 2, 2, J400, 1, 1, 1)
 #ifdef LITTLE_ENDIAN_ONLY_TEST
 TESTPLANARTOB(I420, 2, 2, AR30, 4, 4, 1)
 TESTPLANARTOB(H420, 2, 2, AR30, 4, 4, 1)
+TESTPLANARTOB(I420, 2, 2, AB30, 4, 4, 1)
+TESTPLANARTOB(H420, 2, 2, AB30, 4, 4, 1)
 #endif
 
 #define TESTQPLANARTOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN, \
                         YALIGN, W1280, N, NEG, OFF, ATTEN)                     \
   TEST_F(LibYUVConvertTest, FMT_PLANAR##To##FMT_B##N) {                        \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                            \
+    const int kWidth = W1280;                                                  \
     const int kHeight = ALIGNINT(benchmark_height_, YALIGN);                   \
     const int kStrideB = ALIGNINT(kWidth * BPP_B, ALIGN);                      \
     const int kStrideUV = SUBSAMPLE(kWidth, SUBSAMP_X);                        \
@@ -821,7 +823,7 @@ TESTPLANARTOB(H420, 2, 2, AR30, 4, 4, 1)
 #define TESTQPLANARTOB(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN, \
                        YALIGN)                                                \
   TESTQPLANARTOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,      \
-                  YALIGN, benchmark_width_ - 4, _Any, +, 0, 0)                \
+                  YALIGN, benchmark_width_ + 1, _Any, +, 0, 0)                \
   TESTQPLANARTOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,      \
                   YALIGN, benchmark_width_, _Unaligned, +, 1, 0)              \
   TESTQPLANARTOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,      \
@@ -962,7 +964,7 @@ TESTQPLANARTOB(V444Alpha, 1, 1, ABGR, 4, 4, 1)
 #define TESTBIPLANARTOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, FMT_C,       \
                          BPP_B, W1280, N, NEG, OFF)                            \
   TEST_F(LibYUVConvertTest, FMT_PLANAR##To##FMT_B##N) {                        \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                            \
+    const int kWidth = W1280;                                                  \
     const int kHeight = benchmark_height_;                                     \
     const int kStrideB = kWidth * BPP_B;                                       \
     const int kStrideUV = SUBSAMPLE(kWidth, SUBSAMP_X);                        \
@@ -1015,7 +1017,7 @@ TESTQPLANARTOB(V444Alpha, 1, 1, ABGR, 4, 4, 1)
 
 #define TESTBIPLANARTOB(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, FMT_C, BPP_B) \
   TESTBIPLANARTOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, FMT_C, BPP_B,      \
-                   benchmark_width_ - 4, _Any, +, 0)                           \
+                   benchmark_width_ + 1, _Any, +, 0)                           \
   TESTBIPLANARTOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, FMT_C, BPP_B,      \
                    benchmark_width_, _Unaligned, +, 1)                         \
   TESTBIPLANARTOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, FMT_C, BPP_B,      \
@@ -1070,7 +1072,7 @@ TESTBIPLANARTOB(NV12, 2, 2, RGB565, RGB565, 2)
 #define TESTATOPLANARI(FMT_A, BPP_A, YALIGN, FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, \
                        W1280, N, NEG, OFF)                                     \
   TEST_F(LibYUVConvertTest, FMT_A##To##FMT_PLANAR##N) {                        \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                            \
+    const int kWidth = W1280;                                                  \
     const int kHeight = ALIGNINT(benchmark_height_, YALIGN);                   \
     const int kStrideUV = SUBSAMPLE(kWidth, SUBSAMP_X);                        \
     const int kStride = (kStrideUV * SUBSAMP_X * 8 * BPP_A + 7) / 8;           \
@@ -1117,7 +1119,7 @@ TESTBIPLANARTOB(NV12, 2, 2, RGB565, RGB565, 2)
 
 #define TESTATOPLANAR(FMT_A, BPP_A, YALIGN, FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y) \
   TESTATOPLANARI(FMT_A, BPP_A, YALIGN, FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y,      \
-                 benchmark_width_ - 4, _Any, +, 0)                            \
+                 benchmark_width_ + 1, _Any, +, 0)                            \
   TESTATOPLANARI(FMT_A, BPP_A, YALIGN, FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y,      \
                  benchmark_width_, _Unaligned, +, 1)                          \
   TESTATOPLANARI(FMT_A, BPP_A, YALIGN, FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y,      \
@@ -1140,6 +1142,7 @@ TESTATOPLANAR(BGRA, 4, 1, I420, 2, 2)
 TESTATOPLANAR(I400, 1, 1, I420, 2, 2)
 TESTATOPLANAR(J400, 1, 1, J420, 2, 2)
 TESTATOPLANAR(RAW, 3, 1, I420, 2, 2)
+TESTATOPLANAR(RAW, 3, 1, J420, 2, 2)
 TESTATOPLANAR(RGB24, 3, 1, I420, 2, 2)
 TESTATOPLANAR(RGB24, 3, 1, J420, 2, 2)
 TESTATOPLANAR(RGBA, 4, 1, I420, 2, 2)
@@ -1151,7 +1154,7 @@ TESTATOPLANAR(YUY2, 2, 1, I422, 2, 1)
 #define TESTATOBIPLANARI(FMT_A, SUB_A, BPP_A, FMT_PLANAR, SUBSAMP_X,          \
                          SUBSAMP_Y, W1280, N, NEG, OFF)                       \
   TEST_F(LibYUVConvertTest, FMT_A##To##FMT_PLANAR##N) {                       \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                           \
+    const int kWidth = W1280;                                                 \
     const int kHeight = benchmark_height_;                                    \
     const int kStride = SUBSAMPLE(kWidth, SUB_A) * BPP_A;                     \
     const int kStrideUV = SUBSAMPLE(kWidth, SUBSAMP_X);                       \
@@ -1197,7 +1200,7 @@ TESTATOPLANAR(YUY2, 2, 1, I422, 2, 1)
 
 #define TESTATOBIPLANAR(FMT_A, SUB_A, BPP_A, FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y) \
   TESTATOBIPLANARI(FMT_A, SUB_A, BPP_A, FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y,      \
-                   benchmark_width_ - 4, _Any, +, 0)                           \
+                   benchmark_width_ + 1, _Any, +, 0)                           \
   TESTATOBIPLANARI(FMT_A, SUB_A, BPP_A, FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y,      \
                    benchmark_width_, _Unaligned, +, 1)                         \
   TESTATOBIPLANARI(FMT_A, SUB_A, BPP_A, FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y,      \
@@ -1214,152 +1217,166 @@ TESTATOBIPLANAR(UYVY, 2, 4, NV12, 2, 2)
 TESTATOBIPLANAR(AYUV, 1, 4, NV12, 2, 2)
 TESTATOBIPLANAR(AYUV, 1, 4, NV21, 2, 2)
 
-#define TESTATOBI(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B, STRIDE_B,  \
-                  HEIGHT_B, W1280, N, NEG, OFF)                              \
-  TEST_F(LibYUVConvertTest, FMT_A##To##FMT_B##N) {                           \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                          \
-    const int kHeight = benchmark_height_;                                   \
-    const int kHeightA = (kHeight + HEIGHT_A - 1) / HEIGHT_A * HEIGHT_A;     \
-    const int kHeightB = (kHeight + HEIGHT_B - 1) / HEIGHT_B * HEIGHT_B;     \
-    const int kStrideA =                                                     \
-        (kWidth * BPP_A + STRIDE_A - 1) / STRIDE_A * STRIDE_A;               \
-    const int kStrideB =                                                     \
-        (kWidth * BPP_B + STRIDE_B - 1) / STRIDE_B * STRIDE_B;               \
-    align_buffer_page_end(src_argb, kStrideA* kHeightA + OFF);               \
-    align_buffer_page_end(dst_argb_c, kStrideB* kHeightB);                   \
-    align_buffer_page_end(dst_argb_opt, kStrideB* kHeightB);                 \
-    for (int i = 0; i < kStrideA * kHeightA; ++i) {                          \
-      src_argb[i + OFF] = (fastrand() & 0xff);                               \
-    }                                                                        \
-    memset(dst_argb_c, 1, kStrideB* kHeightB);                               \
-    memset(dst_argb_opt, 101, kStrideB* kHeightB);                           \
-    MaskCpuFlags(disable_cpu_flags_);                                        \
-    FMT_A##To##FMT_B(src_argb + OFF, kStrideA, dst_argb_c, kStrideB, kWidth, \
-                     NEG kHeight);                                           \
-    MaskCpuFlags(benchmark_cpu_info_);                                       \
-    for (int i = 0; i < benchmark_iterations_; ++i) {                        \
-      FMT_A##To##FMT_B(src_argb + OFF, kStrideA, dst_argb_opt, kStrideB,     \
-                       kWidth, NEG kHeight);                                 \
-    }                                                                        \
-    for (int i = 0; i < kStrideB * kHeightB; ++i) {                          \
-      EXPECT_EQ(dst_argb_c[i], dst_argb_opt[i]);                             \
-    }                                                                        \
-    free_aligned_buffer_page_end(src_argb);                                  \
-    free_aligned_buffer_page_end(dst_argb_c);                                \
-    free_aligned_buffer_page_end(dst_argb_opt);                              \
+#define TESTATOBI(FMT_A, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A, FMT_B, TYPE_B,     \
+                  EPP_B, STRIDE_B, HEIGHT_B, W1280, N, NEG, OFF)               \
+  TEST_F(LibYUVConvertTest, FMT_A##To##FMT_B##N) {                             \
+    const int kWidth = W1280;                                                  \
+    const int kHeight = benchmark_height_;                                     \
+    const int kHeightA = (kHeight + HEIGHT_A - 1) / HEIGHT_A * HEIGHT_A;       \
+    const int kHeightB = (kHeight + HEIGHT_B - 1) / HEIGHT_B * HEIGHT_B;       \
+    const int kStrideA =                                                       \
+        (kWidth * EPP_A + STRIDE_A - 1) / STRIDE_A * STRIDE_A;                 \
+    const int kStrideB =                                                       \
+        (kWidth * EPP_B + STRIDE_B - 1) / STRIDE_B * STRIDE_B;                 \
+    align_buffer_page_end(src_argb,                                            \
+                          kStrideA* kHeightA*(int)sizeof(TYPE_A) + OFF);       \
+    align_buffer_page_end(dst_argb_c, kStrideB* kHeightB*(int)sizeof(TYPE_B)); \
+    align_buffer_page_end(dst_argb_opt,                                        \
+                          kStrideB* kHeightB*(int)sizeof(TYPE_B));             \
+    for (int i = 0; i < kStrideA * kHeightA * (int)sizeof(TYPE_A); ++i) {      \
+      src_argb[i + OFF] = (fastrand() & 0xff);                                 \
+    }                                                                          \
+    memset(dst_argb_c, 1, kStrideB* kHeightB);                                 \
+    memset(dst_argb_opt, 101, kStrideB* kHeightB);                             \
+    MaskCpuFlags(disable_cpu_flags_);                                          \
+    FMT_A##To##FMT_B((TYPE_A*)(src_argb + OFF), kStrideA, (TYPE_B*)dst_argb_c, \
+                     kStrideB, kWidth, NEG kHeight);                           \
+    MaskCpuFlags(benchmark_cpu_info_);                                         \
+    for (int i = 0; i < benchmark_iterations_; ++i) {                          \
+      FMT_A##To##FMT_B((TYPE_A*)(src_argb + OFF), kStrideA,                    \
+                       (TYPE_B*)dst_argb_opt, kStrideB, kWidth, NEG kHeight);  \
+    }                                                                          \
+    for (int i = 0; i < kStrideB * kHeightB * (int)sizeof(TYPE_B); ++i) {      \
+      EXPECT_EQ(dst_argb_c[i], dst_argb_opt[i]);                               \
+    }                                                                          \
+    free_aligned_buffer_page_end(src_argb);                                    \
+    free_aligned_buffer_page_end(dst_argb_c);                                  \
+    free_aligned_buffer_page_end(dst_argb_opt);                                \
   }
 
-#define TESTATOBRANDOM(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B,     \
-                       STRIDE_B, HEIGHT_B)                                 \
-  TEST_F(LibYUVConvertTest, FMT_A##To##FMT_B##_Random) {                   \
-    for (int times = 0; times < benchmark_iterations_; ++times) {          \
-      const int kWidth = (fastrand() & 63) + 1;                            \
-      const int kHeight = (fastrand() & 31) + 1;                           \
-      const int kHeightA = (kHeight + HEIGHT_A - 1) / HEIGHT_A * HEIGHT_A; \
-      const int kHeightB = (kHeight + HEIGHT_B - 1) / HEIGHT_B * HEIGHT_B; \
-      const int kStrideA =                                                 \
-          (kWidth * BPP_A + STRIDE_A - 1) / STRIDE_A * STRIDE_A;           \
-      const int kStrideB =                                                 \
-          (kWidth * BPP_B + STRIDE_B - 1) / STRIDE_B * STRIDE_B;           \
-      align_buffer_page_end(src_argb, kStrideA* kHeightA);                 \
-      align_buffer_page_end(dst_argb_c, kStrideB* kHeightB);               \
-      align_buffer_page_end(dst_argb_opt, kStrideB* kHeightB);             \
-      for (int i = 0; i < kStrideA * kHeightA; ++i) {                      \
-        src_argb[i] = (fastrand() & 0xff);                                 \
-      }                                                                    \
-      memset(dst_argb_c, 123, kStrideB* kHeightB);                         \
-      memset(dst_argb_opt, 123, kStrideB* kHeightB);                       \
-      MaskCpuFlags(disable_cpu_flags_);                                    \
-      FMT_A##To##FMT_B(src_argb, kStrideA, dst_argb_c, kStrideB, kWidth,   \
-                       kHeight);                                           \
-      MaskCpuFlags(benchmark_cpu_info_);                                   \
-      FMT_A##To##FMT_B(src_argb, kStrideA, dst_argb_opt, kStrideB, kWidth, \
-                       kHeight);                                           \
-      for (int i = 0; i < kStrideB * kHeightB; ++i) {                      \
-        EXPECT_EQ(dst_argb_c[i], dst_argb_opt[i]);                         \
-      }                                                                    \
-      free_aligned_buffer_page_end(src_argb);                              \
-      free_aligned_buffer_page_end(dst_argb_c);                            \
-      free_aligned_buffer_page_end(dst_argb_opt);                          \
-    }                                                                      \
+#define TESTATOBRANDOM(FMT_A, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A, FMT_B,        \
+                       TYPE_B, EPP_B, STRIDE_B, HEIGHT_B)                      \
+  TEST_F(LibYUVConvertTest, FMT_A##To##FMT_B##_Random) {                       \
+    for (int times = 0; times < benchmark_iterations_; ++times) {              \
+      const int kWidth = (fastrand() & 63) + 1;                                \
+      const int kHeight = (fastrand() & 31) + 1;                               \
+      const int kHeightA = (kHeight + HEIGHT_A - 1) / HEIGHT_A * HEIGHT_A;     \
+      const int kHeightB = (kHeight + HEIGHT_B - 1) / HEIGHT_B * HEIGHT_B;     \
+      const int kStrideA =                                                     \
+          (kWidth * EPP_A + STRIDE_A - 1) / STRIDE_A * STRIDE_A;               \
+      const int kStrideB =                                                     \
+          (kWidth * EPP_B + STRIDE_B - 1) / STRIDE_B * STRIDE_B;               \
+      align_buffer_page_end(src_argb, kStrideA* kHeightA*(int)sizeof(TYPE_A)); \
+      align_buffer_page_end(dst_argb_c,                                        \
+                            kStrideB* kHeightB*(int)sizeof(TYPE_B));           \
+      align_buffer_page_end(dst_argb_opt,                                      \
+                            kStrideB* kHeightB*(int)sizeof(TYPE_B));           \
+      for (int i = 0; i < kStrideA * kHeightA * (int)sizeof(TYPE_A); ++i) {    \
+        src_argb[i] = 0xfe;                                                    \
+      }                                                                        \
+      memset(dst_argb_c, 123, kStrideB* kHeightB);                             \
+      memset(dst_argb_opt, 123, kStrideB* kHeightB);                           \
+      MaskCpuFlags(disable_cpu_flags_);                                        \
+      FMT_A##To##FMT_B((TYPE_A*)src_argb, kStrideA, (TYPE_B*)dst_argb_c,       \
+                       kStrideB, kWidth, kHeight);                             \
+      MaskCpuFlags(benchmark_cpu_info_);                                       \
+      FMT_A##To##FMT_B((TYPE_A*)src_argb, kStrideA, (TYPE_B*)dst_argb_opt,     \
+                       kStrideB, kWidth, kHeight);                             \
+      for (int i = 0; i < kStrideB * kHeightB * (int)sizeof(TYPE_B); ++i) {    \
+        EXPECT_EQ(dst_argb_c[i], dst_argb_opt[i]);                             \
+      }                                                                        \
+      free_aligned_buffer_page_end(src_argb);                                  \
+      free_aligned_buffer_page_end(dst_argb_c);                                \
+      free_aligned_buffer_page_end(dst_argb_opt);                              \
+    }                                                                          \
   }
 
-#define TESTATOB(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B, STRIDE_B, \
-                 HEIGHT_B)                                                 \
-  TESTATOBI(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B, STRIDE_B,      \
-            HEIGHT_B, benchmark_width_ - 4, _Any, +, 0)                    \
-  TESTATOBI(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B, STRIDE_B,      \
-            HEIGHT_B, benchmark_width_, _Unaligned, +, 1)                  \
-  TESTATOBI(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B, STRIDE_B,      \
-            HEIGHT_B, benchmark_width_, _Invert, -, 0)                     \
-  TESTATOBI(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B, STRIDE_B,      \
-            HEIGHT_B, benchmark_width_, _Opt, +, 0)                        \
-  TESTATOBRANDOM(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B, STRIDE_B, \
-                 HEIGHT_B)
+#define TESTATOB(FMT_A, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A, FMT_B, TYPE_B,   \
+                 EPP_B, STRIDE_B, HEIGHT_B)                                 \
+  TESTATOBI(FMT_A, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A, FMT_B, TYPE_B, EPP_B, \
+            STRIDE_B, HEIGHT_B, benchmark_width_ + 1, _Any, +, 0)           \
+  TESTATOBI(FMT_A, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A, FMT_B, TYPE_B, EPP_B, \
+            STRIDE_B, HEIGHT_B, benchmark_width_, _Unaligned, +, 1)         \
+  TESTATOBI(FMT_A, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A, FMT_B, TYPE_B, EPP_B, \
+            STRIDE_B, HEIGHT_B, benchmark_width_, _Invert, -, 0)            \
+  TESTATOBI(FMT_A, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A, FMT_B, TYPE_B, EPP_B, \
+            STRIDE_B, HEIGHT_B, benchmark_width_, _Opt, +, 0)               \
+  TESTATOBRANDOM(FMT_A, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A, FMT_B, TYPE_B,   \
+                 EPP_B, STRIDE_B, HEIGHT_B)
 
-TESTATOB(AB30, 4, 4, 1, ABGR, 4, 4, 1)
-TESTATOB(AB30, 4, 4, 1, ARGB, 4, 4, 1)
+TESTATOB(AB30, uint8_t, 4, 4, 1, ABGR, uint8_t, 4, 4, 1)
+TESTATOB(AB30, uint8_t, 4, 4, 1, ARGB, uint8_t, 4, 4, 1)
 #ifdef LITTLE_ENDIAN_ONLY_TEST
-TESTATOB(ABGR, 4, 4, 1, AR30, 4, 4, 1)
+TESTATOB(ABGR, uint8_t, 4, 4, 1, AR30, uint8_t, 4, 4, 1)
 #endif
-TESTATOB(ABGR, 4, 4, 1, ARGB, 4, 4, 1)
+TESTATOB(ABGR, uint8_t, 4, 4, 1, ARGB, uint8_t, 4, 4, 1)
 #ifdef LITTLE_ENDIAN_ONLY_TEST
-TESTATOB(AR30, 4, 4, 1, AB30, 4, 4, 1)
+TESTATOB(AR30, uint8_t, 4, 4, 1, AB30, uint8_t, 4, 4, 1)
 #endif
-TESTATOB(AR30, 4, 4, 1, ABGR, 4, 4, 1)
+TESTATOB(AR30, uint8_t, 4, 4, 1, ABGR, uint8_t, 4, 4, 1)
 #ifdef LITTLE_ENDIAN_ONLY_TEST
-TESTATOB(AR30, 4, 4, 1, AR30, 4, 4, 1)
-TESTATOB(AR30, 4, 4, 1, ARGB, 4, 4, 1)
+TESTATOB(AR30, uint8_t, 4, 4, 1, AR30, uint8_t, 4, 4, 1)
+TESTATOB(AR30, uint8_t, 4, 4, 1, ARGB, uint8_t, 4, 4, 1)
 #endif
-TESTATOB(ARGB, 4, 4, 1, ABGR, 4, 4, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, ABGR, uint8_t, 4, 4, 1)
 #ifdef LITTLE_ENDIAN_ONLY_TEST
-TESTATOB(ARGB, 4, 4, 1, AR30, 4, 4, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, AR30, uint8_t, 4, 4, 1)
 #endif
-TESTATOB(ARGB, 4, 4, 1, ARGB, 4, 4, 1)
-TESTATOB(ARGB, 4, 4, 1, ARGB1555, 2, 2, 1)
-TESTATOB(ARGB, 4, 4, 1, ARGB4444, 2, 2, 1)
-TESTATOB(ARGB, 4, 4, 1, ARGBMirror, 4, 4, 1)
-TESTATOB(ARGB, 4, 4, 1, BGRA, 4, 4, 1)
-TESTATOB(ARGB, 4, 4, 1, I400, 1, 1, 1)
-TESTATOB(ARGB, 4, 4, 1, J400, 1, 1, 1)
-TESTATOB(RGBA, 4, 4, 1, J400, 1, 1, 1)
-TESTATOB(ARGB, 4, 4, 1, RAW, 3, 3, 1)
-TESTATOB(ARGB, 4, 4, 1, RGB24, 3, 3, 1)
-TESTATOB(ABGR, 4, 4, 1, RAW, 3, 3, 1)
-TESTATOB(ABGR, 4, 4, 1, RGB24, 3, 3, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, ARGB1555, uint8_t, 2, 2, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, ARGB4444, uint8_t, 2, 2, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, ARGBMirror, uint8_t, 4, 4, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, BGRA, uint8_t, 4, 4, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, I400, uint8_t, 1, 1, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, J400, uint8_t, 1, 1, 1)
+TESTATOB(RGBA, uint8_t, 4, 4, 1, J400, uint8_t, 1, 1, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, RAW, uint8_t, 3, 3, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, RGB24, uint8_t, 3, 3, 1)
+TESTATOB(ABGR, uint8_t, 4, 4, 1, RAW, uint8_t, 3, 3, 1)
+TESTATOB(ABGR, uint8_t, 4, 4, 1, RGB24, uint8_t, 3, 3, 1)
 #ifdef LITTLE_ENDIAN_ONLY_TEST
-TESTATOB(ARGB, 4, 4, 1, RGB565, 2, 2, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, RGB565, uint8_t, 2, 2, 1)
 #endif
-TESTATOB(ARGB, 4, 4, 1, RGBA, 4, 4, 1)
-TESTATOB(ARGB, 4, 4, 1, UYVY, 2, 4, 1)
-TESTATOB(ARGB, 4, 4, 1, YUY2, 2, 4, 1)  // 4
-TESTATOB(ARGB1555, 2, 2, 1, ARGB, 4, 4, 1)
-TESTATOB(ARGB4444, 2, 2, 1, ARGB, 4, 4, 1)
-TESTATOB(BGRA, 4, 4, 1, ARGB, 4, 4, 1)
-TESTATOB(I400, 1, 1, 1, ARGB, 4, 4, 1)
-TESTATOB(I400, 1, 1, 1, I400, 1, 1, 1)
-TESTATOB(I400, 1, 1, 1, I400Mirror, 1, 1, 1)
-TESTATOB(J400, 1, 1, 1, ARGB, 4, 4, 1)
-TESTATOB(J400, 1, 1, 1, J400, 1, 1, 1)
-TESTATOB(RAW, 3, 3, 1, ARGB, 4, 4, 1)
-TESTATOB(RAW, 3, 3, 1, RGBA, 4, 4, 1)
-TESTATOB(RAW, 3, 3, 1, RGB24, 3, 3, 1)
-TESTATOB(RGB24, 3, 3, 1, ARGB, 4, 4, 1)
-TESTATOB(RGB24, 3, 3, 1, J400, 1, 1, 1)
-TESTATOB(RGB24, 3, 3, 1, RGB24Mirror, 3, 3, 1)
-TESTATOB(RAW, 3, 3, 1, J400, 1, 1, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, RGBA, uint8_t, 4, 4, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, UYVY, uint8_t, 2, 4, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, YUY2, uint8_t, 2, 4, 1)  // 4
+TESTATOB(ARGB1555, uint8_t, 2, 2, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(ARGB4444, uint8_t, 2, 2, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(BGRA, uint8_t, 4, 4, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(I400, uint8_t, 1, 1, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(I400, uint8_t, 1, 1, 1, I400, uint8_t, 1, 1, 1)
+TESTATOB(I400, uint8_t, 1, 1, 1, I400Mirror, uint8_t, 1, 1, 1)
+TESTATOB(J400, uint8_t, 1, 1, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(J400, uint8_t, 1, 1, 1, J400, uint8_t, 1, 1, 1)
+TESTATOB(RAW, uint8_t, 3, 3, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(RAW, uint8_t, 3, 3, 1, RGBA, uint8_t, 4, 4, 1)
+TESTATOB(RAW, uint8_t, 3, 3, 1, RGB24, uint8_t, 3, 3, 1)
+TESTATOB(RGB24, uint8_t, 3, 3, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(RGB24, uint8_t, 3, 3, 1, J400, uint8_t, 1, 1, 1)
+TESTATOB(RGB24, uint8_t, 3, 3, 1, RGB24Mirror, uint8_t, 3, 3, 1)
+TESTATOB(RAW, uint8_t, 3, 3, 1, J400, uint8_t, 1, 1, 1)
 #ifdef LITTLE_ENDIAN_ONLY_TEST
-TESTATOB(RGB565, 2, 2, 1, ARGB, 4, 4, 1)
+TESTATOB(RGB565, uint8_t, 2, 2, 1, ARGB, uint8_t, 4, 4, 1)
 #endif
-TESTATOB(RGBA, 4, 4, 1, ARGB, 4, 4, 1)
-TESTATOB(UYVY, 2, 4, 1, ARGB, 4, 4, 1)
-TESTATOB(YUY2, 2, 4, 1, ARGB, 4, 4, 1)
-TESTATOB(YUY2, 2, 4, 1, Y, 1, 1, 1)
+TESTATOB(RGBA, uint8_t, 4, 4, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(UYVY, uint8_t, 2, 4, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(YUY2, uint8_t, 2, 4, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(YUY2, uint8_t, 2, 4, 1, Y, uint8_t, 1, 1, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, AR64, uint16_t, 4, 4, 1)
+TESTATOB(ARGB, uint8_t, 4, 4, 1, AB64, uint16_t, 4, 4, 1)
+TESTATOB(ABGR, uint8_t, 4, 4, 1, AR64, uint16_t, 4, 4, 1)
+TESTATOB(ABGR, uint8_t, 4, 4, 1, AB64, uint16_t, 4, 4, 1)
+TESTATOB(AR64, uint16_t, 4, 4, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(AB64, uint16_t, 4, 4, 1, ARGB, uint8_t, 4, 4, 1)
+TESTATOB(AR64, uint16_t, 4, 4, 1, ABGR, uint8_t, 4, 4, 1)
+TESTATOB(AB64, uint16_t, 4, 4, 1, ABGR, uint8_t, 4, 4, 1)
+TESTATOB(AR64, uint16_t, 4, 4, 1, AB64, uint16_t, 4, 4, 1)
+TESTATOB(AB64, uint16_t, 4, 4, 1, AR64, uint16_t, 4, 4, 1)
 
 #define TESTATOBDI(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B, STRIDE_B, \
                    HEIGHT_B, W1280, N, NEG, OFF)                             \
   TEST_F(LibYUVConvertTest, FMT_A##To##FMT_B##Dither##N) {                   \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                          \
+    const int kWidth = W1280;                                                \
     const int kHeight = benchmark_height_;                                   \
     const int kHeightA = (kHeight + HEIGHT_A - 1) / HEIGHT_A * HEIGHT_A;     \
     const int kHeightB = (kHeight + HEIGHT_B - 1) / HEIGHT_B * HEIGHT_B;     \
@@ -1429,7 +1446,7 @@ TESTATOB(YUY2, 2, 4, 1, Y, 1, 1, 1)
 #define TESTATOBD(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B, STRIDE_B, \
                   HEIGHT_B)                                                 \
   TESTATOBDI(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B, STRIDE_B,      \
-             HEIGHT_B, benchmark_width_ - 4, _Any, +, 0)                    \
+             HEIGHT_B, benchmark_width_ + 1, _Any, +, 0)                    \
   TESTATOBDI(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B, STRIDE_B,      \
              HEIGHT_B, benchmark_width_, _Unaligned, +, 1)                  \
   TESTATOBDI(FMT_A, BPP_A, STRIDE_A, HEIGHT_A, FMT_B, BPP_B, STRIDE_B,      \
@@ -1443,35 +1460,39 @@ TESTATOB(YUY2, 2, 4, 1, Y, 1, 1, 1)
 TESTATOBD(ARGB, 4, 4, 1, RGB565, 2, 2, 1)
 #endif
 
-#define TESTSYMI(FMT_ATOB, BPP_A, STRIDE_A, HEIGHT_A, W1280, N, NEG, OFF)      \
+#define TESTSYMI(FMT_ATOB, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A, W1280, N, NEG,   \
+                 OFF)                                                          \
   TEST_F(LibYUVConvertTest, FMT_ATOB##_Symetric##N) {                          \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                            \
+    const int kWidth = W1280;                                                  \
     const int kHeight = benchmark_height_;                                     \
     const int kHeightA = (kHeight + HEIGHT_A - 1) / HEIGHT_A * HEIGHT_A;       \
     const int kStrideA =                                                       \
-        (kWidth * BPP_A + STRIDE_A - 1) / STRIDE_A * STRIDE_A;                 \
-    align_buffer_page_end(src_argb, kStrideA* kHeightA + OFF);                 \
-    align_buffer_page_end(dst_argb_c, kStrideA* kHeightA);                     \
-    align_buffer_page_end(dst_argb_opt, kStrideA* kHeightA);                   \
-    for (int i = 0; i < kStrideA * kHeightA; ++i) {                            \
+        (kWidth * EPP_A + STRIDE_A - 1) / STRIDE_A * STRIDE_A;                 \
+    align_buffer_page_end(src_argb,                                            \
+                          kStrideA* kHeightA*(int)sizeof(TYPE_A) + OFF);       \
+    align_buffer_page_end(dst_argb_c, kStrideA* kHeightA*(int)sizeof(TYPE_A)); \
+    align_buffer_page_end(dst_argb_opt,                                        \
+                          kStrideA* kHeightA*(int)sizeof(TYPE_A));             \
+    for (int i = 0; i < kStrideA * kHeightA * (int)sizeof(TYPE_A); ++i) {      \
       src_argb[i + OFF] = (fastrand() & 0xff);                                 \
     }                                                                          \
     memset(dst_argb_c, 1, kStrideA* kHeightA);                                 \
     memset(dst_argb_opt, 101, kStrideA* kHeightA);                             \
     MaskCpuFlags(disable_cpu_flags_);                                          \
-    FMT_ATOB(src_argb + OFF, kStrideA, dst_argb_c, kStrideA, kWidth,           \
-             NEG kHeight);                                                     \
+    FMT_ATOB((TYPE_A*)(src_argb + OFF), kStrideA, (TYPE_A*)dst_argb_c,         \
+             kStrideA, kWidth, NEG kHeight);                                   \
     MaskCpuFlags(benchmark_cpu_info_);                                         \
     for (int i = 0; i < benchmark_iterations_; ++i) {                          \
-      FMT_ATOB(src_argb + OFF, kStrideA, dst_argb_opt, kStrideA, kWidth,       \
-               NEG kHeight);                                                   \
+      FMT_ATOB((TYPE_A*)(src_argb + OFF), kStrideA, (TYPE_A*)dst_argb_opt,     \
+               kStrideA, kWidth, NEG kHeight);                                 \
     }                                                                          \
     MaskCpuFlags(disable_cpu_flags_);                                          \
-    FMT_ATOB(dst_argb_c, kStrideA, dst_argb_c, kStrideA, kWidth, NEG kHeight); \
+    FMT_ATOB((TYPE_A*)dst_argb_c, kStrideA, (TYPE_A*)dst_argb_c, kStrideA,     \
+             kWidth, NEG kHeight);                                             \
     MaskCpuFlags(benchmark_cpu_info_);                                         \
-    FMT_ATOB(dst_argb_opt, kStrideA, dst_argb_opt, kStrideA, kWidth,           \
-             NEG kHeight);                                                     \
-    for (int i = 0; i < kStrideA * kHeightA; ++i) {                            \
+    FMT_ATOB((TYPE_A*)dst_argb_opt, kStrideA, (TYPE_A*)dst_argb_opt, kStrideA, \
+             kWidth, NEG kHeight);                                             \
+    for (int i = 0; i < kStrideA * kHeightA * (int)sizeof(TYPE_A); ++i) {      \
       EXPECT_EQ(src_argb[i + OFF], dst_argb_opt[i]);                           \
       EXPECT_EQ(dst_argb_c[i], dst_argb_opt[i]);                               \
     }                                                                          \
@@ -1480,18 +1501,20 @@ TESTATOBD(ARGB, 4, 4, 1, RGB565, 2, 2, 1)
     free_aligned_buffer_page_end(dst_argb_opt);                                \
   }
 
-#define TESTSYM(FMT_ATOB, BPP_A, STRIDE_A, HEIGHT_A)                           \
-  TESTSYMI(FMT_ATOB, BPP_A, STRIDE_A, HEIGHT_A, benchmark_width_ - 4, _Any, +, \
-           0)                                                                  \
-  TESTSYMI(FMT_ATOB, BPP_A, STRIDE_A, HEIGHT_A, benchmark_width_, _Unaligned,  \
-           +, 1)                                                               \
-  TESTSYMI(FMT_ATOB, BPP_A, STRIDE_A, HEIGHT_A, benchmark_width_, _Opt, +, 0)
+#define TESTSYM(FMT_ATOB, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A)                  \
+  TESTSYMI(FMT_ATOB, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A, benchmark_width_ + 1, \
+           _Any, +, 0)                                                        \
+  TESTSYMI(FMT_ATOB, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A, benchmark_width_,     \
+           _Unaligned, +, 1)                                                  \
+  TESTSYMI(FMT_ATOB, TYPE_A, EPP_A, STRIDE_A, HEIGHT_A, benchmark_width_,     \
+           _Opt, +, 0)
 
-TESTSYM(ARGBToARGB, 4, 4, 1)
-TESTSYM(ARGBToBGRA, 4, 4, 1)
-TESTSYM(ARGBToABGR, 4, 4, 1)
-TESTSYM(BGRAToARGB, 4, 4, 1)
-TESTSYM(ABGRToARGB, 4, 4, 1)
+TESTSYM(ARGBToARGB, uint8_t, 4, 4, 1)
+TESTSYM(ARGBToBGRA, uint8_t, 4, 4, 1)
+TESTSYM(ARGBToABGR, uint8_t, 4, 4, 1)
+TESTSYM(BGRAToARGB, uint8_t, 4, 4, 1)
+TESTSYM(ABGRToARGB, uint8_t, 4, 4, 1)
+TESTSYM(AB64ToAR64, uint16_t, 4, 4, 1)
 
 TEST_F(LibYUVConvertTest, Test565) {
   SIMD_ALIGNED(uint8_t orig_pixels[256][4]);
@@ -2355,7 +2378,11 @@ TEST_F(LibYUVConvertTest, TestMJPGToARGB) {
 
   // Test result matches known hash value.
   uint32_t dst_argb_hash = HashDjb2(dst_argb, width * height, 5381);
+#ifdef LIBYUV_UNLIMITED_DATA
+  EXPECT_EQ(dst_argb_hash, 3900633302u);
+#else
   EXPECT_EQ(dst_argb_hash, 2355976473u);
+#endif
 
   free_aligned_buffer_page_end(dst_argb);
 }
@@ -2664,7 +2691,7 @@ TEST_F(LibYUVConvertTest, TestDither) {
 #define TESTPLANARTOBID(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN, \
                         YALIGN, W1280, N, NEG, OFF, FMT_C, BPP_C)              \
   TEST_F(LibYUVConvertTest, FMT_PLANAR##To##FMT_B##Dither##N) {                \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                            \
+    const int kWidth = W1280;                                                  \
     const int kHeight = ALIGNINT(benchmark_height_, YALIGN);                   \
     const int kStrideB = ALIGNINT(kWidth * BPP_B, ALIGN);                      \
     const int kStrideUV = SUBSAMPLE(kWidth, SUBSAMP_X);                        \
@@ -2717,7 +2744,7 @@ TEST_F(LibYUVConvertTest, TestDither) {
 #define TESTPLANARTOBD(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN, \
                        YALIGN, FMT_C, BPP_C)                                  \
   TESTPLANARTOBID(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,      \
-                  YALIGN, benchmark_width_ - 4, _Any, +, 0, FMT_C, BPP_C)     \
+                  YALIGN, benchmark_width_ + 1, _Any, +, 0, FMT_C, BPP_C)     \
   TESTPLANARTOBID(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,      \
                   YALIGN, benchmark_width_, _Unaligned, +, 1, FMT_C, BPP_C)   \
   TESTPLANARTOBID(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,      \
@@ -2794,7 +2821,7 @@ TESTPTOB(TestUYVYToNV12, UYVYToI420, UYVYToNV12)
 #define TESTPLANARTOEI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, SUB_B, BPP_B, \
                        W1280, N, NEG, OFF, FMT_C, BPP_C)                      \
   TEST_F(LibYUVConvertTest, FMT_PLANAR##To##FMT_B##_##FMT_C##N) {             \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                           \
+    const int kWidth = W1280;                                                 \
     const int kHeight = benchmark_height_;                                    \
     const int kStrideB = SUBSAMPLE(kWidth, SUB_B) * BPP_B;                    \
     const int kStrideUV = SUBSAMPLE(kWidth, SUBSAMP_X);                       \
@@ -2842,7 +2869,7 @@ TESTPTOB(TestUYVYToNV12, UYVYToI420, UYVYToNV12)
 #define TESTPLANARTOE(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, SUB_B, BPP_B, \
                       FMT_C, BPP_C)                                          \
   TESTPLANARTOEI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, SUB_B, BPP_B,      \
-                 benchmark_width_ - 4, _Any, +, 0, FMT_C, BPP_C)             \
+                 benchmark_width_ + 1, _Any, +, 0, FMT_C, BPP_C)             \
   TESTPLANARTOEI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, SUB_B, BPP_B,      \
                  benchmark_width_, _Unaligned, +, 1, FMT_C, BPP_C)           \
   TESTPLANARTOEI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, SUB_B, BPP_B,      \
@@ -2906,7 +2933,7 @@ TESTPLANARTOE(I422, 2, 1, UYVY, 2, 4, ARGB, 4)
 #define TESTQPLANARTOEI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, SUB_B, BPP_B, \
                         W1280, N, NEG, OFF, FMT_C, BPP_C, ATTEN)               \
   TEST_F(LibYUVConvertTest, FMT_PLANAR##To##FMT_B##_##FMT_C##N) {              \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                            \
+    const int kWidth = W1280;                                                  \
     const int kHeight = benchmark_height_;                                     \
     const int kStrideB = SUBSAMPLE(kWidth, SUB_B) * BPP_B;                     \
     const int kSizeUV =                                                        \
@@ -2959,7 +2986,7 @@ TESTPLANARTOE(I422, 2, 1, UYVY, 2, 4, ARGB, 4)
 #define TESTQPLANARTOE(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, SUB_B, BPP_B, \
                        FMT_C, BPP_C)                                          \
   TESTQPLANARTOEI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, SUB_B, BPP_B,      \
-                  benchmark_width_ - 4, _Any, +, 0, FMT_C, BPP_C, 0)          \
+                  benchmark_width_ + 1, _Any, +, 0, FMT_C, BPP_C, 0)          \
   TESTQPLANARTOEI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, SUB_B, BPP_B,      \
                   benchmark_width_, _Unaligned, +, 1, FMT_C, BPP_C, 0)        \
   TESTQPLANARTOEI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, SUB_B, BPP_B,      \
@@ -3007,7 +3034,7 @@ TESTQPLANARTOE(V444Alpha, 1, 1, ABGR, 1, 4, ARGB, 4)
 #define TESTPLANETOEI(FMT_A, SUB_A, BPP_A, FMT_B, SUB_B, BPP_B, W1280, N, NEG, \
                       OFF, FMT_C, BPP_C)                                       \
   TEST_F(LibYUVConvertTest, FMT_A##To##FMT_B##_##FMT_C##N) {                   \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                            \
+    const int kWidth = W1280;                                                  \
     const int kHeight = benchmark_height_;                                     \
     const int kStrideA = SUBSAMPLE(kWidth, SUB_A) * BPP_A;                     \
     const int kStrideB = SUBSAMPLE(kWidth, SUB_B) * BPP_B;                     \
@@ -3044,7 +3071,7 @@ TESTQPLANARTOE(V444Alpha, 1, 1, ABGR, 1, 4, ARGB, 4)
 
 #define TESTPLANETOE(FMT_A, SUB_A, BPP_A, FMT_B, SUB_B, BPP_B, FMT_C, BPP_C) \
   TESTPLANETOEI(FMT_A, SUB_A, BPP_A, FMT_B, SUB_B, BPP_B,                    \
-                benchmark_width_ - 4, _Any, +, 0, FMT_C, BPP_C)              \
+                benchmark_width_ + 1, _Any, +, 0, FMT_C, BPP_C)              \
   TESTPLANETOEI(FMT_A, SUB_A, BPP_A, FMT_B, SUB_B, BPP_B, benchmark_width_,  \
                 _Unaligned, +, 1, FMT_C, BPP_C)                              \
   TESTPLANETOEI(FMT_A, SUB_A, BPP_A, FMT_B, SUB_B, BPP_B, benchmark_width_,  \
@@ -3202,7 +3229,7 @@ TEST_F(LibYUVConvertTest, ABGRToAR30Row_Opt) {
 #define TESTPLANAR16TOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_MASK, FMT_B,   \
                          BPP_B, ALIGN, YALIGN, W1280, N, NEG, SOFF, DOFF)     \
   TEST_F(LibYUVConvertTest, FMT_PLANAR##To##FMT_B##N) {                       \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                           \
+    const int kWidth = W1280;                                                 \
     const int kHeight = ALIGNINT(benchmark_height_, YALIGN);                  \
     const int kStrideB = ALIGNINT(kWidth * BPP_B, ALIGN);                     \
     const int kStrideUV = SUBSAMPLE(kWidth, SUBSAMP_X);                       \
@@ -3249,7 +3276,7 @@ TEST_F(LibYUVConvertTest, ABGRToAR30Row_Opt) {
 #define TESTPLANAR16TOB(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_MASK, FMT_B,   \
                         BPP_B, ALIGN, YALIGN)                                \
   TESTPLANAR16TOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_MASK, FMT_B, BPP_B, \
-                   ALIGN, YALIGN, benchmark_width_ - 4, _Any, +, 0, 0)       \
+                   ALIGN, YALIGN, benchmark_width_ + 1, _Any, +, 0, 0)       \
   TESTPLANAR16TOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_MASK, FMT_B, BPP_B, \
                    ALIGN, YALIGN, benchmark_width_, _Unaligned, +, 1, 1)     \
   TESTPLANAR16TOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_MASK, FMT_B, BPP_B, \
@@ -3305,7 +3332,7 @@ TESTPLANAR16TOB(I012, 2, 2, 0xfff, AR30, 4, 4, 1)
 #define TESTQPLANAR16TOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B,      \
                           ALIGN, YALIGN, W1280, N, NEG, OFF, ATTEN, S_DEPTH)   \
   TEST_F(LibYUVConvertTest, FMT_PLANAR##To##FMT_B##N) {                        \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                            \
+    const int kWidth = W1280;                                                  \
     const int kHeight = ALIGNINT(benchmark_height_, YALIGN);                   \
     const int kStrideB = ALIGNINT(kWidth * BPP_B, ALIGN);                      \
     const int kStrideUV = SUBSAMPLE(kWidth, SUBSAMP_X);                        \
@@ -3361,7 +3388,7 @@ TESTPLANAR16TOB(I012, 2, 2, 0xfff, AR30, 4, 4, 1)
 #define TESTQPLANAR16TOB(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B,    \
                          ALIGN, YALIGN, S_DEPTH)                            \
   TESTQPLANAR16TOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,  \
-                    YALIGN, benchmark_width_ - 4, _Any, +, 0, 0, S_DEPTH)   \
+                    YALIGN, benchmark_width_ + 1, _Any, +, 0, 0, S_DEPTH)   \
   TESTQPLANAR16TOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,  \
                     YALIGN, benchmark_width_, _Unaligned, +, 1, 0, S_DEPTH) \
   TESTQPLANAR16TOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,  \
@@ -3523,7 +3550,7 @@ TESTQPLANAR16TOB(V410Alpha, 1, 1, ABGR, 4, 4, 1, 10)
 #define TESTBIPLANAR16TOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B,     \
                            ALIGN, YALIGN, W1280, N, NEG, SOFF, DOFF, S_DEPTH)  \
   TEST_F(LibYUVConvertTest, FMT_PLANAR##To##FMT_B##N) {                        \
-    const int kWidth = ((W1280) > 0) ? (W1280) : 1;                            \
+    const int kWidth = W1280;                                                  \
     const int kHeight = ALIGNINT(benchmark_height_, YALIGN);                   \
     const int kStrideB = ALIGNINT(kWidth * BPP_B, ALIGN);                      \
     const int kStrideUV = SUBSAMPLE(kWidth, SUBSAMP_X) * 2;                    \
@@ -3567,7 +3594,7 @@ TESTQPLANAR16TOB(V410Alpha, 1, 1, ABGR, 4, 4, 1, 10)
 #define TESTBIPLANAR16TOB(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B,    \
                           ALIGN, YALIGN, S_DEPTH)                            \
   TESTBIPLANAR16TOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,  \
-                     YALIGN, benchmark_width_ - 4, _Any, +, 0, 0, S_DEPTH)   \
+                     YALIGN, benchmark_width_ + 1, _Any, +, 0, 0, S_DEPTH)   \
   TESTBIPLANAR16TOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,  \
                      YALIGN, benchmark_width_, _Unaligned, +, 1, 1, S_DEPTH) \
   TESTBIPLANAR16TOBI(FMT_PLANAR, SUBSAMP_X, SUBSAMP_Y, FMT_B, BPP_B, ALIGN,  \
