@@ -17,6 +17,9 @@
 #ifndef OZONE_WAYLAND_INPUT_WEBOS_TEXT_INPUT_H_
 #define OZONE_WAYLAND_INPUT_WEBOS_TEXT_INPUT_H_
 
+#include <map>
+#include "wayland-text-client-protocol.h"
+
 #include "ozone/wayland/display.h"
 #include "ui/base/ime/neva/input_content_type.h"
 
@@ -39,14 +42,17 @@ class WaylandTextInput {
   WaylandTextInput& operator=(const WaylandTextInput&) = delete;
   ~WaylandTextInput();
 
-  void ResetIme();
+  void ResetIme(unsigned handle);
   void ShowInputPanel(wl_seat* input_seat, unsigned handle);
-  void HideInputPanel(wl_seat* input_seat, ui::ImeHiddenType);
-  void SetActiveWindow(WaylandWindow* window);
-  void SetHiddenState();
+  void HideInputPanel(wl_seat* input_seat,
+                      const std::string& display_id,
+                      ui::ImeHiddenType);
+  void SetActiveWindow(const std::string& display_id, WaylandWindow* window);
+  WaylandWindow* GetActiveWindow(const std::string& display_id) const;
   void SetTextInputInfo(const ui::TextInputInfo& text_input_info,
                         unsigned handle);
-  void SetSurroundingText(const std::string& text,
+  void SetSurroundingText(unsigned handle,
+                          const std::string& text,
                           size_t cursor_position,
                           size_t anchor_position);
 
@@ -118,10 +124,6 @@ class WaylandTextInput {
                       uint32_t height);
 
  private:
-  void ActivateTextModel(WaylandWindow*);
-  void CreateTextModel();
-  void DeactivateTextModel();
-  void UpdateTextModel();
   enum InputPanelState {
     InputPanelUnknownState = 0xffffffff,
     InputPanelHidden = 0,
@@ -129,16 +131,40 @@ class WaylandTextInput {
     InputPanelShowing = 2
   };
 
+    struct InputPanel {
+    InputPanel();
+    InputPanel(text_model* t_model);
+    ~InputPanel();
+
+    text_model* model = nullptr;
+    gfx::Rect input_panel_rect = gfx::Rect(0, 0, 0, 0);
+    bool activated = false;
+    InputPanelState state = InputPanelUnknownState;
+    ui::InputContentType input_content_type = ui::InputContentType::kNone;
+    int text_input_flags = 0;
+  };
+
+  struct InputPanelDeleter {
+    void operator()(InputPanel* panel) {
+      if (panel->model)
+        text_model_destroy(panel->model);
+      delete panel;
+    }
+  };
+
+  using InputPanelPtr = std::unique_ptr<InputPanel, InputPanelDeleter>;
+
+  text_model* CreateTextModel();
+  WaylandWindow* FindActiveWindow(unsigned handle);
+  InputPanel* FindInputPanel(const std::string& display_id);
+  std::string FindDisplay(text_model* model);
+  void DeactivateInputPanel(const std::string& display_id);
+  void SetHiddenState(const std::string& display_id);
+
   friend struct base::DefaultSingletonTraits<WaylandTextInput>;
 
-  gfx::Rect input_panel_rect_;
-  struct text_model* text_model_ = nullptr;
-  bool activated_;
-  InputPanelState state_;
-  ui::InputContentType input_content_type_;
-  int text_input_flags_;
-  WaylandWindow* active_window_;
-  WaylandWindow* last_active_window_;
+  std::map<std::string, InputPanelPtr> input_panel_map_;
+  std::map<std::string, WaylandWindow*> active_window_map_;
   WaylandSeat* seat_;
 };
 
