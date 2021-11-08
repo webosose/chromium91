@@ -73,6 +73,10 @@ class ShellBrowserMainParts : public content::BrowserMainParts {
   // Initializes the ExtensionSystem.
   void InitExtensionSystem();
 
+#if defined(OS_WEBOS)
+  void ExitWhenPossibleOnUIThread(int signal);
+#endif
+
 #if BUILDFLAG(IS_CHROMEOS_ASH)
   std::unique_ptr<ShellNetworkController> network_controller_;
 #endif

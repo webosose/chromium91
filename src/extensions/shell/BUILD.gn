@@ -289,6 +289,11 @@ source_set("app_shell_lib") {
   }
 
   if (is_webos) {
+    sources += [
+      "neva/platform_shutdown_signal_handler.cc",
+      "neva/platform_shutdown_signal_handler.h",
+    ]
+
     deps += [ "//webos:webos_impl" ]
   }
 
