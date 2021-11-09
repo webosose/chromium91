@@ -63,16 +63,15 @@ class WaylandSeat {
   WaylandKeyboard* GetKeyBoard() const { return input_keyboard_; }
   WaylandPointer* GetPointer() const { return input_pointer_; }
   WaylandTextInput* GetTextInput() const { return text_input_; }
-
+  unsigned GetActiveInputWindow() const { return active_input_window_handle_; }
   unsigned GetEnteredWindowHandle(uint32_t device_id) const;
   void ResetEnteredWindowHandle(unsigned window_handle);
-  unsigned GetActiveInputWindow(const std::string& display_id) const;
+
   unsigned GetGrabWindowHandle(uint32_t device_id) const;
   uint32_t GetGrabButton(uint32_t device_id) const;
   void ResetGrabWindow(unsigned window_handle);
   void SetEnteredWindowHandle(uint32_t device_id, unsigned windowhandle);
-  void SetActiveInputWindow(const std::string& display_id,
-                            unsigned windowhandle);
+  void SetActiveInputWindow(unsigned windowhandle);
   void SetGrabWindow(uint32_t device_id, const GrabWindowInfo& grab_window);
   void SetCursorBitmap(const std::vector<SkBitmap>& bitmaps,
                        const gfx::Point& location);
@@ -81,7 +80,7 @@ class WaylandSeat {
   void ResetIme(unsigned handle);
   void ImeCaretBoundsChanged(gfx::Rect rect);
   void ShowInputPanel(unsigned handle);
-  void HideInputPanel(ui::ImeHiddenType, const std::string& display_id);
+  void HideInputPanel(unsigned handle, ui::ImeHiddenType);
   void SetTextInputInfo(const ui::TextInputInfo& text_input_info,
                         unsigned handle);
   void SetSurroundingText(unsigned handle,
@@ -95,6 +94,7 @@ class WaylandSeat {
                                  uint32_t caps);
 
   // Keeps track of current focused window.
+  unsigned active_input_window_handle_;
   std::map<uint32_t, unsigned> entered_window_handle_map_;
   std::map<uint32_t, GrabWindowInfo> grab_window_map_;
   struct wl_seat* seat_;
