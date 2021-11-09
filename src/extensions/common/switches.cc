@@ -96,6 +96,8 @@ const char kWebOSAppId[] = "webos-appid";
 
 // Pass luna service name to browser
 const char kWebOSLunaServiceName[] = "webos-luna-service-name";
+// Pass display Id to browser
+const char kWebOSDisplayId[] = "webos-displayid";
 #endif
 
 // Mute extension errors while working with new manifest version.
