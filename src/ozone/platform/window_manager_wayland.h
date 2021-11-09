@@ -26,6 +26,7 @@
 
 #include "base/file_descriptor_posix.h"
 #include "base/memory/weak_ptr.h"
+#include "ozone/platform/event_param_traits.h"
 #include "ui/base/cursor/cursor.h"
 #include "ui/events/event.h"
 #include "ui/events/event_modifiers.h"
@@ -85,6 +86,7 @@ class WindowManagerWayland : public PlatformEventSource,
   gfx::AcceleratedWidget event_grabber() const { return event_grabber_; }
 
   unsigned DeviceEventGrabber(uint32_t device_id) const;
+  unsigned TouchButtonGrabber(uint32_t touch_button_id) const;
 
  private:
   void OnActivationChanged(unsigned windowhandle, bool active);
@@ -131,11 +133,10 @@ class WindowManagerWayland : public PlatformEventSource,
   void VirtualKeyNotify(EventType type,
                         uint32_t key,
                         int device_id);
-  void TouchNotify(EventType type,
-                   float x,
-                   float y,
-                   int32_t touch_id,
-                   uint32_t time_stamp);
+  void TouchNotify(uint32_t device_id,
+                   unsigned handle,
+                   ui::EventType type,
+                   const ui::TouchEventInfo& event_info);
   void CloseWidget(unsigned handle);
 
   void ScreenChanged(const std::string& display_id,
@@ -191,11 +192,10 @@ class WindowManagerWayland : public PlatformEventSource,
                           float y);
   void NotifyInputPanelEnter(uint32_t device_id, unsigned handle);
   void NotifyInputPanelLeave(uint32_t device_id);
-  void NotifyTouchEvent(EventType type,
-                        float x,
-                        float y,
-                        int32_t touch_id,
-                        uint32_t time_stamp);
+  void NotifyTouchEvent(uint32_t device_id,
+                        unsigned handle,
+                        ui::EventType type,
+                        const ui::TouchEventInfo& event_info);
   void NotifyScreenChanged(const std::string& display_id,
                            const std::string& display_name,
                            unsigned width,
@@ -245,10 +245,14 @@ class WindowManagerWayland : public PlatformEventSource,
   void GrabDeviceEvents(uint32_t device_id, unsigned widget);
   void UnGrabDeviceEvents(uint32_t device_id);
 
+  void GrabTouchButton(uint32_t touch_button_id, unsigned widget);
+  void UnGrabTouchButton(uint32_t touch_button_id);
+
   // List of all open aura::Window.
   std::list<OzoneWaylandWindow*>* open_windows_;
   gfx::AcceleratedWidget event_grabber_ = gfx::kNullAcceleratedWidget;
   std::map<uint32_t, unsigned> device_event_grabber_map_;
+  std::map<uint32_t, unsigned> touch_button_grabber_map_;
   std::map<std::string, OzoneWaylandWindow*> active_window_map_;
   gfx::AcceleratedWidget current_capture_ = gfx::kNullAcceleratedWidget;
   OzoneGpuPlatformSupportHost* proxy_;
