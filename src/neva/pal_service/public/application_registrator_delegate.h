@@ -28,8 +28,8 @@ class ApplicationRegistratorDelegate {
  public:
   virtual ~ApplicationRegistratorDelegate() {}
 
-  using RepeatingResponse =
-      base::RepeatingCallback<void(const std::string&, const base::Value*)>;
+  using RepeatingResponse = base::RepeatingCallback<
+      void(const std::string&, const std::string&, const base::Value*)>;
 
   enum class Status {
     kSuccess = 0,
