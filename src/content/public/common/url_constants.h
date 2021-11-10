@@ -98,10 +98,6 @@ CONTENT_EXPORT extern const char kChromeUICrashDcheckURL[];
 // Special URL used to start a navigation to an error page.
 CONTENT_EXPORT extern const char kUnreachableWebDataURL[];
 
-#if defined(USE_NEVA_APPRUNTIME)
-CONTENT_EXPORT extern const char kIllegalDataURL[];
-#endif
-
 // Special URL used to rewrite URLs coming from untrusted processes, when the
 // source process is not allowed access to the initially requested URL.
 CONTENT_EXPORT extern const char kBlockedURL[];

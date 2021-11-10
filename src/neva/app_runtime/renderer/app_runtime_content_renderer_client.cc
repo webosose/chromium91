@@ -39,6 +39,7 @@
 #include "third_party/blink/public/web/web_view.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/base/webui/jstemplate_builder.h"
+#include "url/url_constants.h"
 
 #if defined(USE_NEVA_MEDIA)
 #include "components/cdm/renderer/neva/key_systems_util.h"
@@ -187,7 +188,7 @@ void AppRuntimeContentRendererClient::WillSendRequest(
       frame->AddMessageToConsole(error_msg);
 
       // Redirect to unreachable URL
-      *new_url = GURL(content::kIllegalDataURL);
+      *new_url = GURL(url::kIllegalDataURL);
     }
   }
 }

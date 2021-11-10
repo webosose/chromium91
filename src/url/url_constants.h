@@ -41,6 +41,10 @@ COMPONENT_EXPORT(URL) extern const char kStandardSchemeSeparator[];
 
 COMPONENT_EXPORT(URL) extern const size_t kMaxURLChars;
 
+#if defined(USE_NEVA_APPRUNTIME)
+COMPONENT_EXPORT(URL) extern const char kIllegalDataURL[];
+#endif
+
 }  // namespace url
 
 #endif  // URL_URL_CONSTANTS_H_

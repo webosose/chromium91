@@ -95,6 +95,12 @@ std::unique_ptr<URLRequestJob> URLRequestJobFactory::CreateJob(
 
   auto it = protocol_handler_map_.find(request->url().scheme());
   if (it == protocol_handler_map_.end()) {
+#if defined(USE_NEVA_APPRUNTIME)
+    // APPRUNTIME sets 'kIllegalDataURL' for local file request in case the
+    // access is blocked, then we return ERR_ACCESS_DENIED
+    if (request->url() == url::kIllegalDataURL)
+      return std::make_unique<URLRequestErrorJob>(request, ERR_ACCESS_DENIED);
+#endif
     return std::make_unique<URLRequestErrorJob>(request,
                                                 ERR_UNKNOWN_URL_SCHEME);
   }
