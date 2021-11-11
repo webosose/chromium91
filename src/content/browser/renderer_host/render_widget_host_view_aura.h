@@ -348,6 +348,7 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   gfx::Rect GetTextInputBounds() const override;
   gfx::Size GetCompositorViewportPixelSize() override;
   bool IsKeepAliveWebApp() const;
+  int GetTextInputMaxLength() const override;
 #endif
 
 #if defined(USE_NEVA_MEDIA)

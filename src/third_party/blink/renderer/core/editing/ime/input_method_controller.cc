@@ -1582,6 +1582,7 @@ WebTextInputInfo InputMethodController::TextInputInfo() const {
   info.flags = TextInputFlags();
 #if defined(USE_NEVA_APPRUNTIME)
   info.input_panel_rectangle = InputPanelRectangle();
+  info.max_length = TextInputMaxLength();
 #endif  // defined(USE_NEVA_APPRUNTIME)
   if (info.type == kWebTextInputTypeNone)
     return info;
@@ -1713,6 +1714,26 @@ gfx::Rect InputMethodController::InputPanelRectangle() const {
   //     if (html_element->IsDateTimeFieldElement())
   //       ...
   //   }
+  return result;
+}
+
+int InputMethodController::TextInputMaxLength() const {
+  int result = -1;
+
+  Element* element = GetDocument().FocusedElement();
+  if (!element)
+    return result;
+
+  if (auto* input = DynamicTo<HTMLInputElement>(*element)) {
+    if (!input->IsDisabledOrReadOnly())
+      return input->maxLength();
+  }
+
+  if (auto* textarea = DynamicTo<HTMLTextAreaElement>(*element)) {
+    if (!textarea->IsDisabledOrReadOnly())
+      return textarea->maxLength();
+  }
+
   return result;
 }
 #endif  // defined(USE_NEVA_APPRUNTIME)

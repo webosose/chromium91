@@ -63,6 +63,7 @@ IPC_STRUCT_TRAITS_BEGIN(ui::TextInputInfo)
   IPC_STRUCT_TRAITS_MEMBER(type)
   IPC_STRUCT_TRAITS_MEMBER(flags)
   IPC_STRUCT_TRAITS_MEMBER(input_panel_rectangle)
+  IPC_STRUCT_TRAITS_MEMBER(max_length)
 IPC_STRUCT_TRAITS_END()
 
 //------------------------------------------------------------------------------

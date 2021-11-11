@@ -38,6 +38,9 @@ struct COMPONENT_EXPORT(UI_BASE_IME) TextInputInfo {
   // Position on the screen and dimensions of the input panel (virtual keyboard)
   // invoked for the input field.
   gfx::Rect input_panel_rectangle;
+
+  // Maximum text length for the input field.
+  int max_length = -1;
 };
 
 COMPONENT_EXPORT(UI_BASE_IME)

@@ -164,12 +164,18 @@ void WaylandTextInput::SetTextInputInfo(
   if (panel) {
     panel->input_content_type = text_input_info.type;
     panel->text_input_flags = text_input_info.flags;
-    if (panel->model)
+    panel->max_text_length = text_input_info.max_length;
+    if (panel->model) {
       text_model_set_content_type(
           panel->model,
           ContentHintFromInputContentType(panel->input_content_type,
                                           panel->text_input_flags),
           ContentPurposeFromInputContentType(panel->input_content_type));
+
+      // Set maximum text length (if it was previously set only)
+      if (panel->max_text_length >= 0)
+        text_model_set_max_text_length(panel->model, panel->max_text_length);
+    }
   }
 }
 

@@ -142,6 +142,7 @@ void InputMethodNevaObserver::OnTextInputStateChanged(
           GetInputContentTypeFromTextInputType(client->GetTextInputType());
       input_info.flags = client->GetTextInputFlags();
       gfx::Rect rectangle = client->GetInputPanelRectangle();
+      input_info.max_length = client->GetTextInputMaxLength();
       if (FitsScreenBounds(rectangle))
         input_info.input_panel_rectangle = rectangle;
       OnTextInputInfoChanged(input_info);

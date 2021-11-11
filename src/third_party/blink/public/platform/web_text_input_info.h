@@ -82,6 +82,9 @@ struct WebTextInputInfo {
   // The input panel (virtual keyboard) rectangle for the currently
   // focused input field.
   gfx::Rect input_panel_rectangle;
+
+  // The maxLength attribute value of the currently focused input field.
+  int max_length = -1;
 #endif  // defined(USE_NEVA_APPRUNTIME)
 
   BLINK_PLATFORM_EXPORT bool Equals(const WebTextInputInfo&) const;

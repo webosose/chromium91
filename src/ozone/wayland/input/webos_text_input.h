@@ -152,6 +152,7 @@ class WaylandTextInput {
     InputPanelState state = InputPanelUnknownState;
     ui::InputContentType input_content_type = ui::InputContentType::kNone;
     int text_input_flags = 0;
+    int max_text_length = -1;
   };
 
   struct InputPanelDeleter {

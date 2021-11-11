@@ -904,6 +904,7 @@ void WidgetBase::UpdateTextInputStateInternal(bool show_virtual_keyboard,
 
 #if defined(USE_NEVA_APPRUNTIME)
     params->input_panel_rectangle = new_info.input_panel_rectangle;
+    params->max_length = new_info.max_length;
 #endif  // defined(USE_NEVA_APPRUNTIME)
 
 #if defined(OS_ANDROID)
