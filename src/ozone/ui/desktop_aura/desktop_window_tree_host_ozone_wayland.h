@@ -80,6 +80,8 @@ class VIEWS_EXPORT DesktopWindowTreeHostOzone
   // belongs to a particular window.
   gfx::Rect GetBoundsInScreen() const;
 
+  std::string GetDisplayId() const;
+
  protected:
   // Overridden from DesktopWindowTreeHost:
   void Init(const views::Widget::InitParams& params) override;

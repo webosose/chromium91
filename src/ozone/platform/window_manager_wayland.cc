@@ -393,12 +393,15 @@ void WindowManagerWayland::CloseWidget(unsigned handle) {
           weak_ptr_factory_.GetWeakPtr(), handle));
 }
 
-void WindowManagerWayland::ScreenChanged(unsigned width, unsigned height,
+void WindowManagerWayland::ScreenChanged(const std::string& display_id,
+                                         const std::string& display_name,
+                                         unsigned width,
+                                         unsigned height,
                                          int rotation) {
   base::ThreadTaskRunnerHandle::Get()->PostTask(
-      FROM_HERE,
-      base::Bind(&WindowManagerWayland::NotifyScreenChanged,
-          weak_ptr_factory_.GetWeakPtr(), width, height, rotation));
+      FROM_HERE, base::Bind(&WindowManagerWayland::NotifyScreenChanged,
+                            weak_ptr_factory_.GetWeakPtr(), display_id,
+                            display_name, width, height, rotation));
 }
 
 void WindowManagerWayland::WindowResized(unsigned handle,
@@ -604,11 +607,14 @@ void WindowManagerWayland::NotifyTouchEvent(EventType type,
   DispatchEvent(&event);
 }
 
-void WindowManagerWayland::NotifyScreenChanged(unsigned width,
+void WindowManagerWayland::NotifyScreenChanged(const std::string& display_id,
+                                               const std::string& display_name,
+                                               unsigned width,
                                                unsigned height,
                                                int rotation) {
   if (platform_screen_)
-    platform_screen_->GetDelegate()->OnScreenChanged(width, height, rotation);
+    platform_screen_->GetDelegate()->OnScreenChanged(display_id, display_name,
+                                                     width, height, rotation);
 }
 
 void WindowManagerWayland::NotifyDragEnter(

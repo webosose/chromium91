@@ -133,7 +133,11 @@ class WindowManagerWayland : public PlatformEventSource,
                    uint32_t time_stamp);
   void CloseWidget(unsigned handle);
 
-  void ScreenChanged(unsigned width, unsigned height, int rotation);
+  void ScreenChanged(const std::string& display_id,
+                     const std::string& display_name,
+                     unsigned width,
+                     unsigned height,
+                     int rotation);
   void WindowResized(unsigned windowhandle,
                      unsigned width,
                      unsigned height);
@@ -183,7 +187,11 @@ class WindowManagerWayland : public PlatformEventSource,
                         float y,
                         int32_t touch_id,
                         uint32_t time_stamp);
-  void NotifyScreenChanged(unsigned width, unsigned height, int rotation);
+  void NotifyScreenChanged(const std::string& display_id,
+                           const std::string& display_name,
+                           unsigned width,
+                           unsigned height,
+                           int rotation);
 
   void NotifyDragEnter(unsigned windowhandle,
                        float x,

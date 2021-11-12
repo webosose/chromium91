@@ -112,6 +112,8 @@ class OzoneWaylandWindow : public PlatformWindow,
   void FocusGroupLayer() override;
   void DetachGroup() override;
 
+  std::string GetDisplayId() override;
+
   void ShowInputPanel() override;
   void HideInputPanel(ImeHiddenType) override;
   void SetTextInputInfo(const ui::TextInputInfo& text_input_info) override;
@@ -168,6 +170,7 @@ class OzoneWaylandWindow : public PlatformWindow,
   std::u16string title_;
   // The current cursor bitmap (immutable).
   scoped_refptr<BitmapCursorOzone> bitmap_;
+  std::string display_id_ = "-1";
   bool init_window_;
   neva_app_runtime::CustomCursorType cursor_type_ =
       neva_app_runtime::CustomCursorType::kNotUse;

@@ -111,6 +111,7 @@ class PlatformWindow
   virtual void FocusGroupOwner() {}
   virtual void FocusGroupLayer() {}
   virtual void DetachGroup() {}
+  virtual std::string GetDisplayId() { return "-1"; }
 };
 
 }  // namespace neva
