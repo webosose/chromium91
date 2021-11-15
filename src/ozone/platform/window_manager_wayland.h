@@ -63,6 +63,9 @@ class WindowManagerWayland : public PlatformEventSource,
 
   void OnRootWindowCreated(OzoneWaylandWindow* window);
   void OnRootWindowClosed(OzoneWaylandWindow* window);
+  void OnRootWindowDisplayChanged(const std::string& prev_display_id,
+                                  const std::string& new_display_id,
+                                  OzoneWaylandWindow* window);
   void Restore(OzoneWaylandWindow* window);
 
   void OnPlatformScreenCreated(ozonewayland::OzoneWaylandScreen* screen);
@@ -90,7 +93,8 @@ class WindowManagerWayland : public PlatformEventSource,
 
  private:
   void OnActivationChanged(unsigned windowhandle, bool active);
-  std::list<OzoneWaylandWindow*>& open_windows();
+  std::list<OzoneWaylandWindow*>& open_windows(const std::string& display_id);
+  void clear_open_windows(const std::string& display_id);
   void OnWindowFocused(unsigned handle);
   void OnWindowEnter(unsigned handle);
   void OnWindowLeave(unsigned handle);
@@ -249,6 +253,7 @@ class WindowManagerWayland : public PlatformEventSource,
   void UnGrabTouchButton(uint32_t touch_button_id);
 
   // List of all open aura::Window.
+  std::map<std::string, std::list<OzoneWaylandWindow*>*> open_windows_map_;
   std::list<OzoneWaylandWindow*>* open_windows_;
   gfx::AcceleratedWidget event_grabber_ = gfx::kNullAcceleratedWidget;
   std::map<uint32_t, unsigned> device_event_grabber_map_;

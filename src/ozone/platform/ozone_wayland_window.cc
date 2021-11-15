@@ -492,9 +492,13 @@ void OzoneWaylandWindow::SizeConstraintsChanged() {
 
 void OzoneWaylandWindow::SetWindowProperty(const std::string& name,
                                            const std::string& value) {
-   // FIXME : We should have separated API for set display ID.
-  if (name == "displayAffinity")
+  // FIXME : We should have separated API for set display ID.
+  if (name == "displayAffinity" && display_id_ != value) {
+    std::string prev_display_id = display_id_;
     display_id_ = value;
+    window_manager_->OnRootWindowDisplayChanged(prev_display_id, display_id_,
+                                                this);
+  }
 
   sender_->Send(new WaylandDisplay_SetWindowProperty(handle_, name, value));
 }
