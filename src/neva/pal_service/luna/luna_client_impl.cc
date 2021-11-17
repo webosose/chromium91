@@ -144,7 +144,7 @@ bool ClientImpl::CallFromApp(std::string uri,
                                      &(response->context.token),
                                      &error)) {
     LogError(error);
-    std::move(callback).Run(ResponseStatus::ERROR,
+    std::move(response->callback).Run(ResponseStatus::ERROR,
                             static_cast<unsigned>(response->context.token),
                             response->context.on_cancel_value);
     return false;
@@ -201,7 +201,7 @@ bool ClientImpl::SubscribeFromApp(std::string uri,
               &(subscription->context.token),
               &error)) {
     LogError(error);
-    callback.Run(ResponseStatus::ERROR,
+    subscription->callback.Run(ResponseStatus::ERROR,
                  static_cast<unsigned>(subscription->context.token),
                  subscription->context.on_cancel_value);
     return false;
