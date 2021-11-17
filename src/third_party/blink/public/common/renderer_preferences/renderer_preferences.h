@@ -72,6 +72,7 @@ struct BLINK_COMMON_EXPORT RendererPreferences {
   ///@name USE_NEVA_APPRUNTIME
   ///@{
   std::string application_id;
+  std::string display_id;
   std::string media_codec_capability;
   std::string media_preferences;
   std::string board_type;

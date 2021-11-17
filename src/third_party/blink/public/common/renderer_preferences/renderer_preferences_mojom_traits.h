@@ -170,6 +170,10 @@ struct BLINK_COMMON_EXPORT
       const ::blink::RendererPreferences& data) {
     return data.application_id;
   }
+  static const std::string& display_id(
+      const ::blink::RendererPreferences& data) {
+    return data.display_id;
+  }
   static const std::string& media_codec_capability(
       const ::blink::RendererPreferences& data) {
     return data.media_codec_capability;
