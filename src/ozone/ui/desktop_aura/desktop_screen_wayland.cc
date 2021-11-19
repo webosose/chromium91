@@ -142,6 +142,10 @@ display::Display DesktopScreenWayland::GetDisplayNearestPoint(
   if (displays_.size() == 1)
     return displays_.front();
 
+#if defined(OS_WEBOS)
+  return GetPrimaryDisplay();
+#else
+
   for (std::vector<display::Display>::const_iterator it = displays_.begin();
          it != displays_.end(); ++it) {
     if (it->bounds().Contains(point))
@@ -149,12 +153,17 @@ display::Display DesktopScreenWayland::GetDisplayNearestPoint(
   }
 
   return GetPrimaryDisplay();
+#endif
 }
 
 display::Display DesktopScreenWayland::GetDisplayMatching(
     const gfx::Rect& match_rect) const {
   if (displays_.size() == 1)
     return displays_.front();
+
+#if defined(OS_WEBOS)
+  return GetPrimaryDisplay();
+#else
 
   DCHECK(!rect_.IsEmpty());
   int max_area = 0;
@@ -171,6 +180,7 @@ display::Display DesktopScreenWayland::GetDisplayMatching(
 
   // Fallback to the primary display if there is no matching display.
   return matching ? *matching : GetPrimaryDisplay();
+#endif
 }
 
 display::Display DesktopScreenWayland::GetPrimaryDisplay() const {
