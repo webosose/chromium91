@@ -621,6 +621,7 @@ void WaylandDisplay::SubRegion(unsigned handle, int left, int top,
 void WaylandDisplay::SetCursorBitmap(const std::vector<SkBitmap>& bitmaps,
                                      const gfx::Point& location) {
   primary_seat_->SetCursorBitmap(bitmaps, location);
+  FlushDisplay();
 }
 
 void WaylandDisplay::MoveCursor(const gfx::Point& location) {
