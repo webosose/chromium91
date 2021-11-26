@@ -530,12 +530,14 @@ void WaylandDisplay::SetWidgetState(unsigned w, ui::WidgetState state) {
     default:
       break;
   }
+  FlushDisplay();
 }
 
 void WaylandDisplay::SetWidgetTitle(unsigned w, const std::u16string& title) {
   WaylandWindow* widget = GetWidget(w);
   DCHECK(widget);
   widget->SetWindowTitle(title);
+  FlushDisplay();
 }
 
 void WaylandDisplay::CreateWidget(unsigned widget) {
@@ -572,6 +574,7 @@ void WaylandDisplay::InitWindow(unsigned handle,
   default:
     break;
   }
+  FlushDisplay();
 }
 
 void WaylandDisplay::MoveWindow(unsigned widget,
@@ -602,6 +605,7 @@ void WaylandDisplay::MoveWindow(unsigned widget,
     shell_parent = parent_window->ShellSurface();
   }
   popup->Move(shell_type, shell_parent, rect);
+  FlushDisplay();
 }
 
 void WaylandDisplay::AddRegion(unsigned handle, int left, int top,
@@ -609,6 +613,7 @@ void WaylandDisplay::AddRegion(unsigned handle, int left, int top,
   WaylandWindow* widget = GetWidget(handle);
   DCHECK(widget);
   widget->AddRegion(left, top, right, bottom);
+  FlushDisplay();
 }
 
 void WaylandDisplay::SubRegion(unsigned handle, int left, int top,
@@ -616,6 +621,7 @@ void WaylandDisplay::SubRegion(unsigned handle, int left, int top,
   WaylandWindow* widget = GetWidget(handle);
   DCHECK(widget);
   widget->SubRegion(left, top, right, bottom);
+  FlushDisplay();
 }
 
 void WaylandDisplay::SetCursorBitmap(const std::vector<SkBitmap>& bitmaps,
@@ -626,6 +632,7 @@ void WaylandDisplay::SetCursorBitmap(const std::vector<SkBitmap>& bitmaps,
 
 void WaylandDisplay::MoveCursor(const gfx::Point& location) {
   primary_seat_->MoveCursor(location);
+  FlushDisplay();
 }
 
 void WaylandDisplay::SetCursorVisibility(bool visible) {
@@ -633,12 +640,14 @@ void WaylandDisplay::SetCursorVisibility(bool visible) {
   if (pointer_visible_ != visible) {
     wl_webos_input_manager_set_cursor_visibility(webos_input_manager_,
                                                  visible ? 1 : 0);
+    FlushDisplay();
   }
 #endif
 }
 
 void WaylandDisplay::ResetIme(unsigned handle) {
   primary_seat_->ResetIme(handle);
+  FlushDisplay();
 }
 
 void WaylandDisplay::ImeCaretBoundsChanged(gfx::Rect rect) {
@@ -647,16 +656,19 @@ void WaylandDisplay::ImeCaretBoundsChanged(gfx::Rect rect) {
 
 void WaylandDisplay::ShowInputPanel(unsigned handle) {
   primary_seat_->ShowInputPanel(handle);
+  FlushDisplay();
 }
 
 void WaylandDisplay::HideInputPanel(ui::ImeHiddenType hidden_type,
                                     unsigned handle) {
   primary_seat_->HideInputPanel(handle, hidden_type);
+  FlushDisplay();
 }
 
 void WaylandDisplay::SetTextInputInfo(const ui::TextInputInfo& text_input_info,
                                       unsigned handle) {
   primary_seat_->SetTextInputInfo(text_input_info, handle);
+  FlushDisplay();
 }
 
 void WaylandDisplay::RequestDragData(const std::string& mime_type) {
@@ -693,6 +705,7 @@ void WaylandDisplay::SetWindowProperty(unsigned w,
     return;
   }
   widget->SetWindowProperty(name, value);
+  FlushDisplay();
 }
 
 void WaylandDisplay::SetLocationHint(unsigned w, gfx::LocationHint value) {
@@ -702,6 +715,7 @@ void WaylandDisplay::SetLocationHint(unsigned w, gfx::LocationHint value) {
     return;
   }
   widget->SetLocationHint(value);
+  FlushDisplay();
 }
 
 void WaylandDisplay::DetachWindowGroup(unsigned w) {
@@ -921,6 +935,7 @@ void WaylandDisplay::XInputActivate(const std::string& type) {
     return;
 
   wl_webos_xinput_activated(webos_xinput_, type.c_str());
+  FlushDisplay();
 #else
   LOG(INFO) << "WaylandDisplay::XInputActivate reached";
 #endif
@@ -932,6 +947,7 @@ void WaylandDisplay::XInputDeactivate() {
     return;
 
   wl_webos_xinput_deactivated(webos_xinput_);
+  FlushDisplay();
 #else
   LOG(INFO) << "WaylandDisplay::XInputDeactivate reached";
 #endif
