@@ -51,22 +51,21 @@ void PlatformLanguageListener::OnLanguageChanged(
 
   auto* renderer_prefs(contents->GetMutableRendererPrefs());
   if (renderer_prefs->accept_languages.compare(language_string)) {
+    if (!renderer_prefs->accept_languages.empty()) {
+      // when the locale setting is changed
+      content::RenderFrameHost* render_frame_host = contents->GetMainFrame();
+      if (render_frame_host) {
+        std::string js_code =
+            R"JS(
+            var event_locale_change = new CustomEvent("webOSLocaleChange", {detail: {locale: ")JS" +
+            language_string + R"JS("}});
+            document.dispatchEvent(event_locale_change);)JS";
+        render_frame_host->ExecuteJavaScript(base::UTF8ToUTF16(js_code),
+                                             base::NullCallback());
+      }
+    }
     renderer_prefs->accept_languages = language_string;
     contents->SyncRendererPrefs();
-  }
-
-  if (!renderer_prefs->accept_languages.empty()) {
-    // when the locale setting is changed
-    content::RenderFrameHost* render_frame_host = contents->GetMainFrame();
-    if (render_frame_host) {
-      std::string js_code =
-          R"JS(
-          var event_locale_change = new CustomEvent("webOSLocaleChange", {detail: {locale: ")JS" +
-          language_string + R"JS("}});
-          document.dispatchEvent(event_locale_change);)JS";
-      render_frame_host->ExecuteJavaScript(base::UTF8ToUTF16(js_code),
-                                           base::NullCallback());
-    }
   }
 }
 
