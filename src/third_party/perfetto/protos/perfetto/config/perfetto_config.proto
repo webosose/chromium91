@@ -798,7 +798,7 @@ message PerfEvents {
     // See common/perf_events.proto for the definitions.
     oneof event {
       Counter counter = 4;
-      Tracepoint tracepoint = 3;
+      Tracepoint trace_point = 3;
     }
   }
 

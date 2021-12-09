@@ -123,8 +123,8 @@ void WritePerfEventDefaultsPacket(const EventConfig& event_config,
     // TODO(rsavitski): reconsider using a struct with two strings instead
     // of the ::gen::Tracepoint class in the C++ code.
     auto* tracepoint_pb = timebase_pb->set_tracepoint();
-    tracepoint_pb->set_name(timebase.tracepoint.name());
-    tracepoint_pb->set_filter(timebase.tracepoint.filter());
+    tracepoint_pb->set_name(timebase.trace_point.name());
+    tracepoint_pb->set_filter(timebase.trace_point.filter());
   }
 }
 

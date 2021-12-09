@@ -58,8 +58,8 @@ StringId InternTimebaseCounterName(
   if (timebase.counter() != PerfEvents::UNKNOWN_COUNTER) {
     return context->storage->InternString(StringifyCounter(timebase.counter()));
   }
-  PerfEvents::Tracepoint::Decoder tracepoint(timebase.tracepoint());
-  return context->storage->InternString(tracepoint.name());
+  PerfEvents::Tracepoint::Decoder trace_point(timebase.trace_point());
+  return context->storage->InternString(trace_point.name());
 }
 }  // namespace
 

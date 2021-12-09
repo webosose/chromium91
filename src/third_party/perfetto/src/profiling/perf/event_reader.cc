@@ -69,9 +69,9 @@ base::ScopedFile PerfEventOpen(uint32_t cpu,
 // If counting tracepoints, set an event filter if requested.
 bool MaybeApplyTracepointFilter(int fd, const PerfCounter& event) {
   if (event.type == PERF_TYPE_TRACEPOINT &&
-      !event.tracepoint.filter().empty()) {
+      !event.trace_point.filter().empty()) {
     if (ioctl(fd, PERF_EVENT_IOC_SET_FILTER,
-              event.tracepoint.filter().c_str()) != 0) {
+              event.trace_point.filter().c_str()) != 0) {
       PERFETTO_PLOG("Failed ioctl to set event filter");
       return false;
     }

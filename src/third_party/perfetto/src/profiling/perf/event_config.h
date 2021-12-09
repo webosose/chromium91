@@ -54,7 +54,7 @@ struct PerfCounter {
   // Either a predefined counter, or a tracepoint:
   protos::gen::PerfEvents::Counter counter =
       protos::gen::PerfEvents::PerfEvents::UNKNOWN_COUNTER;
-  protos::gen::PerfEvents::Tracepoint tracepoint;
+  protos::gen::PerfEvents::Tracepoint trace_point;
 
   // sycall-level description of the event:
   uint32_t type = 0;    // perf_event_attr.type
@@ -69,7 +69,7 @@ struct PerfCounter {
                              uint32_t type,
                              uint32_t config);
 
-  static PerfCounter Tracepoint(protos::gen::PerfEvents::Tracepoint tracepoint,
+  static PerfCounter Tracepoint(protos::gen::PerfEvents::Tracepoint trace_point,
                                 uint32_t id);
 };
 

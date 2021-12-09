@@ -74,9 +74,9 @@ std::pair<std::string, std::string> SplitTracepointString(
 
 // If set, the returned id is guaranteed to be non-zero.
 base::Optional<uint32_t> ParseTracepointAndResolveId(
-    const protos::gen::PerfEvents::Tracepoint& tracepoint,
-    EventConfig::tracepoint_id_fn_t tracepoint_id_lookup) {
-  std::string full_name = tracepoint.name();
+    const protos::gen::PerfEvents::Tracepoint& trace_point,
+    EventConfig::tracepoint_id_fn_t trace_point_id_lookup) {
+  std::string full_name = trace_point.name();
   std::string tp_group;
   std::string tp_name;
   std::tie(tp_group, tp_name) = SplitTracepointString(full_name);
@@ -194,10 +194,10 @@ PerfCounter PerfCounter::Counter(protos::gen::PerfEvents::Counter counter,
 
 // static
 PerfCounter PerfCounter::Tracepoint(
-    protos::gen::PerfEvents::Tracepoint tracepoint,
+    protos::gen::PerfEvents::Tracepoint trace_point,
     uint32_t id) {
   PerfCounter ret;
-  ret.tracepoint = std::move(tracepoint);
+  ret.trace_point = std::move(trace_point);
   ret.type = PERF_TYPE_TRACEPOINT;
   ret.config = id;
   return ret;
@@ -243,7 +243,7 @@ base::Optional<EventConfig> EventConfig::Create(
     timebase_event = *maybe_counter;
 
   } else if (pb_config.timebase().has_tracepoint()) {
-    const auto& tracepoint_pb = pb_config.timebase().tracepoint();
+    const auto& tracepoint_pb = pb_config.timebase().trace_point();
     base::Optional<uint32_t> maybe_id =
         ParseTracepointAndResolveId(tracepoint_pb, tracepoint_id_lookup);
     if (!maybe_id)
