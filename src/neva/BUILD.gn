@@ -44,10 +44,6 @@ config("config") {
     defines += [ "ENABLE_MEMORYMANAGER_WEBAPI=1" ]
   }
 
-  if (enable_network_error_page_controller_webapi) {
-    defines += [ "ENABLE_NETWORK_ERROR_PAGE_CONTROLLER_WEBAPI=1" ]
-  }
-
   if (neva_dcheck_always_on) {
     defines += [ "NEVA_DCHECK_ALWAYS_ON=1" ]
   }

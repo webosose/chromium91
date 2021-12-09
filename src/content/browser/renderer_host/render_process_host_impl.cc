@@ -270,9 +270,6 @@
 #include "neva/pal_service/public/mojom/os_crypt.mojom.h"
 #include "neva/pal_service/public/mojom/sample.mojom.h"
 #include "neva/pal_service/public/mojom/system_servicebridge.mojom.h"
-#if defined(ENABLE_NETWORK_ERROR_PAGE_CONTROLLER_WEBAPI)
-#include "neva/pal_service/public/mojom/network_error_page_controller.mojom.h"
-#endif  // defined(ENABLE_NETWORK_ERROR_PAGE_CONTROLLER_WEBAPI)
 #endif  // defined(USE_NEVA_APPRUNTIME)
 
 #if defined(USE_NEVA_MEDIA)
@@ -2287,16 +2284,6 @@ void RenderProcessHostImpl::RegisterMojoInterfaces() {
             pal::GetPalService().BindSystemServiceBridgeProvider(
                 std::move(receiver));
           }));
-#if defined(ENABLE_NETWORK_ERROR_PAGE_CONTROLLER_WEBAPI)
-  AddUIThreadInterface(
-      registry.get(),
-      base::BindRepeating(
-          [](mojo::PendingReceiver<pal::mojom::NetworkErrorPageController>
-                 receiver) {
-            pal::GetPalService().BindNetworkErrorPageController(
-                std::move(receiver));
-          }));
-#endif  // defined(ENABLE_NETWORK_ERROR_PAGE_CONTROLLER_WEBAPI)
 #endif  // defined(USE_NEVA_APPRUNTIME)
 
 #if defined(USE_NEVA_MEDIA)

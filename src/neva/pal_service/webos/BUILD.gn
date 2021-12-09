@@ -25,8 +25,6 @@ source_set("pal_service_webos") {
     "language_tracker_delegate_webos.h",
     "memorymanager_delegate_webos.cc",
     "memorymanager_delegate_webos.h",
-    "network_error_page_controller_delegate_webos.cc",
-    "network_error_page_controller_delegate_webos.h",
     "pal_platform_factory_webos.cc",
     "platform_system_delegate_webos.cc",
     "platform_system_delegate_webos.h",

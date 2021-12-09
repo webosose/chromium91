@@ -71,12 +71,6 @@ source_set("webos_impl") {
     "public/runtime.cc",
     "public/runtime.h",
     "public/runtime_delegates.h",
-    "renderer/webos_content_renderer_client.cc",
-    "renderer/webos_content_renderer_client.h",
-    "renderer/webos_network_error_helper.cc",
-    "renderer/webos_network_error_helper.h",
-    "renderer/webos_network_error_template_builder.cc",
-    "renderer/webos_network_error_template_builder.h",
     "webapp_window.cc",
     "webapp_window.h",
     "webapp_window_base.cc",
@@ -114,63 +108,12 @@ source_set("webos_impl") {
   include_dirs = [ "." ]
 }
 
-grit("webos_network_error_resources_grit") {
-  visibility = [ ":*" ]
-  source = "//webos/browser/resources/webos_network_error_resources.grd"
-  output_dir = "$root_gen_dir/webos/"
-  outputs = [
-    "grit/webos_network_error_resources.h",
-    "webos_network_error_resources.pak"
-  ]
-}
-
-grit("webos_network_error_strings_grit") {
-  visibility = [ ":*" ]
-  source = "//webos/browser/resources/webos_network_error_strings.grd"
-  output_dir = "$root_gen_dir/webos/"
-  outputs = [
-    "grit/webos_network_error_strings.h",
-  ]
-
-  foreach(locale, app_runtime_locales) {
-    outputs += [ "webos_network_error_strings_$locale.pak" ]
-  }
-}
-
-repack_locales("repack") {
-  visibility = [ ":resources" ]
-  source_patterns = [
-    "${root_gen_dir}/neva/app_runtime/locales/",
-    "${root_gen_dir}/webos/webos_network_error_strings_",
-  ]
-
-  deps = [
-    ":webos_network_error_strings_grit",
-    "//neva/app_runtime:app_runtime_network_error_strings_grit",
-  ]
-
-  input_locales = app_runtime_locales
-  output_locales = app_runtime_locales
-  copy_data_to_bundle = true
-}
-
-group("resources") {
-  public_deps = [
-    ":webos_network_error_resources_grit",
-    ":repack",
-  ]
-}
-
 repack("webos_resources") {
   sources = [
-    "$root_gen_dir/webos/webos_network_error_resources.pak",
-    "$root_gen_dir/webos/webos_network_error_strings_en-US.pak",
     "$root_out_dir/app_runtime_content.pak",
   ]
 
   deps = [
-    ":resources",
-    ":webos_network_error_strings_grit",
     "//neva/app_runtime:app_runtime_resources"
   ]
 

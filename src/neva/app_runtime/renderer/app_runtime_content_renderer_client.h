@@ -33,8 +33,6 @@ class ShellExtensionsRendererClient;
 
 namespace neva_app_runtime {
 
-class AppRuntimeRenderThreadObserver;
-
 class AppRuntimeContentRendererClient : public content::ContentRendererClient {
  public:
   AppRuntimeContentRendererClient();
@@ -46,11 +44,6 @@ class AppRuntimeContentRendererClient : public content::ContentRendererClient {
 
   void RenderFrameCreated(content::RenderFrame* render_frame) override;
   void RenderThreadStarted() override;
-
-  void PrepareErrorPage(content::RenderFrame* render_frame,
-                        const blink::WebURLError& error,
-                        const std::string& http_method,
-                        std::string* error_html) override;
 
   void WillSendRequest(blink::WebLocalFrame* frame,
                        ui::PageTransition transition_type,
@@ -75,11 +68,8 @@ class AppRuntimeContentRendererClient : public content::ContentRendererClient {
   void RunScriptsAtDocumentEnd(content::RenderFrame* render_frame) override;
 #endif
 
-  void DestructObserver();
-
  private:
   void ArmWatchdog();
-  std::unique_ptr<AppRuntimeRenderThreadObserver> observer_;
   std::unique_ptr<watchdog::Watchdog> watchdog_;
 
   WebViewInfo webview_info_;

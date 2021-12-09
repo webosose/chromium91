@@ -28,7 +28,6 @@
 namespace pal {
 
 class MemoryManagerDelegate;
-class NetworkErrorPageControllerDelegate;
 class OSCryptDelegate;
 class PlatformSystemDelegate;
 
@@ -56,9 +55,6 @@ class COMPONENT_EXPORT(PAL_SERVICE) PlatformFactory {
       SystemServiceBridgeDelegate::Response callback);
 
   std::unique_ptr<PlatformSystemDelegate> CreatePlatformSystemDelegate();
-
-  std::unique_ptr<NetworkErrorPageControllerDelegate>
-  CreateNetworkErrorPageControllerDelegate();
 
  private:
   PlatformFactory();

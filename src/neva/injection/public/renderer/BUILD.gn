@@ -36,13 +36,6 @@ source_set("renderer") {
     ]
   }
 
-  if (enable_network_error_page_controller_webapi) {
-    sources += [
-      "network_error_page_controller_webapi.cc",
-      "network_error_page_controller_webapi.h",
-    ]
-  }
-
   if (enable_sample_webapi) {
     sources += [
       "sample_webapi.cc",

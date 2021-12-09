@@ -136,15 +136,9 @@ copy("locales") {
     "$root_gen_dir/third_party/blink/public/strings/blink_strings_zh-TW.pak",
   ]
 
-  foreach(locale, app_runtime_locales) {
-    sources += [ "$root_gen_dir/webos/repack/$locale.pak" ]
-  }
-
-
   outputs = [ "$image_path/$cbe_data_locales_dir/{{source_file_part}}" ]
   deps = [
     "//third_party/blink/public/strings",
-    "//webos:resources",
   ]
 }
 

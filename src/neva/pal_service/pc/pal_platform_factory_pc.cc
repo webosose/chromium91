@@ -23,7 +23,6 @@
 #include "neva/pal_service/public/application_registrator_delegate.h"
 #include "neva/pal_service/public/language_tracker_delegate.h"
 #include "neva/pal_service/public/memorymanager_delegate.h"
-#include "neva/pal_service/public/network_error_page_controller_delegate.h"
 #include "neva/pal_service/public/system_servicebridge_delegate.h"
 
 namespace pal {
@@ -60,11 +59,6 @@ PlatformFactory::CreateSystemServiceBridgeDelegate(
 std::unique_ptr<PlatformSystemDelegate>
 PlatformFactory::CreatePlatformSystemDelegate() {
   return std::make_unique<dummy::PlatformSystemDelegateDummy>();
-}
-
-std::unique_ptr<NetworkErrorPageControllerDelegate>
-PlatformFactory::CreateNetworkErrorPageControllerDelegate() {
-  return std::unique_ptr<NetworkErrorPageControllerDelegate>();
 }
 
 }  // namespace pal

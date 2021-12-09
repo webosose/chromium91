@@ -27,9 +27,7 @@
 #include "net/base/filename_util.h"
 #include "neva/app_runtime/app/app_runtime_main_delegate.h"
 #include "neva/app_runtime/common/app_runtime_file_access_controller.h"
-#include "neva/app_runtime/grit/app_runtime_network_error_resources.h"
 #include "neva/app_runtime/public/webview_info.h"
-#include "neva/app_runtime/renderer/app_runtime_localized_error.h"
 #include "neva/app_runtime/renderer/app_runtime_page_load_timing_render_frame_observer.h"
 #include "neva/app_runtime/renderer/app_runtime_render_frame_observer.h"
 #include "third_party/blink/public/mojom/fetch/fetch_api_request.mojom.h"
@@ -78,35 +76,6 @@ using blink::mojom::FetchCacheMode;
 
 namespace neva_app_runtime {
 
-class AppRuntimeRenderThreadObserver : public content::RenderFrameObserver,
-                                       public content::RenderThreadObserver {
- public:
-  AppRuntimeRenderThreadObserver(content::RenderFrame* render_frame,
-      AppRuntimeContentRendererClient* renderer_client)
-      : content::RenderFrameObserver(render_frame),
-        renderer_client_(renderer_client) {
-    content::RenderThread::Get()->AddObserver(this);
-  }
-
-  ~AppRuntimeRenderThreadObserver() override {
-    content::RenderThread::Get()->RemoveObserver(this);
-  }
-
-  void OnDestruct() override { renderer_client_->DestructObserver(); }
-
-  void NetworkStateChanged(bool online) override {
-    if (online) {
-      if (render_frame() && render_frame()->GetWebFrame())
-        render_frame()->GetWebFrame()->StartReload(
-            blink::WebFrameLoadType::kReload);
-      OnDestruct();
-    }
-  }
-
- private:
-  AppRuntimeContentRendererClient* renderer_client_;
-};
-
 AppRuntimeContentRendererClient::AppRuntimeContentRendererClient() {}
 
 AppRuntimeContentRendererClient::~AppRuntimeContentRendererClient() {}
@@ -128,33 +97,6 @@ void AppRuntimeContentRendererClient::RenderFrameCreated(
   // since we only want to observe page load timing for the main frame.
   if (render_frame->IsMainFrame()) {
     new AppRuntimePageLoadTimingRenderFrameObserver(render_frame);
-  }
-}
-
-void AppRuntimeContentRendererClient::PrepareErrorPage(
-    content::RenderFrame* render_frame,
-    const blink::WebURLError& error,
-    const std::string& http_method,
-    std::string* error_html) {
-  if (error_html) {
-    error_html->clear();
-
-    // Resource will change to net error specific page
-    int resource_id = IDR_APP_RUNTIME_NETWORK_ERROR_PAGE;
-    const std::string template_html =
-        ui::ResourceBundle::GetSharedInstance().LoadDataResourceString(
-            resource_id);
-    if (template_html.empty()) {
-      LOG(ERROR) << "unable to load template.";
-    } else {
-      base::DictionaryValue error_strings;
-      AppRuntimeLocalizedError::GetStrings(error.reason(), error_strings);
-      // "t" is the id of the template's root node.
-      *error_html = webui::GetTemplatesHtml(template_html,
-          &error_strings, "t");
-    }
-
-    observer_.reset(new AppRuntimeRenderThreadObserver(render_frame, this));
   }
 }
 
@@ -197,10 +139,6 @@ void AppRuntimeContentRendererClient::SetWebViewInfo(
     const std::string& app_path, const std::string& trust_level) {
   webview_info_.app_path = app_path;
   webview_info_.trust_level = trust_level;
-}
-
-void AppRuntimeContentRendererClient::DestructObserver() {
-  observer_.reset();
 }
 
 #if defined(USE_NEVA_MEDIA)

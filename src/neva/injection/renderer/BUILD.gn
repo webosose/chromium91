@@ -47,13 +47,6 @@ source_set("renderer") {
     ]
   }
 
-  if (enable_network_error_page_controller_webapi) {
-    sources += [
-      "network_error_page/network_error_page_controller_injection.cc",
-      "network_error_page/netwerk_error_page_controller_injection.h",
-    ]
-  }
-
   if (enable_sample_webapi) {
     sources += [
       "sample/sample_injection.cc",

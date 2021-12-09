@@ -22,8 +22,6 @@ component("pal_service") {
   sources = [
     "memorymanager.cc",
     "memorymanager.h",
-    "network_error_page_controller.cc",
-    "network_error_page_controller.h",
     "os_crypt.cc",
     "os_crypt.h",
     "os_crypt_delegate.h",

@@ -24,10 +24,10 @@
 #include "components/viz/common/switches.h"
 #include "content/public/common/content_switches.h"
 #include "neva/app_runtime/browser/app_runtime_content_browser_client.h"
+#include "neva/app_runtime/renderer/app_runtime_content_renderer_client.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/base/ui_base_paths.h"
 #include "webos/common/webos_resource_delegate.h"
-#include "webos/renderer/webos_content_renderer_client.h"
 
 #if defined(USE_PMLOG)
 #include "base/logging_pmlog_provider.h"
@@ -87,7 +87,8 @@ void WebOSContentMainDelegate::PreSandboxStartup() {
 
 content::ContentRendererClient*
 WebOSContentMainDelegate::CreateContentRendererClient() {
-  content_renderer_client_.reset(new WebOSContentRendererClient());
+  content_renderer_client_.reset(
+      new neva_app_runtime::AppRuntimeContentRendererClient());
   return content_renderer_client_.get();
 }
 

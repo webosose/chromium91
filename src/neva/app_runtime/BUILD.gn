@@ -95,8 +95,6 @@ static_library("app_runtime") {
     "renderer/app_runtime_content_renderer_client.h",
     "renderer/app_runtime_injection_loader.cc",
     "renderer/app_runtime_injection_loader.h",
-    "renderer/app_runtime_localized_error.cc",
-    "renderer/app_runtime_localized_error.h",
     "renderer/app_runtime_page_load_timing_render_frame_observer.cc",
     "renderer/app_runtime_page_load_timing_render_frame_observer.h",
     "renderer/app_runtime_render_frame_observer.cc",
@@ -216,50 +214,10 @@ grit("app_runtime_inspector_resources_grit") {
   ]
 }
 
-grit("app_runtime_network_error_resources_grit") {
-  visibility = [ ":*" ]
-  source = "//neva/app_runtime/browser/resources/app_runtime_network_error_resources.grd"
-  output_dir = "$root_gen_dir/neva/app_runtime/"
-  outputs = [
-    "grit/app_runtime_network_error_resources.h",
-    "network_error_resources.pak",
-  ]
-}
-
-grit("app_runtime_network_error_strings_grit") {
-  source = "//neva/app_runtime/browser/resources/app_runtime_network_error_strings.grd"
-  output_dir = "$root_gen_dir/neva/app_runtime/"
-  outputs = [
-    "grit/app_runtime_network_error_strings.h",
-  ]
-
-  foreach(locale, app_runtime_locales) {
-    outputs += [ "locales/$locale.pak" ]
-  }
-}
-
-if (!use_cbe) {
-  repack_locales("locales_repack") {
-    source_patterns = [ "${root_gen_dir}/neva/app_runtime/locales/" ]
-    deps = [ ":app_runtime_network_error_strings_grit" ]
-
-    output_dir = "$root_out_dir/neva_locales"
-    input_locales = app_runtime_locales
-    output_locales = app_runtime_locales
-    copy_data_to_bundle = true
-  }
-}
-
 group("resources") {
   public_deps = [
     ":app_runtime_inspector_resources_grit",
-    ":app_runtime_network_error_resources_grit",
-    ":app_runtime_network_error_strings_grit",
   ]
-
-  if (!use_cbe) {
-    public_deps += [":locales_repack"]
-  }
 }
 
 repack("app_runtime_resources") {
@@ -276,8 +234,6 @@ repack("app_runtime_resources") {
     "$root_gen_dir/mojo/public/js/mojo_bindings_resources.pak",
     "$root_gen_dir/net/net_resources.pak",
     "$root_gen_dir/neva/app_runtime/app_runtime_inspector_resources.pak",
-    "$root_gen_dir/neva/app_runtime/locales/en-US.pak",
-    "$root_gen_dir/neva/app_runtime/network_error_resources.pak",
     "$root_gen_dir/third_party/blink/public/resources/blink_resources.pak",
     "$root_gen_dir/third_party/blink/public/resources/blink_scaled_resources_100_percent.pak",
     "$root_gen_dir/third_party/blink/public/strings/blink_strings_en-US.pak",

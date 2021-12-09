@@ -22,7 +22,6 @@
 #include "neva/pal_service/webos/application_registrator_delegate_webos.h"
 #include "neva/pal_service/webos/language_tracker_delegate_webos.h"
 #include "neva/pal_service/webos/memorymanager_delegate_webos.h"
-#include "neva/pal_service/webos/network_error_page_controller_delegate_webos.h"
 #include "neva/pal_service/webos/system_servicebridge_delegate_webos.h"
 
 #if defined(USE_WEBOS_STARFISH)
@@ -75,11 +74,6 @@ PlatformFactory::CreatePlatformSystemDelegate() {
 #else
   return std::make_unique<webos::PlatformSystemDelegateWebOS>();
 #endif
-}
-
-std::unique_ptr<NetworkErrorPageControllerDelegate>
-PlatformFactory::CreateNetworkErrorPageControllerDelegate() {
-  return std::make_unique<webos::NetworkErrorPageControllerDelegateWebOS>();
 }
 
 }  // namespace pal

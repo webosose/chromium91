@@ -109,7 +109,4 @@ declare_args() {
 declare_args() {
   # Suspend capturing audio/video when tab or app is suspended
   use_neva_suspend_media_capture = is_webos
-
-  # Enable network error page controller WebAPI
-  enable_network_error_page_controller_webapi = is_webos
 }

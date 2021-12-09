@@ -30,9 +30,7 @@
 #include "content/public/browser/browser_thread.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "neva/pal_service/memorymanager.h"
-#include "neva/pal_service/network_error_page_controller.h"
 #include "neva/pal_service/public/mojom/memorymanager.mojom.h"
-#include "neva/pal_service/public/mojom/network_error_page_controller.mojom.h"
 #include "neva/pal_service/public/mojom/sample.mojom.h"
 #include "neva/pal_service/public/mojom/system_servicebridge.mojom.h"
 #include "neva/pal_service/sample.h"
@@ -48,17 +46,12 @@ class PalServiceImpl : public mojom::PalService {
  private:
   void BindMemoryManager(
       mojo::PendingReceiver<mojom::MemoryManager> receiver) override;
-  void BindNetworkErrorPageController(
-      mojo::PendingReceiver<mojom::NetworkErrorPageController> receiver)
-      override;
   void BindSample(mojo::PendingReceiver<mojom::Sample> receiver) override;
   void BindSystemServiceBridgeProvider(
       mojo::PendingReceiver<mojom::SystemServiceBridgeProvider>
           receiver) override;
 
   std::unique_ptr<pal::MemoryManagerImpl> memorymanager_impl_;
-  std::unique_ptr<pal::NetworkErrorPageControllerImpl>
-      network_error_page_controller_impl_;
   std::unique_ptr<pal::SampleImpl> sample_impl_;
   std::unique_ptr<pal::SystemServiceBridgeProviderImpl>
       system_servicebridge_provider_impl_;
@@ -79,16 +72,6 @@ void PalServiceImpl::BindMemoryManager(
   if (!memorymanager_impl_)
     memorymanager_impl_ = std::make_unique<MemoryManagerImpl>();
   memorymanager_impl_->AddBinding(std::move(receiver));
-}
-
-void PalServiceImpl::BindNetworkErrorPageController(
-    mojo::PendingReceiver<mojom::NetworkErrorPageController> receiver) {
-  if (!network_error_page_controller_impl_) {
-    network_error_page_controller_impl_ =
-        std::make_unique<NetworkErrorPageControllerImpl>();
-  }
-
-  network_error_page_controller_impl_->AddBinding(std::move(receiver));
 }
 
 void PalServiceImpl::BindSample(mojo::PendingReceiver<mojom::Sample> receiver) {
