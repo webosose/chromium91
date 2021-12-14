@@ -21,6 +21,10 @@
 #include "content/public/common/url_constants.h"
 #include "mojo/public/cpp/system/message_pipe.h"
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "url/url_constants.h"
+#endif
+
 namespace content {
 
 namespace {
@@ -150,7 +154,15 @@ bool VerifyBeginNavigationCommonParams(
 
   // Verify (and possibly rewrite) |url|.
   process->FilterURL(false, &common_params->url);
+
+#if defined(USE_NEVA_APPRUNTIME)
+  // APPRUNTIME sets 'kIllegalDataURL' for local file request in case the
+  // access is blocked, in that case we don't need to terminate renderer.
+  if (common_params->url.SchemeIs(kChromeErrorScheme) &&
+      GURL(common_params->url) != url::kIllegalDataURL) {
+#else
   if (common_params->url.SchemeIs(kChromeErrorScheme)) {
+#endif
     mojo::ReportBadMessage("Renderer cannot request error page URLs directly");
     return false;
   }
