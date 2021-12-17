@@ -679,6 +679,7 @@ base::Optional<ui::Cursor> EventHandler::SelectCursor(
   if (!check_parent_node) {
     Element* element = To<Element>(node);
     bool defined_by_css_class = false;
+    element->GetDocument().UpdateStyleAndLayoutTreeForNode(element);
     StyleRuleList* default_style =
         element->GetDocument().GetStyleResolver().StyleRulesForElement(
             element, StyleResolver::kAuthorCSSRules);
