@@ -18,7 +18,7 @@
 #define CONTENT_BROWSER_MEDIA_NEVA_FRAME_VIDEO_WINDOW_FACTORY_IMPL_
 
 #include "content/public/common/neva/frame_video_window_factory.mojom.h"
-#include "mojo/public/cpp/bindings/unique_receiver_set.h"
+#include "mojo/public/cpp/bindings/remote.h"
 #include "ui/platform_window/neva/mojom/video_window.mojom.h"
 
 namespace content {
@@ -37,6 +37,7 @@ class FrameVideoWindowFactoryImpl
 
  private:
   RenderFrameHostImpl* render_frame_host_impl_;
+  mojo::Remote<ui::mojom::VideoWindowConnector> controller_;
 };
 
 }  // namespace content

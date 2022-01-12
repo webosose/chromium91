@@ -20,7 +20,6 @@
 #include "content/browser/renderer_host/render_frame_host_impl.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/gpu_service_registry.h"
-#include "mojo/public/cpp/bindings/remote.h"
 
 namespace content {
 
@@ -38,12 +37,10 @@ void FrameVideoWindowFactoryImpl::CreateVideoWindow(
 
   gfx::AcceleratedWidget owner =
       render_frame_host_impl_->GetAcceleratedWidget();
-
-  mojo::Remote<ui::mojom::VideoWindowConnector> connector;
-  content::BindInterfaceInGpuProcess(connector.BindNewPipeAndPassReceiver());
-
-  connector->CreateVideoWindow(owner, std::move(client), std::move(receiver),
-                               params);
+  if (!controller_)
+    content::BindInterfaceInGpuProcess(controller_.BindNewPipeAndPassReceiver());
+  controller_->CreateVideoWindow(owner, std::move(client), std::move(receiver),
+                                 params);
 }
 
 }  // namespace content

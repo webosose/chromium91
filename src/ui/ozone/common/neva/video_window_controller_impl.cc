@@ -55,7 +55,7 @@ void VideoWindowControllerImpl::SetVideoWindowProvider(
 
 void VideoWindowControllerImpl::Bind(
     mojo::PendingReceiver<mojom::VideoWindowConnector> receiver) {
-  receiver_.Bind(std::move(receiver));
+  receivers_.Add(this, std::move(receiver));
 }
 
 void VideoWindowControllerImpl::OnVideoWindowCreated(

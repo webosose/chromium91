@@ -23,7 +23,7 @@
 #include "base/unguessable_token.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
-#include "mojo/public/cpp/bindings/receiver.h"
+#include "mojo/public/cpp/bindings/receiver_set.h"
 #include "ui/gfx/geometry/rect.h"
 #include "ui/gfx/native_widget_types.h"
 #include "ui/ozone/common/neva/video_window_controller.h"
@@ -88,7 +88,7 @@ class VideoWindowControllerImpl : public mojom::VideoWindowConnector,
   std::map<gfx::AcceleratedWidget, std::set<base::UnguessableToken>>
       hidden_candidate_;
 
-  mojo::Receiver<mojom::VideoWindowConnector> receiver_{this};
+  mojo::ReceiverSet<ui::mojom::VideoWindowConnector> receivers_;
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
   bool initialized_ = false;
 };
