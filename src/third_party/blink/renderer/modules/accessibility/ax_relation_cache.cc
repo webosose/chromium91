@@ -444,6 +444,13 @@ void AXRelationCache::RemoveAXID(AXID obj_id) {
     aria_owned_child_to_owner_mapping_.RemoveAll(child_axids);
     // Owned children are no longer owned by |obj_id|
     aria_owner_to_children_mapping_.erase(obj_id);
+    for (const auto& child_axid : child_axids) {
+      if (AXObject* owned_child = ObjectFromAXID(child_axid)) {
+        owned_child->DetachFromParent();
+        if (AXObject* real_parent = owned_child->ParentObject())
+          ChildrenChanged(real_parent);
+      }
+    }
   }
 
   // Another id owned |obj_id|:
