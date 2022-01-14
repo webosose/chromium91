@@ -17,6 +17,7 @@
 #include "neva/pal_service/luna/luna_client_impl.h"
 
 #include "base/logging.h"
+#include "neva/pal_service/luna/luna_names.h"
 
 #include <glib.h>
 #include <stdlib.h>
@@ -52,7 +53,7 @@ ClientImpl::ClientImpl(const Params& params)
   Error error;
   bool registered = false;
 
-  if (params.appid.empty()) {
+  if (params.appid.empty() || params.name.find(service_name::kSettingsClient) == 0) {
     registered = LSRegister(params.name.c_str(), &handle_, &error);
   } else {
     registered = LSRegisterApplicationService(
