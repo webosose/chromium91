@@ -392,6 +392,9 @@ class CONTENT_EXPORT RenderFrameImpl
   float GetDeviceScaleFactor() override;
 #if defined(USE_NEVA_APPRUNTIME)
   void ResetStateToMarkNextPaint() override;
+
+  // APPRUNTIME has own procedure for regulating access to local resources.
+  bool IsAccessAllowedForURL(const blink::WebURL& url) override;
 #endif
 #if defined(USE_NEVA_MEDIA)
   content::mojom::FrameVideoWindowFactory* GetFrameVideoWindowFactory()

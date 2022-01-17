@@ -4371,6 +4371,12 @@ void RenderFrameImpl::WillSendRequest(blink::WebURLRequest& request,
 #endif
 }
 
+#if defined(USE_NEVA_APPRUNTIME)
+bool RenderFrameImpl::IsAccessAllowedForURL(const blink::WebURL& url) {
+  return GetContentClient()->renderer()->IsAccessAllowedForURL(url);
+}
+#endif
+
 void RenderFrameImpl::WillSendRequestInternal(
     blink::WebURLRequest& request,
     bool for_main_frame,

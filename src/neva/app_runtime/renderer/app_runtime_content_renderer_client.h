@@ -45,6 +45,8 @@ class AppRuntimeContentRendererClient : public content::ContentRendererClient {
   void RenderFrameCreated(content::RenderFrame* render_frame) override;
   void RenderThreadStarted() override;
 
+  bool IsAccessAllowedForURL(const blink::WebURL& url) override;
+
   void WillSendRequest(blink::WebLocalFrame* frame,
                        ui::PageTransition transition_type,
                        const blink::WebURL& url,

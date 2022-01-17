@@ -100,6 +100,22 @@ void AppRuntimeContentRendererClient::RenderFrameCreated(
   }
 }
 
+bool AppRuntimeContentRendererClient::IsAccessAllowedForURL(
+    const blink::WebURL& url) {
+  // Ignore non-file scheme requests
+  if (!static_cast<GURL>(url).SchemeIsFile())
+    return true;
+
+  const neva_app_runtime::AppRuntimeFileAccessController*
+      file_access_controller = GetFileAccessController();
+
+  if (file_access_controller)
+    return file_access_controller->IsAccessAllowed(
+        base::FilePath(static_cast<GURL>(url).path()), webview_info_);
+
+  return false;
+}
+
 void AppRuntimeContentRendererClient::WillSendRequest(
     blink::WebLocalFrame* frame,
     ui::PageTransition transition_type,

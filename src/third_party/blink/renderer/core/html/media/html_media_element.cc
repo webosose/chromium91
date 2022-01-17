@@ -1627,7 +1627,30 @@ bool HTMLMediaElement::IsSafeToLoadURL(const KURL& url,
   }
 
   LocalDOMWindow* window = GetDocument().domWindow();
+
+#if defined(USE_NEVA_APPRUNTIME)
+  // For local media, it's needed to check, if access is allowed for
+  // current application. APPRUNTIME regulates access to local
+  // resources according to its own logic.
+  bool allow_to_display_url = true;
+  // For all protocols except 'file://' skip below check
+  if (url.ProtocolIs(url::kFileScheme)) {
+    // Strict access to local resources except it's explicitly allowed
+    allow_to_display_url = false;
+    LocalFrame* frame = GetDocument().GetFrame();
+    if (frame) {
+      WebLocalFrameImpl* web_frame = WebLocalFrameImpl::FromFrame(frame);
+      if (web_frame)
+        allow_to_display_url =
+            web_frame->Client()->IsAccessAllowedForURL(WebURL(url));
+    }
+  }
+
+  if (!window || !window->GetSecurityOrigin()->CanDisplay(url) ||
+      !allow_to_display_url) {
+#else
   if (!window || !window->GetSecurityOrigin()->CanDisplay(url)) {
+#endif
     if (action_if_invalid == kComplain) {
       GetDocument().AddConsoleMessage(MakeGarbageCollected<ConsoleMessage>(
           mojom::ConsoleMessageSource::kSecurity,

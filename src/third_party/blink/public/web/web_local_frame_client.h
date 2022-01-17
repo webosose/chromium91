@@ -742,6 +742,11 @@ class BLINK_EXPORT WebLocalFrameClient {
   // than the document's URL because it will contain a data URL if a base URL
   // was used for its load or if an unreachable URL was used.
   virtual WebURL LastCommittedUrlForUKM() { return WebURL(); }
+
+#if defined(USE_NEVA_APPRUNTIME)
+  // APPRUNTIME has own procedure for regulating access to local resources.
+  virtual bool IsAccessAllowedForURL(const blink::WebURL& url) { return true; }
+#endif
 };
 
 }  // namespace blink
