@@ -1628,7 +1628,7 @@ bool HTMLMediaElement::IsSafeToLoadURL(const KURL& url,
 
   LocalDOMWindow* window = GetDocument().domWindow();
 
-#if defined(USE_NEVA_APPRUNTIME)
+#if defined(USE_NEVA_MEDIA)
   // For local media, it's needed to check, if access is allowed for
   // current application. APPRUNTIME regulates access to local
   // resources according to its own logic.
