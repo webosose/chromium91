@@ -103,6 +103,8 @@ bool StructTraits<blink::mojom::RendererPreferencesDataView,
   ///@{
   if (!data.ReadApplicationId(&out->application_id))
     return false;
+  if (!data.ReadDisplayId(&out->display_id))
+    return false;
   if (!data.ReadMediaCodecCapability(&out->media_codec_capability))
     return false;
   if (!data.ReadMediaPreferences(&out->media_preferences))
