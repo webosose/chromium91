@@ -14,17 +14,19 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-module pal.mojom;
+#include "neva/injection/public/renderer/sitefilter_webapi.h"
 
-import "neva/pal_service/public/mojom/memorymanager.mojom";
-import "neva/pal_service/public/mojom/sample.mojom";
-import "neva/pal_service/public/mojom/sitefilter_service.mojom";
-import "neva/pal_service/public/mojom/system_servicebridge.mojom";
+#include "neva/injection/renderer/browser_control/sitefilter_injection.h"
 
-interface PalService {
-  BindMemoryManager(pending_receiver<MemoryManager> receiver);
-  BindSample(pending_receiver<Sample> receiver);
-  BindSystemServiceBridgeProvider(
-      pending_receiver<SystemServiceBridgeProvider> receiver);
-  BindSiteFilterService(pending_receiver<SiteFilterService> receiver);
-};
+namespace injections {
+
+// static
+void SiteFilterWebAPI::Install(blink::WebLocalFrame* frame) {
+  SiteFilterInjection::Install(frame);
+}
+
+void SiteFilterWebAPI::Uninstall(blink::WebLocalFrame* frame) {
+  SiteFilterInjection::Uninstall(frame);
+}
+
+}  // namespace injections

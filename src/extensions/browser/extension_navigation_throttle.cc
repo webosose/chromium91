@@ -37,6 +37,9 @@
 #include "services/metrics/public/cpp/ukm_source_id.h"
 #include "services/network/public/cpp/web_sandbox_flags.h"
 #include "ui/base/page_transition_types.h"
+#if defined(USE_NEVA_APPRUNTIME)
+#include "neva/pal_service/browser/sitefilter_service_impl.h"
+#endif
 
 namespace extensions {
 
@@ -148,6 +151,16 @@ ExtensionNavigationThrottle::WillStartOrRedirectRequest() {
     target_extension =
         registry->enabled_extensions().GetByID(target_origin.host());
   } else {
+#if defined(USE_NEVA_APPRUNTIME)
+    // Calling SiteFilterService::IsBlocked() to check if the current URL
+    // should be blocked or not as per the filter type and URL list set by
+    // user(blocked/allowed/off).
+    // Returns true if the URL has to be blocked.
+    if (pal::SiteFilterServiceImpl::Get()->IsBlocked(
+            url, navigation_handle()->WasServerRedirect())) {
+      return content::NavigationThrottle::CANCEL;
+    }
+#endif
     // If the navigation is not to a chrome-extension resource, no need to
     // perform any more checks; it's outside of the purview of this throttle.
     return content::NavigationThrottle::PROCEED;

@@ -118,6 +118,7 @@ void ShellAppDelegate::RenderFrameCreated(
     contents->GetMainFrame()->GetRemoteAssociatedInterfaces()
         ->GetInterface(&client);
 
+    client->AddInjectionToLoad(std::string("v8/sitefilter"));
 #if defined(ENABLE_MEMORYMANAGER_WEBAPI)
     client->AddInjectionToLoad(std::string("v8/memorymanager"));
 #endif  // defined(ENABLE_MEMORYMANAGER_WEBAPI)

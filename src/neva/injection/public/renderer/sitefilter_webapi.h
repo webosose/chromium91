@@ -14,17 +14,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-module pal.mojom;
+#ifndef NEVA_INJECTION_PUBLIC_RENDERER_SITEFILTER_WEBAPI_H_
+#define NEVA_INJECTION_PUBLIC_RENDERER_SITEFILTER_WEBAPI_H_
 
-import "neva/pal_service/public/mojom/memorymanager.mojom";
-import "neva/pal_service/public/mojom/sample.mojom";
-import "neva/pal_service/public/mojom/sitefilter_service.mojom";
-import "neva/pal_service/public/mojom/system_servicebridge.mojom";
+#include "base/component_export.h"
 
-interface PalService {
-  BindMemoryManager(pending_receiver<MemoryManager> receiver);
-  BindSample(pending_receiver<Sample> receiver);
-  BindSystemServiceBridgeProvider(
-      pending_receiver<SystemServiceBridgeProvider> receiver);
-  BindSiteFilterService(pending_receiver<SiteFilterService> receiver);
+namespace blink {
+class WebLocalFrame;
+}  // namespace blink
+
+namespace injections {
+
+class COMPONENT_EXPORT(INJECTION) SiteFilterWebAPI {
+ public:
+  static void Install(blink::WebLocalFrame* frame);
+  static void Uninstall(blink::WebLocalFrame* frame);
 };
+
+}  // namespace injections
+
+#endif  // NEVA_INJECTION_PUBLIC_RENDERER_SITEFILTER_WEBAPI_H_

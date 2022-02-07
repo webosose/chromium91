@@ -41,6 +41,7 @@ component("pal_service") {
   deps = [
     "//base",
     "//neva/emulator",
+    "//neva/pal_service/browser:pal_service_browser",
     "//neva/pal_service/public:pal_service_delegates",
   ]
 
