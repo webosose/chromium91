@@ -17,13 +17,14 @@
 #ifndef UI_VIEWS_WIDGET_DESKTOP_AURA_NEVA_VIEWS_DELEGATE_STUB_H_
 #define UI_VIEWS_WIDGET_DESKTOP_AURA_NEVA_VIEWS_DELEGATE_STUB_H_
 
+#include "ui/views/touchui/touch_selection_menu_runner_views.h"
 #include "ui/views/views_delegate.h"
 
 namespace views {
 
 class ViewsDelegateStub : public ViewsDelegate {
  public:
-  ViewsDelegateStub() = default;
+  ViewsDelegateStub() { SetTouchSelectionMenuRunner(nullptr); }
   ViewsDelegateStub(const ViewsDelegateStub&) = delete;
   ViewsDelegateStub& operator=(const ViewsDelegateStub&) = delete;
   ~ViewsDelegateStub() override = default;
