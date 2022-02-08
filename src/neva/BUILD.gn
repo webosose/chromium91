@@ -78,6 +78,10 @@ config("config") {
     }
   }
 
+  if (use_neva_punch_hole) {
+    defines += [ "USE_NEVA_PUNCH_HOLE=1" ]
+  }
+
   if (use_neva_v4l2_codec) {
     defines += [ "USE_NEVA_V4L2_CODEC=1" ]
   }

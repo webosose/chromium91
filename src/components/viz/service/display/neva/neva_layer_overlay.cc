@@ -203,7 +203,7 @@ NevaLayerOverlayProcessor::ProcessAggregatedRenderPassDrawQuad(
                        clipped_punch_through_rect, false,
                        should_blend ? SK_ColorBLACK : SK_ColorTRANSPARENT,
                        true);
-
+    solid_quad->SetForceDrawTransparentColor(true);
     gfx::Rect clipped_quad_rect =
         gfx::ToEnclosingRect(ClippedQuadRectangle(solid_quad));
     // Propagate punch through rect as damage up the stack of render passes.

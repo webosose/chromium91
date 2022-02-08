@@ -50,10 +50,19 @@ void RenderPassInternal::ReplaceExistingQuadWithSolidColor(
   }
 
   const gfx::Rect rect = at->rect;
-  quad_list.ReplaceExistingElement<SolidColorDrawQuad>(at)->SetAll(
+#if defined(USE_NEVA_MEDIA)
+  auto* replacement = quad_list.ReplaceExistingElement<SolidColorDrawQuad>(at);
+  replacement->SetAll(
       shared_quad_state, rect, /*visible_rect=*/rect,
       /*needs_blending=*/false, color,
       /*force_anti_aliasing_off=*/true);
+  replacement->SetForceDrawTransparentColor(true);
+#else
+  quad_list.ReplaceExistingElement<SolidColorDrawQuad>(at)->SetAll(
+    shared_quad_state, rect, /*visible_rect=*/rect,
+    /*needs_blending=*/false, color,
+    /*force_anti_aliasing_off=*/true);
+#endif
 }
 
 }  // namespace viz

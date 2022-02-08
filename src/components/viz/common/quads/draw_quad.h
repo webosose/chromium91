@@ -77,8 +77,14 @@ class VIZ_COMMON_EXPORT DrawQuad {
   bool IsDebugQuad() const { return material == Material::kDebugBorder; }
 
   bool ShouldDrawWithBlendingForReasonOtherThanMaskFilter() const {
+#if defined(USE_NEVA_PUNCH_HOLE)
+    return !force_draw_transparent_color &&
+           (needs_blending || shared_quad_state->opacity < 1.0f ||
+           shared_quad_state->blend_mode != SkBlendMode::kSrcOver);
+#else
     return needs_blending || shared_quad_state->opacity < 1.0f ||
            shared_quad_state->blend_mode != SkBlendMode::kSrcOver;
+#endif
   }
 
   bool ShouldDrawWithBlending() const {
@@ -86,9 +92,13 @@ class VIZ_COMMON_EXPORT DrawQuad {
            !shared_quad_state->mask_filter_info.IsEmpty();
   }
 
-#if defined(USE_NEVA_MEDIA)
-  bool is_overlay_for_video_hole = false;
-#endif
+#if defined(USE_NEVA_PUNCH_HOLE)
+  bool force_draw_transparent_color = false;
+
+  void SetForceDrawTransparentColor(bool force_draw) {
+    force_draw_transparent_color = force_draw;
+  }
+#endif  // USE_NEVA_PUNCH_HOLE
 
   // Is the left edge of this tile aligned with the originating layer's
   // left edge?
