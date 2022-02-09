@@ -17,8 +17,7 @@
 namespace media {
 namespace internal {
 void NevaMimeUtil::AddSupportedMediaFormats() {
-  CodecSet webos_codecs;
-  webos_codecs.insert(VALID_CODEC);
+  const CodecSet webos_codecs{VALID_CODEC};
   AddContainerWithCodecs("application/vnd.apple.mpegurl", webos_codecs);
   AddContainerWithCodecs("application/mpegurl", webos_codecs);
   AddContainerWithCodecs("application/x-mpegurl", webos_codecs);
