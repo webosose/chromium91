@@ -268,6 +268,7 @@
 #include "neva/pal_service/pal_service.h"
 #include "neva/pal_service/public/mojom/memorymanager.mojom.h"
 #include "neva/pal_service/public/mojom/os_crypt.mojom.h"
+#include "neva/pal_service/public/mojom/popupblocker_service.mojom.h"
 #include "neva/pal_service/public/mojom/sample.mojom.h"
 #include "neva/pal_service/public/mojom/sitefilter_service.mojom.h"
 #include "neva/pal_service/public/mojom/system_servicebridge.mojom.h"
@@ -2291,6 +2292,13 @@ void RenderProcessHostImpl::RegisterMojoInterfaces() {
       base::BindRepeating(
           [](mojo::PendingReceiver<pal::mojom::SiteFilterService> receiver) {
             pal::GetPalService().BindSiteFilterService(std::move(receiver));
+          }));
+
+  AddUIThreadInterface(
+      registry.get(),
+      base::BindRepeating(
+          [](mojo::PendingReceiver<pal::mojom::PopupBlockerService> receiver) {
+            pal::GetPalService().BindPopupBlockerService(std::move(receiver));
           }));
 #endif  // defined(USE_NEVA_APPRUNTIME)
 

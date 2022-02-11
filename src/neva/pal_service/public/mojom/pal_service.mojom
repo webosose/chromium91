@@ -17,12 +17,14 @@
 module pal.mojom;
 
 import "neva/pal_service/public/mojom/memorymanager.mojom";
+import "neva/pal_service/public/mojom/popupblocker_service.mojom";
 import "neva/pal_service/public/mojom/sample.mojom";
 import "neva/pal_service/public/mojom/sitefilter_service.mojom";
 import "neva/pal_service/public/mojom/system_servicebridge.mojom";
 
 interface PalService {
   BindMemoryManager(pending_receiver<MemoryManager> receiver);
+  BindPopupBlockerService(pending_receiver<PopupBlockerService> receiver);
   BindSample(pending_receiver<Sample> receiver);
   BindSystemServiceBridgeProvider(
       pending_receiver<SystemServiceBridgeProvider> receiver);

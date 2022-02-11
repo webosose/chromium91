@@ -14,24 +14,19 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "neva/injection/public/common/webapi_names.h"
+#include "neva/injection/public/renderer/popupblocker_webapi.h"
+
+#include "neva/injection/renderer/browser_control/popupblocker_injection.h"
 
 namespace injections {
 
-namespace webapi {
+// static
+void PopupBlockerWebAPI::Install(blink::WebLocalFrame* frame) {
+  PopupBlockerInjection::Install(frame);
+}
 
-const char kBrowserControl[] = "v8/browser_control";
-const char kMemoryManager[] = "v8/memorymanager";
-const char kNetworkErrorPage[] = "v8/networkerrorpage";
-const char kPopupBlocker[] = "v8/popupblocker";
-const char kSample[] = "v8/sample";
-const char kSiteFilter[] = "v8/sitefilter";
-const char kWebOSGAV[] = "v8/webosgavplugin";
-const char kWebOSServiceBridge[] = "v8/webosservicebridge";
-const char kWebOSServiceBridgeObsolete[] = "v8/palmservicebridge";
-const char kWebOSSystem[] = "v8/webossystem";
-const char kWebOSSystemObsolete[] = "v8/palmsystem";
-
-}  // namespace webapi
+void PopupBlockerWebAPI::Uninstall(blink::WebLocalFrame* frame) {
+  PopupBlockerInjection::Uninstall(frame);
+}
 
 }  // namespace injections
