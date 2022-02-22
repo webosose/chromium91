@@ -109,9 +109,12 @@ bool AppRuntimeContentRendererClient::IsAccessAllowedForURL(
   const neva_app_runtime::AppRuntimeFileAccessController*
       file_access_controller = GetFileAccessController();
 
+  base::FilePath file_path;
+  if (!net::FileURLToFilePath(url, &file_path))
+    return false;
+
   if (file_access_controller)
-    return file_access_controller->IsAccessAllowed(
-        base::FilePath(static_cast<GURL>(url).path()), webview_info_);
+    return file_access_controller->IsAccessAllowed(file_path, webview_info_);
 
   return false;
 }
@@ -136,9 +139,9 @@ void AppRuntimeContentRendererClient::WillSendRequest(
                                                      ui::PAGE_TRANSITION_FIRST))
       return;
 
-    base::FilePath path;
-    if (!net::FileURLToFilePath(GURL(url), &path) ||
-        !file_access_controller->IsAccessAllowed(path, webview_info_)) {
+    base::FilePath file_path;
+    if (!net::FileURLToFilePath(GURL(url), &file_path) ||
+        !file_access_controller->IsAccessAllowed(file_path, webview_info_)) {
       blink::WebConsoleMessage error_msg;
       error_msg.level = blink::mojom::ConsoleMessageLevel::kError;
       error_msg.text = blink::WebString::FromASCII(
