@@ -120,6 +120,7 @@ void ShellAppDelegate::RenderFrameCreated(
 
     client->AddInjectionToLoad(std::string("v8/popupblocker"));
     client->AddInjectionToLoad(std::string("v8/sitefilter"));
+    client->AddInjectionToLoad(std::string("v8/cookiemanager"));
 #if defined(ENABLE_MEMORYMANAGER_WEBAPI)
     client->AddInjectionToLoad(std::string("v8/memorymanager"));
 #endif  // defined(ENABLE_MEMORYMANAGER_WEBAPI)

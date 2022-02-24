@@ -213,6 +213,9 @@
 #include "content/browser/media/session/pepper_playback_observer.h"
 #endif
 
+#if defined(USE_NEVA_APPRUNTIME)
+#include "neva/pal_service/browser/cookiemanager_service_impl.h"
+#endif
 namespace content {
 
 namespace {
@@ -2394,7 +2397,10 @@ const blink::web_pref::WebPreferences WebContentsImpl::ComputeWebPreferences() {
       *base::CommandLine::ForCurrentProcess();
 
   SetSlowWebPreferences(command_line, &prefs);
-
+#if defined(USE_NEVA_APPRUNTIME)
+  prefs.cookie_enabled =
+      pal::CookieManagerServiceImpl::Get()->IsCookieEnabled();
+#endif
   prefs.web_security_enabled =
       !command_line.HasSwitch(switches::kDisableWebSecurity);
 

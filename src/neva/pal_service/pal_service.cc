@@ -29,6 +29,7 @@
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 #include "mojo/public/cpp/bindings/receiver.h"
+#include "neva/pal_service/browser/cookiemanager_service_impl.h"
 #include "neva/pal_service/browser/popupblocker_service_impl.h"
 #include "neva/pal_service/browser/sitefilter_service_impl.h"
 #include "neva/pal_service/memorymanager.h"
@@ -46,6 +47,8 @@ class PalServiceImpl : public mojom::PalService {
   ~PalServiceImpl() override;
 
  private:
+  void BindCookieManagerService(
+      mojo::PendingReceiver<mojom::CookieManagerService> receiver) override;
   void BindMemoryManager(
       mojo::PendingReceiver<mojom::MemoryManager> receiver) override;
   void BindSample(mojo::PendingReceiver<mojom::Sample> receiver) override;
@@ -103,6 +106,11 @@ void PalServiceImpl::BindPopupBlockerService(
 void PalServiceImpl::BindSiteFilterService(
     mojo::PendingReceiver<mojom::SiteFilterService> receiver) {
   pal::SiteFilterServiceImpl::Get()->AddBinding(std::move(receiver));
+}
+
+void PalServiceImpl::BindCookieManagerService(
+    mojo::PendingReceiver<mojom::CookieManagerService> receiver) {
+  pal::CookieManagerServiceImpl::Get()->AddBinding(std::move(receiver));
 }
 
 namespace {

@@ -19,6 +19,7 @@ import("//mojo/public/tools/bindings/mojom.gni")
 mojom("mojom") {
   sources = [
     "constants.mojom",
+    "cookiemanager_service.mojom",
     "memorymanager.mojom",
     "os_crypt.mojom",
     "pal_service.mojom",
