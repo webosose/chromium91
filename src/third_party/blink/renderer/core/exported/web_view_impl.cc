@@ -1642,6 +1642,7 @@ void WebView::ApplyWebPreferences(const web_pref::WebPreferences& prefs,
 #endif  // defined(OS_ANDROID)
 #if defined(USE_NEVA_APPRUNTIME)
   settings->SetFirstFramePolicy(prefs.first_frame_policy);
+  RuntimeEnabledFeatures::SetBadgingEnabled(false);
 #endif  // defined(USE_NEVA_APPRUNTIME)
   settings->SetForceDarkModeEnabled(prefs.force_dark_mode_enabled);
 
