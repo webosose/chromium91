@@ -1104,8 +1104,9 @@ void WebView::DidFinishLoad(content::RenderFrameHost* render_frame_host,
   // Async notification is required for webOS WAM app exit logic which
   // depends on loading about:blank page
   content::GetUIThreadTaskRunner({})->PostTask(
-      FROM_HERE, base::BindOnce(&WebView::FinishLoadCallback,
-                                base::Unretained(this), validated_url.spec()));
+      FROM_HERE,
+      base::BindOnce(&WebView::FinishLoadCallback, weak_factory_.GetWeakPtr(),
+                     validated_url.spec()));
 }
 
 void WebView::FinishLoadCallback(const std::string& url) {

@@ -20,6 +20,7 @@
 #include <set>
 
 #include "base/memory/memory_pressure_listener.h"
+#include "base/memory/weak_ptr.h"
 #include "content/public/browser/web_contents_delegate.h"
 #include "content/public/browser/web_contents_observer.h"
 #include "neva/app_runtime/public/app_runtime_constants.h"
@@ -321,6 +322,7 @@ class WebView : public content::WebContentsDelegate,
 #if defined(USE_NEVA_EXTENSIONS)
   const extensions::Extension* extension_ = nullptr;
 #endif
+  base::WeakPtrFactory<WebView> weak_factory_{this};
 };
 
 }  // namespace neva_app_runtime
