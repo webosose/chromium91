@@ -204,8 +204,19 @@ SharedImageRepresentationSkia::BeginScopedReadAccess(
     std::vector<GrBackendSemaphore>* begin_semaphores,
     std::vector<GrBackendSemaphore>* end_semaphores) {
   if (!IsCleared()) {
+#if defined(OS_WEBOS)
+    // A workaround for the rare cases where the storage is not
+    // completely cleared as it should be. The root of this problem
+    // sides in RasterDecoderImpl::DoCopySubTextureINTERNALGL where
+    // the texture size does not match the expected copied rectangle,
+    // and this leads to the fact that the 'clear' attribute is not
+    // set for backing storage.
+    LOG(WARNING) << "Storage is not cleared, attempt to continue";
+    SetCleared();
+#else
     LOG(ERROR) << "Attempt to read from an uninitialized SharedImage";
     return nullptr;
+#endif
   }
 
   std::unique_ptr<GrBackendSurfaceMutableState> end_state;
