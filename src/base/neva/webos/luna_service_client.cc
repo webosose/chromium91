@@ -43,15 +43,6 @@ void LogError(const std::string& message, const AutoLSError& lserror) {
 
 }  // namespace
 
-LunaServiceClient* LunaServiceClient::client_ = nullptr;
-
-LunaServiceClient* LunaServiceClient::getInstance(const std::string& identifier,
-                              bool application_service) {
-  if (!client_)
-      client_ = new LunaServiceClient(identifier, application_service);
-  return client_;
-}
-
 // static
 std::string LunaServiceClient::GetServiceURI(URIType type,
                                              const std::string& action) {

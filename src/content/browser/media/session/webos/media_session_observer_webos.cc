@@ -81,10 +81,10 @@ MediaSessionObserverWebOS::MediaSessionObserverWebOS(MediaSessionImpl* session)
       web_contents->GetMutableRendererPrefs();
 
   DCHECK(renderer_prefs);
-  luna_service_client_ =
-       base::LunaServiceClient::getInstance(renderer_prefs->application_id);
+  luna_service_client_.reset(
+      new base::LunaServiceClient(renderer_prefs->application_id));
 
-  application_id_ = renderer_prefs->application_id;
+  application_id_ = renderer_prefs->application_id + renderer_prefs->display_id;
 
   VLOG(0) << __func__ << " this: [" << this << "]"
             << " Application id: " << application_id_;

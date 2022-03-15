@@ -75,7 +75,7 @@ UMediaClientImpl::UMediaClientImpl(
       umediaclient_extension_(
       UMediaClientExtension::Create(AsWeakPtr(), main_task_runner)) {
 #if defined(USE_GST_MEDIA)
-     luna_service_client_ = base::LunaServiceClient::getInstance(app_id_);
+      luna_service_client_.reset(new base::LunaServiceClient(app_id));
 #endif
   // NOTE: AsWeakPtr() will create new valid WeakPtr even after it is
   // invalidated.

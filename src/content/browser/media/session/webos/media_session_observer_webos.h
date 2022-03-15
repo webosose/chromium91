@@ -98,7 +98,7 @@ class MediaSessionObserverWebOS final
   std::string session_id_;
 
   LSMessageToken subscribe_key_ = 0;
-  base::LunaServiceClient* luna_service_client_;
+  std::unique_ptr<base::LunaServiceClient> luna_service_client_;
 
   media_session::mojom::MediaPlaybackState playback_state_ =
       media_session::mojom::MediaPlaybackState::kStopped;

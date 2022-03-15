@@ -57,6 +57,9 @@ class LunaServiceClient {
 
   static std::string GetServiceURI(URIType type, const std::string& action);
 
+  explicit LunaServiceClient(const std::string& identifier,
+                             bool application_service = false);
+
   ~LunaServiceClient();
   bool CallAsync(const std::string& uri, const std::string& param);
   bool CallAsync(const std::string& uri,
@@ -68,19 +71,12 @@ class LunaServiceClient {
                  const ResponseCB& callback);
   bool Unsubscribe(LSMessageToken subscribeKey);
 
-  static LunaServiceClient* getInstance(const std::string& identifier = " ",
-                                     bool application_service = false);
-
  private:
-  explicit LunaServiceClient(const std::string& identifier,
-                             bool application_service = false);
-  LunaServiceClient();
   void Initialize(const std::string& identifier, bool application_service);
   bool RegisterService(const std::string& name);
   bool RegisterApplicationService(const std::string& appid);
   bool UnregisterService();
 
-  static LunaServiceClient* client_;
   LSHandle* handle_ = nullptr;
   GMainContext* context_ = nullptr;
   std::map<LSMessageToken, std::unique_ptr<ResponseHandlerWrapper>> handlers_;
