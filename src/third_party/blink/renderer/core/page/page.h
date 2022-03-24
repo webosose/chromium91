@@ -502,6 +502,8 @@ class CORE_EXPORT Page final : public GarbageCollected<Page>,
 
   WebScopedVirtualTimePauser history_navigation_virtual_time_pauser_;
 
+  bool is_destroying_ = false;
+
   DISALLOW_COPY_AND_ASSIGN(Page);
 };
 
