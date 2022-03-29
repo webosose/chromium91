@@ -195,6 +195,7 @@ display::Display DesktopScreenWayland::GetPrimaryDisplay() const {
       if (display.id() == display_id)
         return display;
   }
+  CHECK(!displays_.empty()) << " Get display but no any display in list.";
   return displays_.front();
 #else
   DCHECK(!rect_.IsEmpty());

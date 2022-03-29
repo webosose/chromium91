@@ -40,8 +40,7 @@ gfx::Point OzoneWaylandScreen::GetCursorScreenPoint() {
 
 void OzoneWaylandScreen::LookAheadOutputGeometry() {
   wl_display* display = wl_display_connect(nullptr);
-  if (!display)
-    return;
+  CHECK(display) << " Not connect to display.";
 
   static const struct wl_registry_listener registry_output = {
     OzoneWaylandScreen::DisplayHandleOutputOnly
