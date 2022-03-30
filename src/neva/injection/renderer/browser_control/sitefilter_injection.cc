@@ -69,8 +69,7 @@ void SiteFilterInjection::Install(blink::WebLocalFrame* frame) {
   if (IsTrue(navigator->Has(context, sitefilter_name)))
     return;
 
-  v8::Local<v8::Object> sitefilter;
-  CreateSiteFilterObject(isolate, navigator).ToLocal(&sitefilter);
+  CreateSiteFilterObject(isolate, navigator);
 }
 
 // static
@@ -97,7 +96,7 @@ void SiteFilterInjection::Uninstall(blink::WebLocalFrame* frame) {
 }
 
 // static
-v8::MaybeLocal<v8::Object> SiteFilterInjection::CreateSiteFilterObject(
+void SiteFilterInjection::CreateSiteFilterObject(
     v8::Isolate* isolate,
     v8::Local<v8::Object> parent) {
   gin::Handle<SiteFilterInjection> sitefilter =
@@ -106,7 +105,6 @@ v8::MaybeLocal<v8::Object> SiteFilterInjection::CreateSiteFilterObject(
       ->Set(isolate->GetCurrentContext(),
             gin::StringToV8(isolate, kSiteFilterObjectName), sitefilter.ToV8())
       .Check();
-  return sitefilter->GetWrapper(isolate);
 }
 
 SiteFilterInjection::SiteFilterInjection() {

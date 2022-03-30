@@ -70,8 +70,7 @@ void PopupBlockerInjection::Install(blink::WebLocalFrame* frame) {
   if (IsTrue(navigator->Has(context, popupblocker_name)))
     return;
 
-  v8::Local<v8::Object> popupblocker;
-  CreatePopupBlockerObject(isolate, navigator).ToLocal(&popupblocker);
+  CreatePopupBlockerObject(isolate, navigator);
 }
 
 // static
@@ -98,7 +97,7 @@ void PopupBlockerInjection::Uninstall(blink::WebLocalFrame* frame) {
 }
 
 // static
-v8::MaybeLocal<v8::Object> PopupBlockerInjection::CreatePopupBlockerObject(
+void PopupBlockerInjection::CreatePopupBlockerObject(
     v8::Isolate* isolate,
     v8::Local<v8::Object> parent) {
   gin::Handle<PopupBlockerInjection> popupblocker =
@@ -108,7 +107,6 @@ v8::MaybeLocal<v8::Object> PopupBlockerInjection::CreatePopupBlockerObject(
             gin::StringToV8(isolate, kPopupBlockerObjectName),
             popupblocker.ToV8())
       .Check();
-  return popupblocker->GetWrapper(isolate);
 }
 
 PopupBlockerInjection::PopupBlockerInjection() {

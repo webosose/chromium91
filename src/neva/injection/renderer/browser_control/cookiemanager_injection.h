@@ -50,7 +50,7 @@ class CookieManagerInjection : public gin::Wrappable<CookieManagerInjection> {
   bool GetAllCookiesForTesting(gin::Arguments* args);
 
  private:
-  static v8::MaybeLocal<v8::Object> CreateCookieManagerObject(
+  static void CreateCookieManagerObject(
       v8::Isolate* isolate,
       v8::Local<v8::Object> parent);
 

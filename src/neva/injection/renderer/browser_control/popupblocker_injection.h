@@ -52,7 +52,7 @@ class PopupBlockerInjection : public gin::Wrappable<PopupBlockerInjection> {
   bool updateURL(gin::Arguments* args);
 
  private:
-  static v8::MaybeLocal<v8::Object> CreatePopupBlockerObject(
+  static void CreatePopupBlockerObject(
       v8::Isolate* isolate,
       v8::Local<v8::Object> parent);
 

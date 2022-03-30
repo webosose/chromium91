@@ -52,7 +52,7 @@ class SiteFilterInjection : public gin::Wrappable<SiteFilterInjection> {
   bool UpdateURL(gin::Arguments* args);
 
  private:
-  static v8::MaybeLocal<v8::Object> CreateSiteFilterObject(
+  static void CreateSiteFilterObject(
       v8::Isolate* isolate,
       v8::Local<v8::Object> parent);
 
