@@ -2645,7 +2645,7 @@ void RenderWidgetHostViewAura::OnTextSelectionChanged(
 #if defined(USE_X11) || (defined(USE_OZONE) && !BUILDFLAG(IS_CHROMEOS_ASH))
   const TextInputManager::TextSelection* selection =
       GetTextInputManager()->GetTextSelection(focused_view);
-  if (selection->selected_text().length()) {
+  if (selection && selection->selected_text().length()) {
     // Set the ClipboardBuffer::kSelection to the ui::Clipboard.
     ui::ScopedClipboardWriter clipboard_writer(ui::ClipboardBuffer::kSelection);
     clipboard_writer.WriteText(selection->selected_text());
