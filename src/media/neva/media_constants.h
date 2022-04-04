@@ -31,7 +31,8 @@ enum class PlayerEvent : int32_t {
   kNeedData,
   kBufferLow,
   kBufferFull,
-  kMaxValue = kBufferFull,
+  kSuspendDone,
+  kMaxValue = kSuspendDone,
 };
 
 enum class RestorePlaybackMode : int32_t {

@@ -217,6 +217,8 @@ class MEDIA_EXPORT ExternalRenderer : public Renderer,
   void FinishInitialization(PipelineStatus status);
   bool HasEncryptedStream();
 
+  void OnFlushDone();
+
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_;
 
   // Sink should call Render from media_task_runner

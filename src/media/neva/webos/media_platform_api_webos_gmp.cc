@@ -282,6 +282,9 @@ void MediaPlatformAPIWebOSGmp::Suspend(SuspendReason reason) {
   VLOG(1) << " media_player_client_=" << media_player_client_.get()
           << "is_finalized_=" << is_finalized_;
 
+  if (player_event_cb_)
+    player_event_cb_.Run(PlayerEvent::kSuspendDone);
+
   if (!media_player_client_) {
     if (suspend_done_cb_)
       suspend_done_cb_.Run();

@@ -888,6 +888,12 @@ void ExternalRenderer::SetMediaPlatformAPICb() {
 
 void ExternalRenderer::OnPlayerEvent(PlayerEvent event) {
   DCHECK(task_runner_->BelongsToCurrentThread());
+
+  if (event == PlayerEvent::kSuspendDone) {
+    Flush(base::Bind(&ExternalRenderer::OnFlushDone,
+                     weak_factory_.GetWeakPtr()));
+  }
+
   // Declare HAVE_NOTHING if we reach a state where we can't progress playback
   // any further.  We don't want to do this if we've already done so, reached
   // end of stream, or have frames available.  We also don't want to do this in
@@ -934,5 +940,10 @@ bool ExternalRenderer::HasEncryptedStream() {
   }
 
   return false;
+}
+
+void ExternalRenderer::OnFlushDone() {
+  DCHECK(task_runner_->BelongsToCurrentThread());
+  DVLOG(1) << __func__;
 }
 }  // namespace media
