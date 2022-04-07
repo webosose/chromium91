@@ -66,6 +66,9 @@ declare_args() {
 
   use_gst_media = false
 
+  # Use neva browser
+  use_neva_browser_service = true
+
   # Use memory trace feature
   use_memory_trace = false
 

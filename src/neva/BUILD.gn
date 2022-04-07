@@ -78,6 +78,10 @@ config("config") {
     }
   }
 
+  if(use_neva_browser_service) {
+    defines += [ "USE_NEVA_BROWSER_SERVICE=1" ]
+  }
+
   if (use_neva_punch_hole) {
     defines += [ "USE_NEVA_PUNCH_HOLE=1" ]
   }
