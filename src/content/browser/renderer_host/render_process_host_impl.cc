@@ -1443,10 +1443,14 @@ size_t RenderProcessHost::GetMaxRendererProcessCount() {
   if (g_max_renderer_count_override)
     return g_max_renderer_count_override;
 
-#if defined(OS_ANDROID)
+#if defined(OS_ANDROID) || defined(OS_WEBOS)
   // On Android we don't maintain a limit of renderer process hosts - we are
   // happy with keeping a lot of these, as long as the number of live renderer
   // processes remains reasonable, and on Android the OS takes care of that.
+  //
+  // On webOS memory manager takes care of limiting the number of running
+  // applications, and handling low and critical memory situations. Because
+  // of this, a lower limit is not really required.
   return std::numeric_limits<size_t>::max();
 #elif BUILDFLAG(IS_CHROMEOS_ASH)
   // On Chrome OS new renderer processes are very cheap and there's no OS
