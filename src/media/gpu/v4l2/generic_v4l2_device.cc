@@ -345,8 +345,11 @@ GLenum GenericV4L2Device::GetTextureTarget() const {
 
 std::vector<uint32_t> GenericV4L2Device::PreferredInputFormat(Type type) const {
   if (type == Type::kEncoder)
+#if defined(USE_NEVA_V4L2_CODEC)
+    return {V4L2_PIX_FMT_YUV420, V4L2_PIX_FMT_NV12M, V4L2_PIX_FMT_NV12};
+#else
     return {V4L2_PIX_FMT_NV12M, V4L2_PIX_FMT_NV12};
-
+#endif
   return {};
 }
 
@@ -480,16 +483,17 @@ bool GenericV4L2Device::PostSandboxInitialization() {
 
 void GenericV4L2Device::EnumerateDevicesForType(Type type) {
 #if defined(USE_NEVA_V4L2_CODEC)
+  static const std::string kDecoderDevicePattern = "/dev/video10";
+  static const std::string kEncoderDevicePattern = "/dev/video11";
+  static const std::string kImageProcessorDevicePattern = "/dev/video12";
+#else
   // Normally, video device files are "video%d" in linux.
   // But in CrOS, video device files are renamed as video-dec,
   // video-enc.
-  static const std::string kDecoderDevicePattern = "/dev/video10";
-  static const std::string kEncoderDevicePattern = "/dev/video11";
-#else
   static const std::string kDecoderDevicePattern = "/dev/video-dec";
   static const std::string kEncoderDevicePattern = "/dev/video-enc";
-#endif
   static const std::string kImageProcessorDevicePattern = "/dev/image-proc";
+#endif
   static const std::string kJpegDecoderDevicePattern = "/dev/jpeg-dec";
   static const std::string kJpegEncoderDevicePattern = "/dev/jpeg-enc";
 

@@ -616,6 +616,11 @@ class MEDIA_GPU_EXPORT V4L2VideoDecodeAccelerator
   // Input format V4L2 fourccs this class supports.
   static const uint32_t supported_input_fourccs_[];
 
+#if defined(USE_NEVA_V4L2_CODEC)
+  base::TimeTicks old_time_ = base::TimeTicks::Now();
+  int32_t frames_per_sec_ = 0;
+#endif
+
   // The WeakPtrFactory for |weak_this_|.
   base::WeakPtrFactory<V4L2VideoDecodeAccelerator> weak_this_factory_;
 

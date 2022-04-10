@@ -356,6 +356,11 @@ class MEDIA_GPU_EXPORT V4L2VideoEncodeAccelerator
   base::WeakPtr<Client> client_;
   std::unique_ptr<base::WeakPtrFactory<Client>> client_ptr_factory_;
 
+#if defined(USE_NEVA_V4L2_CODEC)
+  base::TimeTicks old_time_ = base::TimeTicks::Now();
+  int32_t frames_per_sec_ = 0;
+#endif
+
   // WeakPtr<> pointing to |this| for use in posting tasks to
   // |encoder_task_runner_|.
   base::WeakPtr<V4L2VideoEncodeAccelerator> weak_this_;

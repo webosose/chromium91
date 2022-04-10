@@ -2518,6 +2518,18 @@ void V4L2VideoDecodeAccelerator::SendPictureReady() {
   bool send_now = (decoder_state_ == kChangingResolution ||
                    decoder_state_ == kResetting || decoder_flushing_);
   while (pending_picture_ready_.size() > 0) {
+#if defined(USE_NEVA_V4L2_CODEC)
+    frames_per_sec_++;
+    base::TimeTicks curr_time = base::TimeTicks::Now();
+    base::TimeDelta time_past = curr_time - old_time_;
+    if (time_past >= base::TimeDelta::FromSeconds(1)) {
+      LOG(INFO) << "--------------------------------------------------";
+      LOG(INFO) << __func__ << " decoded frames_per_sec: " << frames_per_sec_;
+      LOG(INFO) << "--------------------------------------------------";
+      old_time_ = curr_time;
+      frames_per_sec_ = 0;
+    }
+#endif
     bool cleared = pending_picture_ready_.front().cleared;
     const Picture& picture = pending_picture_ready_.front().picture;
     if (cleared && picture_clearing_count_ == 0) {
