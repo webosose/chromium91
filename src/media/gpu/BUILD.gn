@@ -248,6 +248,10 @@ component("gpu") {
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
   }
+
+  if (use_webos_codec) {
+    public_deps += [ "//media/gpu/webos" ]
+  }
 }
 
 source_set("common") {

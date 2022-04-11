@@ -156,4 +156,8 @@ config("config") {
   if (use_local_storage_tracker) {
     defines += [ "USE_LOCAL_STORAGE_TRACKER=1" ]
   }
+
+  if (use_webos_codec) {
+    defines += [ "USE_WEBOS_CODEC=1" ]
+  }
 }

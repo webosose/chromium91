@@ -99,14 +99,14 @@ declare_args() {
   # Use Neva WebRTC
   use_neva_webrtc = false
 
-  # Use Neva V4L2 codec
-  use_neva_v4l2_codec = false
-
   # For updating v8 version number with webos submission number
   webos_submission_number = 0
 
   # Enable using local storage tracker
   use_local_storage_tracker = false
+
+  # Use webOS Video Codec
+  use_webos_codec = false
 }
 
 declare_args() {
@@ -115,4 +115,7 @@ declare_args() {
 
   # Suspend capturing audio/video when tab or app is suspended
   use_neva_suspend_media_capture = is_webos
+
+  # Use Neva V4L2 codec
+  use_neva_v4l2_codec = false || use_webos_codec
 }
