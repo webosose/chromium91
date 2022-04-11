@@ -58,6 +58,9 @@ base::Optional<VideoFrameLayout> VideoFrameLayoutFrom(
     mcil::scoped_refptr<mcil::VideoFrame> video_frame) {
   VLOG(2) << __func__;
 
+  if (!video_frame)
+    return base::nullopt;
+
   const size_t num_color_planes = video_frame->color_planes.size();
   const VideoPixelFormat video_format =
       VideoPixelFormatFrom(video_frame->format);

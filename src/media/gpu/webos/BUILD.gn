@@ -41,6 +41,8 @@ source_set("webos") {
     "webos_vda_utils.h",
     "webos_video_decode_accelerator.cc",
     "webos_video_decode_accelerator.h",
+    "webos_video_encode_accelerator.cc",
+    "webos_video_encode_accelerator.h",
   ]
 
   libs = [
