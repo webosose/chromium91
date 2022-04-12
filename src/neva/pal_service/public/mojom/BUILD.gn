@@ -23,7 +23,6 @@ mojom("mojom") {
     "os_crypt.mojom",
     "pal_service.mojom",
     "sample.mojom",
-    "sitefilter_service.mojom",
     "system_servicebridge.mojom",
   ]
 }

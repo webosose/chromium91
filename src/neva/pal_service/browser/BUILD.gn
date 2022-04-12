@@ -16,8 +16,6 @@
 
 source_set("pal_service_browser") {
   sources = [
-    "sitefilter_service_impl.cc",
-    "sitefilter_service_impl.h",
     "url_database.cc",
     "url_database.h",
   ]

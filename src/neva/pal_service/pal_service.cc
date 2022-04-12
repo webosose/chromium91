@@ -29,7 +29,6 @@
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 #include "mojo/public/cpp/bindings/receiver.h"
-#include "neva/pal_service/browser/sitefilter_service_impl.h"
 #include "neva/pal_service/memorymanager.h"
 #include "neva/pal_service/public/mojom/memorymanager.mojom.h"
 #include "neva/pal_service/public/mojom/sample.mojom.h"
@@ -51,8 +50,6 @@ class PalServiceImpl : public mojom::PalService {
   void BindSystemServiceBridgeProvider(
       mojo::PendingReceiver<mojom::SystemServiceBridgeProvider>
           receiver) override;
-  void BindSiteFilterService(
-      mojo::PendingReceiver<mojom::SiteFilterService> receiver) override;
 
   std::unique_ptr<pal::MemoryManagerImpl> memorymanager_impl_;
   std::unique_ptr<pal::SampleImpl> sample_impl_;
@@ -90,11 +87,6 @@ void PalServiceImpl::BindSystemServiceBridgeProvider(
         std::make_unique<SystemServiceBridgeProviderImpl>();
   }
   system_servicebridge_provider_impl_->AddBinding(std::move(receiver));
-}
-
-void PalServiceImpl::BindSiteFilterService(
-    mojo::PendingReceiver<mojom::SiteFilterService> receiver) {
-  pal::SiteFilterServiceImpl::Get()->AddBinding(std::move(receiver));
 }
 
 namespace {
