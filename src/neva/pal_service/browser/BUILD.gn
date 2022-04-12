@@ -16,8 +16,6 @@
 
 source_set("pal_service_browser") {
   sources = [
-    "cookiemanager_service_impl.cc",
-    "cookiemanager_service_impl.h",
     "popupblocker_service_impl.cc",
     "popupblocker_service_impl.h",
     "sitefilter_service_impl.cc",

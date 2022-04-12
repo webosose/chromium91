@@ -266,7 +266,6 @@
 #if defined(USE_NEVA_APPRUNTIME)
 #include "content/public/common/content_neva_switches.h"
 #include "neva/pal_service/pal_service.h"
-#include "neva/pal_service/public/mojom/cookiemanager_service.mojom.h"
 #include "neva/pal_service/public/mojom/memorymanager.mojom.h"
 #include "neva/pal_service/public/mojom/os_crypt.mojom.h"
 #include "neva/pal_service/public/mojom/popupblocker_service.mojom.h"
@@ -2304,13 +2303,6 @@ void RenderProcessHostImpl::RegisterMojoInterfaces() {
       base::BindRepeating(
           [](mojo::PendingReceiver<pal::mojom::PopupBlockerService> receiver) {
             pal::GetPalService().BindPopupBlockerService(std::move(receiver));
-          }));
-
-  AddUIThreadInterface(
-      registry.get(),
-      base::BindRepeating(
-          [](mojo::PendingReceiver<pal::mojom::CookieManagerService> receiver) {
-            pal::GetPalService().BindCookieManagerService(std::move(receiver));
           }));
 #endif  // defined(USE_NEVA_APPRUNTIME)
 

@@ -64,7 +64,6 @@
 #include "content/shell/common/shell_neva_switches.h"
 #include "extensions/browser/extension_util.h"
 #include "extensions/common/manifest_handlers/app_isolation_info.h"
-#include "neva/pal_service/browser/cookiemanager_service_impl.h"
 #include "neva/pal_service/browser/popupblocker_service_impl.h"
 #include "neva/pal_service/public/mojom/constants.mojom.h"
 #include "services/network/public/mojom/network_service.mojom.h"
@@ -204,16 +203,6 @@ bool ShellContentBrowserClient::IsHandledURL(const GURL& url) {
 
 void ShellContentBrowserClient::SiteInstanceGotProcess(
     content::SiteInstance* site_instance) {
-#if defined(USE_NEVA_APPRUNTIME)
-  // We need to set the new cookie manager instance as it is changed
-  // after a web page is opened because storage partition is changed
-  network::mojom::CookieManager* cookie_manager =
-      content::BrowserContext::GetStoragePartition(
-          browser_main_parts_->browser_context(), site_instance, false)
-      ->GetCookieManagerForBrowserProcess();
-  pal::CookieManagerServiceImpl::Get()->SetNetworkCookieManager(cookie_manager);
-#endif
-
   // If this isn't an extension renderer there's nothing to do.
   const Extension* extension = GetExtension(site_instance);
   if (!extension)
