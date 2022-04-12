@@ -64,7 +64,6 @@
 #include "content/shell/common/shell_neva_switches.h"
 #include "extensions/browser/extension_util.h"
 #include "extensions/common/manifest_handlers/app_isolation_info.h"
-#include "neva/pal_service/browser/popupblocker_service_impl.h"
 #include "neva/pal_service/public/mojom/constants.mojom.h"
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "ui/base/ui_base_neva_switches.h"
@@ -109,31 +108,6 @@ ShellContentBrowserClient::~ShellContentBrowserClient() {
 // static
 ShellContentBrowserClient* ShellContentBrowserClient::Get() {
   return g_instance;
-}
-
-bool ShellContentBrowserClient::CanCreateWindow(
-    content::RenderFrameHost* opener,
-    const GURL& opener_url,
-    const GURL& opener_top_level_frame_url,
-    const url::Origin& source_origin,
-    content::mojom::WindowContainerType container_type,
-    const GURL& target_url,
-    const content::Referrer& referrer,
-    const std::string& frame_name,
-    WindowOpenDisposition disposition,
-    const blink::mojom::WindowFeatures& features,
-    bool user_gesture,
-    bool opener_suppressed,
-    bool* no_javascript_access) {
-  *no_javascript_access = false;
-
-  if (pal::PopupBlockerServiceImpl::GetInstance()->IsBlocked(
-          opener_top_level_frame_url, user_gesture, disposition)) {
-    LOG(INFO) << __func__ << "Pop up window is blocked for this site: "
-              << opener_url.spec().c_str();
-    return false;
-  }
-  return true;
 }
 
 content::BrowserContext* ShellContentBrowserClient::GetBrowserContext() {

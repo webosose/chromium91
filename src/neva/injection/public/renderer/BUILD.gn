@@ -33,8 +33,6 @@ source_set("renderer") {
     sources += [
       "browser_control_webapi.cc",
       "browser_control_webapi.h",
-      "popupblocker_webapi.cc",
-      "popupblocker_webapi.h",
       "sitefilter_webapi.cc",
       "sitefilter_webapi.h",
     ]

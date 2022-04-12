@@ -47,23 +47,7 @@ class ShellContentBrowserClient : public content::ContentBrowserClient {
 
   // Returns the single browser context for app_shell.
   content::BrowserContext* GetBrowserContext();
-  // Returns true if the given page is allowed to open a window of the given
-  // type. If true is returned, |no_javascript_access| will indicate whether
-  // the window that is created should be scriptable/in the same process.
-  // This is called on the UI thread.
-  bool CanCreateWindow(content::RenderFrameHost* opener,
-                       const GURL& opener_url,
-                       const GURL& opener_top_level_frame_url,
-                       const url::Origin& source_origin,
-                       content::mojom::WindowContainerType container_type,
-                       const GURL& target_url,
-                       const content::Referrer& referrer,
-                       const std::string& frame_name,
-                       WindowOpenDisposition disposition,
-                       const blink::mojom::WindowFeatures& features,
-                       bool user_gesture,
-                       bool opener_suppressed,
-                       bool* no_javascript_access) override;
+
   // content::ContentBrowserClient overrides.
   std::unique_ptr<content::BrowserMainParts> CreateBrowserMainParts(
       const content::MainFunctionParams& parameters) override;

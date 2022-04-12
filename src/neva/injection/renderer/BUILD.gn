@@ -44,8 +44,6 @@ source_set("renderer") {
     sources += [
       "browser_control/browser_control_injection.cc",
       "browser_control/browser_control_injection.h",
-      "browser_control/popupblocker_injection.cc",
-      "browser_control/popupblocker_injection.h",
       "browser_control/sitefilter_injection.cc",
       "browser_control/sitefilter_injection.h",
     ]
