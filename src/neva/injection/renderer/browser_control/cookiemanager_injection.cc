@@ -68,7 +68,8 @@ void CookieManagerInjection::Install(blink::WebLocalFrame* frame) {
   if (IsTrue(navigator->Has(context, cookiemanager_name)))
     return;
 
-  CreateCookieManagerObject(isolate, navigator);
+  v8::Local<v8::Object> cookiemanager;
+  CreateCookieManagerObject(isolate, navigator).ToLocal(&cookiemanager);
 }
 
 // static
@@ -95,7 +96,7 @@ void CookieManagerInjection::Uninstall(blink::WebLocalFrame* frame) {
 }
 
 // static
-void CookieManagerInjection::CreateCookieManagerObject(
+v8::MaybeLocal<v8::Object> CookieManagerInjection::CreateCookieManagerObject(
     v8::Isolate* isolate,
     v8::Local<v8::Object> parent) {
   gin::Handle<CookieManagerInjection> cookiemanager =
@@ -103,6 +104,7 @@ void CookieManagerInjection::CreateCookieManagerObject(
   parent->Set(isolate->GetCurrentContext(),
               gin::StringToV8(isolate, kCookieManagerObjectName),
               cookiemanager.ToV8()).Check();
+  return cookiemanager->GetWrapper(isolate);
 }
 
 CookieManagerInjection::CookieManagerInjection() {
