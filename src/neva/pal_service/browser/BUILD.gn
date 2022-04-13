@@ -26,8 +26,5 @@ source_set("pal_service_browser") {
     "url_database.h",
   ]
 
-  deps = [
-    "//base",
-    "//neva/pal_service/public/mojom"
-  ]
+  deps = [ "//base" ]
 }
