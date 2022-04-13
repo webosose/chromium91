@@ -16,6 +16,8 @@
 
 source_set("browser_service_browser") {
   sources = [
+    "popupblocker_service_impl.cc",
+    "popupblocker_service_impl.h",
     "sitefilter_service_impl.cc",
     "sitefilter_service_impl.h",
     "url_database.cc",

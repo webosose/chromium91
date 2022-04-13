@@ -44,6 +44,7 @@
 #include "extensions/shell/browser/shell_navigation_ui_data.h"
 #include "extensions/shell/browser/shell_speech_recognition_manager_delegate.h"
 #include "extensions/shell/common/version.h"  // Generated file.
+#include "neva/browser_service/browser/popupblocker_service_impl.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
 #include "url/gurl.h"
 
@@ -111,6 +112,33 @@ ShellContentBrowserClient::~ShellContentBrowserClient() {
 // static
 ShellContentBrowserClient* ShellContentBrowserClient::Get() {
   return g_instance;
+}
+
+bool ShellContentBrowserClient::CanCreateWindow(
+    content::RenderFrameHost* opener,
+    const GURL& opener_url,
+    const GURL& opener_top_level_frame_url,
+    const url::Origin& source_origin,
+    content::mojom::WindowContainerType container_type,
+    const GURL& target_url,
+    const content::Referrer& referrer,
+    const std::string& frame_name,
+    WindowOpenDisposition disposition,
+    const blink::mojom::WindowFeatures& features,
+    bool user_gesture,
+    bool opener_suppressed,
+    bool* no_javascript_access) {
+  *no_javascript_access = false;
+
+#if defined(USE_NEVA_APPRUNTIME)
+  if (browser::PopupBlockerServiceImpl::GetInstance()->IsBlocked(
+          opener_top_level_frame_url, user_gesture, disposition)) {
+    LOG(INFO) << __func__ << "Pop up window is blocked for this site: "
+              << opener_url.spec().c_str();
+    return false;
+  }
+#endif
+  return true;
 }
 
 content::BrowserContext* ShellContentBrowserClient::GetBrowserContext() {
@@ -301,6 +329,13 @@ void ShellContentBrowserClient::ExposeInterfacesToRenderer(
             std::move(receiver));
       };
   registry->AddInterface(base::BindRepeating(sitefilter_service),
+                         content::GetUIThreadTaskRunner({}));
+  auto popupblocker_service =
+      [](mojo::PendingReceiver<browser::mojom::PopupBlockerService> receiver) {
+        browser::BrowserService::GetBrowserService()->BindPopupBlockerService(
+            std::move(receiver));
+      };
+  registry->AddInterface(base::BindRepeating(popupblocker_service),
                          content::GetUIThreadTaskRunner({}));
 #endif
 }

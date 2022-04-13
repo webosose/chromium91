@@ -14,23 +14,21 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "neva/browser_service/browser_service.h"
+module browser.mojom;
 
-namespace browser {
+interface PopupBlockerService {
+  // Enables the Popup Blocker featre, true/false
+  [Sync] SetEnabled(bool type) => (bool result);
 
-BrowserService* BrowserService::GetBrowserService() {
-  return base::Singleton<BrowserService>::get();
-}
+  // Get the list of URLs from popup blocker DB
+  GetURLs() => (array<string> result);
 
-void BrowserService::BindPopupBlockerService(
-    mojo::PendingReceiver<mojom::PopupBlockerService> receiver) {
-  browser::PopupBlockerServiceImpl::GetInstance()->AddBinding(
-      std::move(receiver));
-}
+  // Add an URL to the set popup blocker DB
+  [Sync] AddURL(string url) => (bool result);
 
-void BrowserService::BindSiteFilterService(
-    mojo::PendingReceiver<mojom::SiteFilterService> receiver) {
-  browser::SiteFilterServiceImpl::Get()->AddBinding(std::move(receiver));
-}
+  // Delete a list of URLs from the popup blocker DB
+  DeleteURLs(array<string> urls) => (bool result);
 
-}  // namespace browser
+  // Update an URL in popup blocker DB
+  [Sync] updateURL(string old_url, string new_url) => (bool result);
+};

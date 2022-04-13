@@ -19,6 +19,7 @@
 
 #include "base/component_export.h"
 #include "mojo/public/cpp/bindings/receiver.h"
+#include "neva/browser_service/browser/popupblocker_service_impl.h"
 #include "neva/browser_service/browser/sitefilter_service_impl.h"
 
 namespace browser {
@@ -29,6 +30,8 @@ public:
 static BrowserService* GetBrowserService();
 void BindSiteFilterService(
     mojo::PendingReceiver<mojom::SiteFilterService> receiver);
+void BindPopupBlockerService(
+    mojo::PendingReceiver<mojom::PopupBlockerService> receiver);
 
 private:
   friend struct base::DefaultSingletonTraits<BrowserService>;

@@ -112,8 +112,6 @@ void ShellAppDelegate::RenderFrameCreated(
     // and views::WebView but app_shell is aura-only and must do it manually.
     contents->Focus();
 
-
-
 #if defined(USE_NEVA_APPRUNTIME)
     mojo::AssociatedRemote<neva_app_runtime::mojom::AppRuntimeWebViewClient>
         client;
@@ -121,6 +119,7 @@ void ShellAppDelegate::RenderFrameCreated(
         ->GetInterface(&client);
 #if defined(USE_NEVA_BROWSER_SERVICE)
     client->AddInjectionToLoad(std::string("v8/sitefilter"));
+    client->AddInjectionToLoad(std::string("v8/popupblocker"));
 #endif
 #if defined(ENABLE_MEMORYMANAGER_WEBAPI)
     client->AddInjectionToLoad(std::string("v8/memorymanager"));
