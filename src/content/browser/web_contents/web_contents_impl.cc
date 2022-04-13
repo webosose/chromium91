@@ -2394,7 +2394,6 @@ const blink::web_pref::WebPreferences WebContentsImpl::ComputeWebPreferences() {
       *base::CommandLine::ForCurrentProcess();
 
   SetSlowWebPreferences(command_line, &prefs);
-
   prefs.web_security_enabled =
       !command_line.HasSwitch(switches::kDisableWebSecurity);
 

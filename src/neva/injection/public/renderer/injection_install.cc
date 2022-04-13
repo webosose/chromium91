@@ -21,6 +21,7 @@
 #include "neva/injection/public/common/webapi_names.h"
 
 #if defined(OS_WEBOS)
+#include "neva/injection/public/renderer/cookiemanager_webapi.h"
 #include "neva/injection/public/renderer/popupblocker_webapi.h"
 #include "neva/injection/public/renderer/sitefilter_webapi.h"
 #if defined(USE_GAV)
@@ -58,6 +59,12 @@ bool GetInjectionInstallAPI(const std::string& name, InstallAPI* api) {
       (name == webapi::kWebOSServiceBridgeObsolete)) {
     api->install_func = WebOSServiceBridgeWebAPI::Install;
     api->uninstall_func = WebOSServiceBridgeWebAPI::Uninstall;
+    return true;
+  }
+
+  if (name == webapi::kCookieManager) {
+    api->install_func = CookieManagerWebAPI::Install;
+    api->uninstall_func = CookieManagerWebAPI::Uninstall;
     return true;
   }
 

@@ -120,6 +120,7 @@ void ShellAppDelegate::RenderFrameCreated(
 #if defined(USE_NEVA_BROWSER_SERVICE)
     client->AddInjectionToLoad(std::string("v8/sitefilter"));
     client->AddInjectionToLoad(std::string("v8/popupblocker"));
+    client->AddInjectionToLoad(std::string("v8/cookiemanager"));
 #endif
 #if defined(ENABLE_MEMORYMANAGER_WEBAPI)
     client->AddInjectionToLoad(std::string("v8/memorymanager"));

@@ -19,6 +19,7 @@ import("//mojo/public/tools/bindings/mojom.gni")
 mojom("mojom") {
   sources = [
     "constants.mojom",
+    "cookiemanager_service.mojom",
     "popupblocker_service.mojom",
     "sitefilter_service.mojom",
   ]

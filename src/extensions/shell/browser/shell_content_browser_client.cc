@@ -44,6 +44,7 @@
 #include "extensions/shell/browser/shell_navigation_ui_data.h"
 #include "extensions/shell/browser/shell_speech_recognition_manager_delegate.h"
 #include "extensions/shell/common/version.h"  // Generated file.
+#include "neva/browser_service/browser/cookiemanager_service_impl.h"
 #include "neva/browser_service/browser/popupblocker_service_impl.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
 #include "url/gurl.h"
@@ -65,16 +66,20 @@
 #include "content/shell/common/shell_neva_switches.h"
 #include "extensions/browser/extension_util.h"
 #include "extensions/common/manifest_handlers/app_isolation_info.h"
-#include "neva/pal_service/public/mojom/constants.mojom.h"
+#include "neva/browser_service/public/mojom/constants.mojom.h"
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "ui/base/ui_base_neva_switches.h"
 #endif
 #if defined(USE_NEVA_BROWSER_SERVICE)
 #include "neva/browser_service/browser_service.h"
+#include "third_party/blink/public/common/web_preferences/web_preferences.h"
 #endif
 
 using base::CommandLine;
 using content::BrowserContext;
+#if defined(USE_NEVA_BROWSER_SERVICE)
+using blink::web_pref::WebPreferences;
+#endif
 namespace extensions {
 namespace {
 #if defined(USE_NEVA_APPRUNTIME)
@@ -208,6 +213,17 @@ bool ShellContentBrowserClient::IsHandledURL(const GURL& url) {
 
 void ShellContentBrowserClient::SiteInstanceGotProcess(
     content::SiteInstance* site_instance) {
+#if defined(USE_NEVA_BROWSER_SERVICE)
+  // We need to set the new cookie manager instance as it is changed
+  // after a web page is opened because storage partition is changed
+  network::mojom::CookieManager* cookie_manager =
+      content::BrowserContext::GetStoragePartition(
+          browser_main_parts_->browser_context(), site_instance, false)
+          ->GetCookieManagerForBrowserProcess();
+  browser::CookieManagerServiceImpl::Get()->SetNetworkCookieManager(
+      cookie_manager);
+#endif
+
   // If this isn't an extension renderer there's nothing to do.
   const Extension* extension = GetExtension(site_instance);
   if (!extension)
@@ -336,6 +352,13 @@ void ShellContentBrowserClient::ExposeInterfacesToRenderer(
             std::move(receiver));
       };
   registry->AddInterface(base::BindRepeating(popupblocker_service),
+                         content::GetUIThreadTaskRunner({}));
+  auto cookiemanager_service =
+      [](mojo::PendingReceiver<browser::mojom::CookieManagerService> receiver) {
+        browser::BrowserService::GetBrowserService()->BindCookieManagerService(
+            std::move(receiver));
+      };
+  registry->AddInterface(base::BindRepeating(cookiemanager_service),
                          content::GetUIThreadTaskRunner({}));
 #endif
 }
@@ -588,6 +611,17 @@ void ShellContentBrowserClient::ConfigureNetworkContextParams(
   network_context_params->http_cache_max_size = disk_cache_size;
   network_context_params->http_cache_path =
       context->GetPath().Append(kCacheStoreFile);
+}
+#endif
+
+#if defined(USE_NEVA_BROWSER_SERVICE)
+void ShellContentBrowserClient::OverrideWebkitPrefs(
+    content::WebContents* web_contents,
+    WebPreferences* prefs) {
+  prefs->cookie_enabled =
+      browser::CookieManagerServiceImpl::Get()->IsCookieEnabled();
+  if (override_web_preferences_callback_)
+    override_web_preferences_callback_.Run(prefs);
 }
 #endif
 

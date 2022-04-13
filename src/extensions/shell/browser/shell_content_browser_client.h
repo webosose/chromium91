@@ -164,6 +164,15 @@ class ShellContentBrowserClient : public content::ContentBrowserClient {
       network::mojom::URLLoaderFactoryParams* factory_params) override;
   base::FilePath GetSandboxedStorageServiceDataDirectory() override;
   std::string GetUserAgent() override;
+#if defined(USE_NEVA_BROWSER_SERVICE)
+  void OverrideWebkitPrefs(content::WebContents* web_contents,
+                           blink::web_pref::WebPreferences* prefs) override;
+  void set_override_web_preferences_callback(
+      base::RepeatingCallback<void(blink::web_pref::WebPreferences*)>
+          callback) {
+    override_web_preferences_callback_ = std::move(callback);
+  }
+#endif
 
  protected:
   // Subclasses may wish to provide their own ShellBrowserMainParts.
@@ -187,6 +196,11 @@ class ShellContentBrowserClient : public content::ContentBrowserClient {
 #if defined(USE_NEVA_APPRUNTIME)
   // Store the path of V8 snapshot blob for app_shell.
   std::pair<int, std::string> v8_snapshot_path_;
+#endif
+
+#if defined(USE_NEVA_BROWSER_SERVICE)
+  base::RepeatingCallback<void(blink::web_pref::WebPreferences*)>
+      override_web_preferences_callback_;
 #endif
 
   DISALLOW_COPY_AND_ASSIGN(ShellContentBrowserClient);

@@ -22,6 +22,11 @@ BrowserService* BrowserService::GetBrowserService() {
   return base::Singleton<BrowserService>::get();
 }
 
+void BrowserService::BindCookieManagerService(
+    mojo::PendingReceiver<mojom::CookieManagerService> receiver) {
+  browser::CookieManagerServiceImpl::Get()->AddBinding(std::move(receiver));
+}
+
 void BrowserService::BindPopupBlockerService(
     mojo::PendingReceiver<mojom::PopupBlockerService> receiver) {
   browser::PopupBlockerServiceImpl::GetInstance()->AddBinding(
