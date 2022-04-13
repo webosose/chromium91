@@ -158,7 +158,7 @@ ExtensionNavigationThrottle::WillStartOrRedirectRequest() {
     // Returns true if the URL has to be blocked.
     if (pal::SiteFilterServiceImpl::Get()->IsBlocked(
             url, navigation_handle()->WasServerRedirect())) {
-      return content::NavigationThrottle::BLOCK_BY_SITEFILTER;
+      return content::NavigationThrottle::CANCEL;
     }
 #endif
     // If the navigation is not to a chrome-extension resource, no need to

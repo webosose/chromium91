@@ -236,9 +236,7 @@ void NavigationThrottleRunner::ProcessInternal() {
     switch (result.action()) {
       case NavigationThrottle::PROCEED:
         continue;
-#if defined(USE_NEVA_APPRUNTIME)
-      case NavigationThrottle::BLOCK_BY_SITEFILTER:
-#endif
+
       case NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE:
       case NavigationThrottle::BLOCK_REQUEST:
       case NavigationThrottle::BLOCK_RESPONSE:
