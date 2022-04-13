@@ -3287,12 +3287,20 @@ void NavigationRequest::OnStartChecksComplete(
   // Abort the request if needed. This will destroy the NavigationRequest.
   if (result.action() == NavigationThrottle::CANCEL_AND_IGNORE ||
       result.action() == NavigationThrottle::CANCEL ||
+#if defined(USE_NEVA_BROWSER_SERVICE)
+      result.action() == NavigationThrottle::BLOCK_BY_SITEFILTER ||
+#endif
       result.action() == NavigationThrottle::BLOCK_REQUEST ||
       result.action() == NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE) {
 #if DCHECK_IS_ON()
     if (result.action() == NavigationThrottle::BLOCK_REQUEST) {
       DCHECK(net::IsRequestBlockedError(result.net_error_code()));
     }
+#if defined(USE_NEVA_BROWSER_SERVICE)
+    else if (result.action() == NavigationThrottle::BLOCK_BY_SITEFILTER) {
+      DCHECK(net::IsRequestBlockedError(result.net_error_code()));
+    }
+#endif
     // TODO(clamy): distinguish between CANCEL and CANCEL_AND_IGNORE.
     else if (result.action() == NavigationThrottle::CANCEL_AND_IGNORE) {
       DCHECK_EQ(result.net_error_code(), net::ERR_ABORTED);
@@ -3545,6 +3553,9 @@ void NavigationRequest::OnRedirectChecksComplete(
   }
 
   if (result.action() == NavigationThrottle::BLOCK_REQUEST ||
+#if defined(USE_NEVA_BROWSER_SERVICE)
+      result.action() == NavigationThrottle::BLOCK_BY_SITEFILTER ||
+#endif
       result.action() == NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE) {
     DCHECK(net::IsRequestBlockedError(result.net_error_code()));
     OnRequestFailedInternal(
@@ -4805,6 +4816,9 @@ void NavigationRequest::OnWillProcessResponseProcessed(
     NavigationThrottle::ThrottleCheckResult result) {
   DCHECK_EQ(WILL_PROCESS_RESPONSE, state_);
   DCHECK_NE(NavigationThrottle::BLOCK_REQUEST, result.action());
+#if defined(USE_NEVA_BROWSER_SERVICE)
+  DCHECK_NE(NavigationThrottle::BLOCK_BY_SITEFILTER, result.action());
+#endif
   DCHECK_NE(NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE, result.action());
   DCHECK(processing_navigation_throttle_);
   processing_navigation_throttle_ = false;

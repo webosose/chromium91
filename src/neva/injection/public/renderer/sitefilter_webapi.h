@@ -14,17 +14,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "neva/browser_service/browser_service.h"
+#ifndef NEVA_INJECTION_PUBLIC_RENDERER_SITEFILTER_WEBAPI_H_
+#define NEVA_INJECTION_PUBLIC_RENDERER_SITEFILTER_WEBAPI_H_
 
-namespace browser {
+#include "base/component_export.h"
 
-BrowserService* BrowserService::GetBrowserService() {
-  return base::Singleton<BrowserService>::get();
-}
+namespace blink {
+class WebLocalFrame;
+}  // namespace blink
 
-void BrowserService::BindSiteFilterService(
-    mojo::PendingReceiver<mojom::SiteFilterService> receiver) {
-  browser::SiteFilterServiceImpl::Get()->AddBinding(std::move(receiver));
-}
+namespace injections {
 
-}  // namespace browser
+class COMPONENT_EXPORT(INJECTION) SiteFilterWebAPI {
+ public:
+  static void Install(blink::WebLocalFrame* frame);
+  static void Uninstall(blink::WebLocalFrame* frame);
+};
+
+}  // namespace injections
+
+#endif  // NEVA_INJECTION_PUBLIC_RENDERER_SITEFILTER_WEBAPI_H_

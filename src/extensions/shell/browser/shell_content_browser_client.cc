@@ -68,6 +68,9 @@
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "ui/base/ui_base_neva_switches.h"
 #endif
+#if defined(USE_NEVA_BROWSER_SERVICE)
+#include "neva/browser_service/browser_service.h"
+#endif
 
 using base::CommandLine;
 using content::BrowserContext;
@@ -285,6 +288,21 @@ ShellContentBrowserClient::CreateThrottlesForNavigation(
   throttles.push_back(
       std::make_unique<ExtensionNavigationThrottle>(navigation_handle));
   return throttles;
+}
+
+void ShellContentBrowserClient::ExposeInterfacesToRenderer(
+    service_manager::BinderRegistry* registry,
+    blink::AssociatedInterfaceRegistry* associated_registry,
+    content::RenderProcessHost* render_process_host) {
+#if defined(USE_NEVA_BROWSER_SERVICE)
+  auto sitefilter_service =
+      [](mojo::PendingReceiver<browser::mojom::SiteFilterService> receiver) {
+        browser::BrowserService::GetBrowserService()->BindSiteFilterService(
+            std::move(receiver));
+      };
+  registry->AddInterface(base::BindRepeating(sitefilter_service),
+                         content::GetUIThreadTaskRunner({}));
+#endif
 }
 
 std::unique_ptr<content::NavigationUIData>

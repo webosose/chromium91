@@ -51,6 +51,13 @@ class CONTENT_EXPORT NavigationThrottle {
     // This can only be returned from WillStartRequest or WillRedirectRequest.
     BLOCK_REQUEST_AND_COLLAPSE,
 
+
+#if defined(USE_NEVA_BROWSER_SERVICE)
+    // Blocks the navigation of an URL if the Site filter service does not
+    // allow this URL to be loaded as per user's request.
+    BLOCK_BY_SITEFILTER,
+#endif
+
     // Blocks a navigation due to rules asserted by a response (for instance,
     // embedding restrictions like 'X-Frame-Options'). This result will only
     // be returned from WillProcessResponse.

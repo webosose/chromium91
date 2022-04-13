@@ -1992,7 +1992,10 @@ source_set("browser") {
   ]
 
   if (use_neva_appruntime) {
-    deps += [ "//neva/pal_service:pal_service" ]
+    deps += [
+      "//neva/pal_service:pal_service",
+      "//neva/browser_service:browser_service",
+    ]
   }
 
   if (use_neva_media) {

@@ -19,6 +19,7 @@
 
 #include "base/component_export.h"
 #include "mojo/public/cpp/bindings/receiver.h"
+#include "neva/browser_service/browser/sitefilter_service_impl.h"
 
 namespace browser {
 
@@ -26,6 +27,8 @@ COMPONENT_EXPORT(BROWSER_SERVICE)
 class BrowserService {
 public:
 static BrowserService* GetBrowserService();
+void BindSiteFilterService(
+    mojo::PendingReceiver<mojom::SiteFilterService> receiver);
 
 private:
   friend struct base::DefaultSingletonTraits<BrowserService>;

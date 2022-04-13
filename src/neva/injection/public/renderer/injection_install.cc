@@ -21,6 +21,7 @@
 #include "neva/injection/public/common/webapi_names.h"
 
 #if defined(OS_WEBOS)
+#include "neva/injection/public/renderer/sitefilter_webapi.h"
 #if defined(USE_GAV)
 #include "neva/injection/public/renderer/webosgavplugin_webapi.h"
 #endif  // defined(USE_GAV)
@@ -56,6 +57,12 @@ bool GetInjectionInstallAPI(const std::string& name, InstallAPI* api) {
       (name == webapi::kWebOSServiceBridgeObsolete)) {
     api->install_func = WebOSServiceBridgeWebAPI::Install;
     api->uninstall_func = WebOSServiceBridgeWebAPI::Uninstall;
+    return true;
+  }
+
+  if (name == webapi::kSiteFilter) {
+    api->install_func = SiteFilterWebAPI::Install;
+    api->uninstall_func = SiteFilterWebAPI::Uninstall;
     return true;
   }
 

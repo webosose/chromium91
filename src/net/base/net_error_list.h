@@ -127,6 +127,11 @@ NET_ERROR(BLOCKED_BY_CSP, -30)
 // The request was blocked because of no H/2 or QUIC session.
 NET_ERROR(H2_OR_QUIC_REQUIRED, -31)
 
+#if defined(USE_NEVA_BROWSER_SERVICE)
+// Blocked the navigation by the Site filter feature
+NET_ERROR(BLOCKED_BY_SITEFILTER, -32)
+#endif
+
 // A connection was closed (corresponding to a TCP FIN).
 NET_ERROR(CONNECTION_CLOSED, -100)
 

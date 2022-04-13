@@ -14,17 +14,21 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "neva/browser_service/browser_service.h"
+module browser.mojom;
 
-namespace browser {
+interface SiteFilterService {
+  // Sets the Site Filter type, Allowed/Blocked/Off
+  [Sync] SetType(int32 type) => (bool result);
 
-BrowserService* BrowserService::GetBrowserService() {
-  return base::Singleton<BrowserService>::get();
-}
+  // Get the list of URLs from the filter type set
+  GetURLs() => (array<string> result);
 
-void BrowserService::BindSiteFilterService(
-    mojo::PendingReceiver<mojom::SiteFilterService> receiver) {
-  browser::SiteFilterServiceImpl::Get()->AddBinding(std::move(receiver));
-}
+  // Add an URL to the set filter type DB
+  [Sync] AddURL(string url) => (bool result);
 
-}  // namespace browser
+  // Delete a list of URLs from the set filter type DB
+  DeleteURLs(array<string> urls) => (bool result);
+
+  // Update an URL in the set filter type DB
+  [Sync] UpdateURL(string old_url, string new_url) => (bool result);
+};

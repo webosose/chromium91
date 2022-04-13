@@ -23,6 +23,10 @@ net::Error DefaultNetErrorCode(NavigationThrottle::ThrottleAction action) {
       return net::ERR_BLOCKED_BY_CLIENT;
     case NavigationThrottle::BLOCK_RESPONSE:
       return net::ERR_BLOCKED_BY_RESPONSE;
+#if defined(USE_NEVA_BROWSER_SERVICE)
+    case NavigationThrottle::BLOCK_BY_SITEFILTER:
+      return net::ERR_BLOCKED_BY_SITEFILTER;
+#endif
     default:
       NOTREACHED();
       return net::ERR_UNEXPECTED;
