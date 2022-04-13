@@ -1,0 +1,58 @@
+// Copyright 2022 LG Electronics, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+#ifndef NEVA_BROWSER_SERVICE_BROWSER_URL_DATABASE_H_
+#define NEVA_BROWSER_SERVICE_BROWSER_URL_DATABASE_H_
+
+#include <string>
+#include <vector>
+#include "sql/database.h"
+
+namespace base {
+class FilePath;
+}
+
+namespace browser {
+
+// Implements communication interface with sqlite database for handling
+// a list of urls and performing add/delete etc operations on them.
+class URLDatabase {
+ public:
+  // Class constructor for creating tables for storing URLs
+  URLDatabase(const std::string& table_name);
+  ~URLDatabase();
+
+  bool InsertURL(const std::string& url);
+  bool DeleteURLs(const std::vector<std::string>& url_list);
+  bool ModifyURL(const std::string& old_url, const std::string& new_url);
+  bool IsURLAvailable(const std::string& url);
+
+  // API which will fill the input vector with URLs present in the table
+  bool GetAllURLs(std::vector<std::string>& url_list);
+
+ private:
+  bool CreateTableIfNeeded();
+  URLDatabase(const URLDatabase&) = delete;
+  URLDatabase& operator=(const URLDatabase&) = delete;
+
+  sql::Database db_;
+  base::FilePath db_file_path_;
+  std::string table_name_;
+};
+
+}  // namespace browser
+
+#endif  // NEVA_BROWSER_SERVICE_BROWSER_URL_DATABASE_H_

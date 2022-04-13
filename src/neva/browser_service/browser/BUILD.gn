@@ -15,6 +15,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 source_set("browser_service_browser") {
+  sources = [
+    "url_database.cc",
+    "url_database.h",
+  ]
+
   deps = [
     "//base",
     "//neva/browser_service/public/mojom"
