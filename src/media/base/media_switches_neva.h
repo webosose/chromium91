@@ -28,7 +28,6 @@ MEDIA_EXPORT extern const char kEnableAccurateSeek[];
 
 #if defined(USE_NEVA_WEBRTC)
 MEDIA_EXPORT extern const char kEnableWebRTCPlatformVideoDecoder[];
-MEDIA_EXPORT extern const char kEnableWebRTCPlatformVideoEncoder[];
 #endif
 
 }  // namespace switches

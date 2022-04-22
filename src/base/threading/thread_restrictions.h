@@ -214,9 +214,6 @@ class AudioInputDevice;
 class AudioOutputDevice;
 class BlockingUrlProtocol;
 class PaintCanvasVideoRenderer;
-#if defined(USE_NEVA_WEBRTC)
-class WebRtcPassThroughVideoEncoder;
-#endif
 }
 namespace memory_instrumentation {
 class OSMetrics;
@@ -589,10 +586,6 @@ class BASE_EXPORT ScopedAllowBaseSyncPrimitivesOutsideBlockingScope {
   friend class service_manager::ServiceProcessLauncher;
   friend class ui::WindowResizeHelperMac;  // http://crbug.com/902829
   friend class content::TextInputClientMac;  // http://crbug.com/121917
-
-#if defined(USE_NEVA_WEBRTC)
-  friend class media::WebRtcPassThroughVideoEncoder;
-#endif
 
   ScopedAllowBaseSyncPrimitivesOutsideBlockingScope(
       const Location& from_here = Location::Current());
