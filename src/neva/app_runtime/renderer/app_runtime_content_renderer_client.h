@@ -58,6 +58,7 @@ class AppRuntimeContentRendererClient : public content::ContentRendererClient {
                       const std::string& trust_level);
 
 #if defined(USE_NEVA_MEDIA)
+  void SetEnableWebOSVDA(bool enable);
   void AddSupportedKeySystems(
       std::vector<std::unique_ptr<media::KeySystemProperties>>* key_systems)
       override;

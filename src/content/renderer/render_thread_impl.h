@@ -409,6 +409,11 @@ class CONTENT_EXPORT RenderThreadImpl
     video_frame_compositor_task_runner_ = task_runner;
   }
 
+#if defined(USE_NEVA_MEDIA)
+  void SetEnableWebOSVDA(bool enable);
+  bool GetEnableWebOSVDA() { return enable_webos_vda_; }
+#endif
+
  private:
   friend class RenderThreadImplBrowserTest;
   friend class AgentSchedulingGroup;
@@ -618,6 +623,10 @@ class CONTENT_EXPORT RenderThreadImpl
 
 #if defined(USE_NEVA_APPRUNTIME)
   unsigned suspension_count_ = 0;
+#endif
+
+#if defined(USE_NEVA_MEDIA)
+  bool enable_webos_vda_ = false;
 #endif
 
   // A mojo connection to the CompositingModeReporter service.

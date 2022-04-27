@@ -200,6 +200,7 @@ class WEBOS_EXPORT WebViewBase
   void SetMediaPreferences(const std::string& preferences);
   void SetSearchKeywordForCustomPlayer(bool enabled);
   void SetUseUnlimitedMediaPolicy(bool enabled);
+  void SetEnableWebOSVDA(bool enable);
 
   // WebPreferences
   void SetAllowRunningInsecureContent(bool enable);

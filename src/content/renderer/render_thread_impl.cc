@@ -1105,6 +1105,9 @@ media::GpuVideoAcceleratorFactories* RenderThreadImpl::GetGpuFactories() {
       enable_video_accelerator, std::move(interface_factory),
       std::move(vea_provider)));
   gpu_factories_.back()->SetRenderingColorSpace(rendering_color_space_);
+#if defined(USE_NEVA_MEDIA)
+  gpu_factories_.back()->SetEnableWebOSVDA(enable_webos_vda_);
+#endif
   return gpu_factories_.back().get();
 }
 
@@ -2003,5 +2006,16 @@ gfx::ColorSpace RenderThreadImpl::GetRenderingColorSpace() {
   DCHECK(IsMainThread());
   return rendering_color_space_;
 }
+
+#if defined(USE_NEVA_MEDIA)
+void RenderThreadImpl::SetEnableWebOSVDA(bool enable) {
+  DCHECK(IsMainThread());
+  enable_webos_vda_ = enable;
+  for (const auto& factories : gpu_factories_) {
+    if (factories)
+      factories->SetEnableWebOSVDA(enable);
+  }
+}
+#endif
 
 }  // namespace content

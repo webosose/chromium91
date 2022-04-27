@@ -52,6 +52,9 @@ class AppRuntimeRenderFrameObserver : public content::RenderFrameObserver,
 
   void AddInjectionToLoad(const std::string& injection) override;
   void UnloadInjections() override;
+#if defined(USE_NEVA_MEDIA)
+  void SetEnableWebOSVDA(bool enable) override;
+#endif
 
   void BindPendingReceiver(mojo::PendingAssociatedReceiver<
                            mojom::AppRuntimeWebViewClient> pending_receiver);
