@@ -193,12 +193,12 @@ void AppRuntimeRenderFrameObserver::UnloadInjections() {
   injection_loader_.Unload();
 }
 
-#if defined(USE_NEVA_MEDIA)
 void AppRuntimeRenderFrameObserver::SetEnableWebOSVDA(bool enable) {
+#if defined(USE_NEVA_MEDIA)
   auto* renderer_client = static_cast<AppRuntimeContentRendererClient*>(
       GetAppRuntimeContentClient()->renderer());
   renderer_client->SetEnableWebOSVDA(enable);
-}
 #endif
+}
 
 }  // namespace neva_app_runtime
