@@ -16,7 +16,6 @@
 
 #include "neva/injection/renderer/webossystem/webossystem_injection.h"
 
-#include <ctime>
 #include <string>
 
 #include "base/bind.h"
@@ -34,6 +33,7 @@
 #include "neva/injection/renderer/grit/injection_resources.h"
 #include "neva/injection/renderer/injection_browser_control_base.h"
 #include "neva/injection/renderer/webosservicebridge/webosservicebridge_injection.h"
+#include "third_party/abseil-cpp/absl/time/time.h"
 #include "third_party/blink/public/web/blink.h"
 #include "third_party/blink/public/web/web_local_frame.h"
 #include "third_party/blink/public/web/web_script_source.h"
@@ -554,11 +554,7 @@ std::string WebOSSystemInjection::GetTimeFormat() {
 }
 
 std::string WebOSSystemInjection::GetTimeZone() {
-  time_t localTime = time(0);
-  tm localTM;
-  localTM = *localtime(&localTime);
-
-  return localTM.tm_zone? localTM.tm_zone: "";
+  return absl::FormatTime("%Z", absl::UnixEpoch(), absl::LocalTimeZone());
 }
 
 std::string WebOSSystemInjection::GetDeviceInfo() {
