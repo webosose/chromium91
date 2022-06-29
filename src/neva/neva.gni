@@ -69,6 +69,9 @@ declare_args() {
   # Use neva browser
   use_neva_browser_service = true
 
+  # Use webrisk service
+  use_webrisk_service = true
+
   # Use memory trace feature
   use_memory_trace = false
 

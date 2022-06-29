@@ -78,8 +78,12 @@ config("config") {
     }
   }
 
-  if(use_neva_browser_service) {
+  if (use_neva_browser_service) {
     defines += [ "USE_NEVA_BROWSER_SERVICE=1" ]
+  }
+
+  if (use_webrisk_service) {
+    defines += [ "USE_WEBRISK_SERVICE=1" ]
   }
 
   if (use_neva_punch_hole) {

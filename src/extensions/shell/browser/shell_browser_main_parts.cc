@@ -97,6 +97,10 @@
 #include "neva/app_runtime/browser/app_runtime_shared_memory_manager.h"
 #endif
 
+#if defined(USE_NEVA_BROWSER_SERVICE)
+#include "extensions/shell/neva/malware_detection_service.h"
+#endif
+
 ///@name USE_NEVA_APPRUNTIME
 ///@{
 #include "ui/views/linux_ui/linux_ui.h"
@@ -368,6 +372,13 @@ int ShellBrowserMainParts::PreMainMessageLoopRun() {
 
 #if defined(USE_NEVA_APPRUNTIME)
   web_cache::WebCacheManager::GetInstance();
+#endif
+
+#if defined(USE_NEVA_BROWSER_SERVICE)
+  if (!malware_detection_service_)
+    malware_detection_service_ = neva::MalwareDetectionService::Create();
+  if (!malware_detection_service_->Initialize(browser_context()))
+    malware_detection_service_.reset();
 #endif
 
   desktop_controller_->PreMainMessageLoopRun();

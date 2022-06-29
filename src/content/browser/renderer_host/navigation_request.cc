@@ -3289,6 +3289,7 @@ void NavigationRequest::OnStartChecksComplete(
       result.action() == NavigationThrottle::CANCEL ||
 #if defined(USE_NEVA_BROWSER_SERVICE)
       result.action() == NavigationThrottle::BLOCK_BY_SITEFILTER ||
+      result.action() == NavigationThrottle::BLOCK_BY_MALWARE_SITES ||
 #endif
       result.action() == NavigationThrottle::BLOCK_REQUEST ||
       result.action() == NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE) {
@@ -3297,7 +3298,8 @@ void NavigationRequest::OnStartChecksComplete(
       DCHECK(net::IsRequestBlockedError(result.net_error_code()));
     }
 #if defined(USE_NEVA_BROWSER_SERVICE)
-    else if (result.action() == NavigationThrottle::BLOCK_BY_SITEFILTER) {
+    else if (result.action() == NavigationThrottle::BLOCK_BY_SITEFILTER ||
+             result.action() == NavigationThrottle::BLOCK_BY_MALWARE_SITES) {
       DCHECK(net::IsRequestBlockedError(result.net_error_code()));
     }
 #endif
@@ -3555,6 +3557,7 @@ void NavigationRequest::OnRedirectChecksComplete(
   if (result.action() == NavigationThrottle::BLOCK_REQUEST ||
 #if defined(USE_NEVA_BROWSER_SERVICE)
       result.action() == NavigationThrottle::BLOCK_BY_SITEFILTER ||
+      result.action() == NavigationThrottle::BLOCK_BY_MALWARE_SITES ||
 #endif
       result.action() == NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE) {
     DCHECK(net::IsRequestBlockedError(result.net_error_code()));
@@ -4818,6 +4821,7 @@ void NavigationRequest::OnWillProcessResponseProcessed(
   DCHECK_NE(NavigationThrottle::BLOCK_REQUEST, result.action());
 #if defined(USE_NEVA_BROWSER_SERVICE)
   DCHECK_NE(NavigationThrottle::BLOCK_BY_SITEFILTER, result.action());
+  DCHECK_NE(NavigationThrottle::BLOCK_BY_MALWARE_SITES, result.action());
 #endif
   DCHECK_NE(NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE, result.action());
   DCHECK(processing_navigation_throttle_);

@@ -76,6 +76,7 @@ bool IsRequestBlockedError(int error) {
     case ERR_BLOCKED_BY_CSP:
 #if defined(USE_NEVA_BROWSER_SERVICE)
     case ERR_BLOCKED_BY_SITEFILTER:
+    case ERR_BLOCKED_BY_MALWARE_SITES:
 #endif
       return true;
     default:

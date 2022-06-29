@@ -238,6 +238,7 @@ void NavigationThrottleRunner::ProcessInternal() {
         continue;
 #if defined(USE_NEVA_BROWSER_SERVICE)
       case NavigationThrottle::BLOCK_BY_SITEFILTER:
+      case NavigationThrottle::BLOCK_BY_MALWARE_SITES:
 #endif
       case NavigationThrottle::BLOCK_REQUEST_AND_COLLAPSE:
       case NavigationThrottle::BLOCK_REQUEST:

@@ -24,6 +24,13 @@ if (use_neva_extensions) {
   import("//extensions/shell/neva_extensions.gni")
 }
 
+if (use_webrisk_service) {
+  import("//extensions/shell/neva/webrisk/webrisk.gni")
+  proto_library("webrisk_proto") {
+    sources = [ "//extensions/shell/neva/webrisk/core/webrisk.proto" ]
+  }
+}
+
 assert(enable_extensions)
 
 grit("resources") {
@@ -285,6 +292,24 @@ source_set("app_shell_lib") {
       sources += [
         "neva/platform_register_app.cc",
         "neva/platform_register_app.h",
+      ]
+    }
+  }
+
+  if (use_neva_browser_service) {
+    sources += [
+      "//extensions/shell/neva/malware_detection_service.h",
+      "//extensions/shell/neva/neva_url_loader_throttle.cc",
+      "//extensions/shell/neva/neva_url_loader_throttle.h",
+    ]
+
+    if (use_webrisk_service) {
+      sources += webrisk_sources
+      public_deps = [ ":webrisk_proto" ]
+    } else {
+      sources += [
+        "//extensions/shell/neva/malware_detection_service_proxy.cc",
+        "//extensions/shell/neva/malware_detection_service_proxy.h",
       ]
     }
   }

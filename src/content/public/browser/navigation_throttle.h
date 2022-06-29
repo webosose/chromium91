@@ -56,6 +56,9 @@ class CONTENT_EXPORT NavigationThrottle {
     // Blocks the navigation of an URL if the Site filter service does not
     // allow this URL to be loaded as per user's request.
     BLOCK_BY_SITEFILTER,
+
+    // Blocks the navigation of an URL if the site is found to be malware.
+    BLOCK_BY_MALWARE_SITES,
 #endif
 
     // Blocks a navigation due to rules asserted by a response (for instance,

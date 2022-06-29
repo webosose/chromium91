@@ -28,6 +28,12 @@ class AppRuntimeSharedMemoryManager;
 }
 #endif
 
+#if defined(USE_NEVA_BROWSER_SERVICE)
+namespace neva {
+class MalwareDetectionService;
+}
+#endif
+
 namespace extensions {
 
 class DesktopController;
@@ -69,6 +75,13 @@ class ShellBrowserMainParts : public content::BrowserMainParts {
   void PostMainMessageLoopRun() override;
   void PostDestroyThreads() override;
 
+#if defined(USE_NEVA_BROWSER_SERVICE)
+  // Store instance of malware detection service
+  neva::MalwareDetectionService* malware_detection_service() {
+    return malware_detection_service_.get();
+  };
+#endif
+
  private:
   // Initializes the ExtensionSystem.
   void InitExtensionSystem();
@@ -92,6 +105,11 @@ class ShellBrowserMainParts : public content::BrowserMainParts {
 #if defined(USE_NEVA_APPRUNTIME)
   std::unique_ptr<neva_app_runtime::AppRuntimeSharedMemoryManager>
       app_runtime_mem_manager_;
+#endif
+
+#if defined(USE_NEVA_BROWSER_SERVICE)
+  // Store instance of malware detection service
+  scoped_refptr<neva::MalwareDetectionService> malware_detection_service_;
 #endif
 
   // The DesktopController outlives ExtensionSystem and context-keyed services.

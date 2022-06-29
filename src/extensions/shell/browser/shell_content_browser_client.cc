@@ -71,6 +71,7 @@
 #include "ui/base/ui_base_neva_switches.h"
 #endif
 #if defined(USE_NEVA_BROWSER_SERVICE)
+#include "extensions/shell/neva/neva_url_loader_throttle.h"
 #include "neva/browser_service/browser_service.h"
 #include "third_party/blink/public/common/web_preferences/web_preferences.h"
 #endif
@@ -622,6 +623,22 @@ void ShellContentBrowserClient::OverrideWebkitPrefs(
       browser::CookieManagerServiceImpl::Get()->IsCookieEnabled();
   if (override_web_preferences_callback_)
     override_web_preferences_callback_.Run(prefs);
+}
+
+std::vector<std::unique_ptr<blink::URLLoaderThrottle>>
+ShellContentBrowserClient::CreateURLLoaderThrottles(
+    const network::ResourceRequest& request,
+    content::BrowserContext* browser_context,
+    const base::RepeatingCallback<content::WebContents*()>& wc_getter,
+    content::NavigationUIData* navigation_ui_data,
+    int frame_tree_node_id) {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+  std::vector<std::unique_ptr<blink::URLLoaderThrottle>> result;
+  if (browser_main_parts_->malware_detection_service()) {
+    result.push_back(std::make_unique<neva::NevaURLLoaderThrottle>(
+        browser_main_parts_->malware_detection_service()));
+  }
+  return result;
 }
 #endif
 
