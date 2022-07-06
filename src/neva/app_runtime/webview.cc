@@ -656,17 +656,6 @@ void WebView::SetUseUnlimitedMediaPolicy(bool enabled) {
   web_contents_->SyncRendererPrefs();
 }
 
-void WebView::SetEnableWebOSVDA(bool enable) {
-#if defined(USE_NEVA_MEDIA)
-  if (auto* frame_host = web_contents_->GetMainFrame()) {
-    mojo::AssociatedRemote<neva_app_runtime::mojom::AppRuntimeWebViewClient>
-        client;
-    frame_host->GetRemoteAssociatedInterfaces()->GetInterface(&client);
-    client->SetEnableWebOSVDA(enable);
-  }
-#endif
-}
-
 void WebView::UpdatePreferencesAttributeForPrefs(
     blink::web_pref::WebPreferences* preferences,
     WebView::Attribute attribute,

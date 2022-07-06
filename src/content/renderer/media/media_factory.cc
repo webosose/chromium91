@@ -441,12 +441,10 @@ blink::WebMediaPlayer* MediaFactory::CreateMediaPlayer(
   base::WeakPtr<media::MediaObserver> media_observer;
 
 #if defined(USE_NEVA_MEDIA)
-  bool use_neva_media = !base::CommandLine::ForCurrentProcess()->HasSwitch(
+  bool use_neva_media = false;
+  use_neva_media = !base::CommandLine::ForCurrentProcess()->HasSwitch(
       switches::kDisableWebMediaPlayerNeva);
   if (client->ContentTypeDecoder() == "sw")
-    use_neva_media = false;
-
-  if (content::RenderThreadImpl::current()->GetEnableWebOSVDA())
     use_neva_media = false;
 #endif
 
@@ -827,8 +825,7 @@ blink::WebMediaPlayer* MediaFactory::CreateWebMediaPlayerForMediaStream(
 
 #if defined(USE_NEVA_WEBRTC)
   const base::CommandLine* cmd_line = base::CommandLine::ForCurrentProcess();
-  if (cmd_line->HasSwitch(switches::kEnableWebRTCPlatformVideoDecoder) &&
-      !content::RenderThreadImpl::current()->GetEnableWebOSVDA()) {
+  if (cmd_line->HasSwitch(switches::kEnableWebRTCPlatformVideoDecoder)) {
     const blink::RendererPreferences& renderer_prefs =
         render_frame_->GetRendererPreferences();
 
@@ -836,9 +833,8 @@ blink::WebMediaPlayer* MediaFactory::CreateWebMediaPlayerForMediaStream(
         new media::WebMediaPlayerParamsNeva(base::BindRepeating(
             &content::mojom::FrameVideoWindowFactory::CreateVideoWindow,
             base::Unretained(render_frame_->GetFrameVideoWindowFactory()))));
-    params_neva->set_application_id(
-        blink::WebString::FromUTF8(renderer_prefs.application_id +
-                                   renderer_prefs.display_id));
+params_neva->set_application_id(
+        blink::WebString::FromUTF8(renderer_prefs.application_id + renderer_prefs.display_id));
     params_neva->set_use_unlimited_media_policy(
         renderer_prefs.use_unlimited_media_policy);
 

@@ -246,10 +246,6 @@ void WebViewBase::SetUseUnlimitedMediaPolicy(bool enabled) {
   webview_->SetUseUnlimitedMediaPolicy(enabled);
 }
 
-void WebViewBase::SetEnableWebOSVDA(bool enable) {
-  webview_->SetEnableWebOSVDA(enable);
-}
-
 void WebViewBase::SetActiveOnNonBlankPaint(bool active) {
   webview_->SetActiveOnNonBlankPaint(active);
 }

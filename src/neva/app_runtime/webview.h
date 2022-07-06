@@ -153,7 +153,6 @@ class WebView : public content::WebContentsDelegate,
   void SetMediaPreferences(const std::string& preferences);
   void SetSearchKeywordForCustomPlayer(bool enabled);
   void SetUseUnlimitedMediaPolicy(bool enabled);
-  void SetEnableWebOSVDA(bool enable);
   void UpdatePreferencesAttribute(WebView::Attribute attribute, bool enable);
   void SetNetworkQuietTimeout(double timeout);
   void SetFontFamily(WebView::FontFamily fontFamily, const std::string& font);

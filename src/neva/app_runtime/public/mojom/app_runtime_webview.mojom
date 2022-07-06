@@ -38,7 +38,6 @@ interface AppRuntimeWebViewClient {
   ReplaceBaseURL(string new_url);
   SetWebViewInfo(string app_path,
                  string trust_level);
-  SetEnableWebOSVDA(bool enable);
 
   AddInjectionToLoad(string injection);
   UnloadInjections();
