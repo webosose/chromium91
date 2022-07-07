@@ -825,7 +825,8 @@ blink::WebMediaPlayer* MediaFactory::CreateWebMediaPlayerForMediaStream(
 
 #if defined(USE_NEVA_WEBRTC)
   const base::CommandLine* cmd_line = base::CommandLine::ForCurrentProcess();
-  if (cmd_line->HasSwitch(switches::kEnableWebRTCPlatformVideoDecoder)) {
+  if (!cmd_line->HasSwitch(switches::kDisableWebMediaPlayerNeva) &&
+      cmd_line->HasSwitch(switches::kEnableWebRTCPlatformVideoDecoder)) {
     const blink::RendererPreferences& renderer_prefs =
         render_frame_->GetRendererPreferences();
 
