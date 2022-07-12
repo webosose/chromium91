@@ -42,8 +42,7 @@ class WebRiskSearchHashes {
  private:
   WebRiskSearchHashes() = delete;
 
-  void OnSearchHashResponse(unsigned int token_id,
-                            const std::string& url,
+  void OnSearchHashResponse(const std::string& url,
                             SearchHashesCallback callback,
                             std::unique_ptr<std::string> response_body);
 

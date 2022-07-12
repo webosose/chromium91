@@ -17,7 +17,6 @@
 #include "extensions/shell/neva/webrisk/core/webrisk_search_hashes.h"
 
 #include "content/public/browser/storage_partition.h"
-#include "extensions/shell/neva/webrisk/core/webrisk.pb.h"
 #include "extensions/shell/neva/webrisk/core/webrisk_store.h"
 #include "net/http/http_status_code.h"
 #include "net/traffic_annotation/network_traffic_annotation.h"
@@ -38,7 +37,6 @@ WebRiskSearchHashes::~WebRiskSearchHashes() = default;
 
 void WebRiskSearchHashes::SearchHashPrefix(const std::string& hash_prefix,
                                            SearchHashesCallback callback) {
-  unsigned int token_id;
   constexpr int kRetryMode =
       network::SimpleURLLoader::RETRY_ON_NETWORK_CHANGE |
       network::SimpleURLLoader::RETRY_ON_NAME_NOT_RESOLVED;
@@ -67,14 +65,12 @@ void WebRiskSearchHashes::SearchHashPrefix(const std::string& hash_prefix,
   url_loader_->DownloadToString(
       url_loader_factory_,
       base::BindOnce(&WebRiskSearchHashes::OnSearchHashResponse,
-                     base::Unretained(this), token_id, api_endpoint_url,
+                     base::Unretained(this), api_endpoint_url,
                      std::move(callback)),
       WebRiskStore::kMaxWebRiskStoreSize);
-  response_tokens_.insert(token_id);
 }
 
 void WebRiskSearchHashes::OnSearchHashResponse(
-    unsigned int token_id,
     const std::string& url,
     SearchHashesCallback callback,
     std::unique_ptr<std::string> response_body) {
@@ -102,7 +98,6 @@ void WebRiskSearchHashes::OnSearchHashResponse(
           << ", Response_code = " << response_code
           << ", NetError = " << url_loader_->NetError();
 
-  response_tokens_.erase(token_id);
   url_loader_.reset();
   std::move(callback).Run(is_safe);
 }

@@ -17,25 +17,18 @@
 #include "extensions/shell/neva/webrisk/core/webrisk_store.h"
 
 #include "base/base64.h"
-#include "base/command_line.h"
 #include "base/files/file_util.h"
 #include "base/hash/hash.h"
-#include "base/json/json_reader.h"
-#include "base/json/json_writer.h"
 #include "base/rand_util.h"
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
 #include "base/values.h"
 #include "content/public/browser/storage_partition.h"
-#include "content/shell/common/shell_neva_switches.h"
 #include "net/base/net_errors.h"
 
 namespace webrisk {
 
 namespace {
-
-// File name to be used for webrisk data
-const char kWebRiskStoreFileName[] = "webrisk.store";
 
 const int64_t kDefaultUpdateInterval = 60 * 60;  // 1 Hr
 
@@ -45,8 +38,8 @@ constexpr char WebRiskStore::kThreatTypeMalware[];
 constexpr size_t WebRiskStore::kHashPrefixSize;
 constexpr size_t WebRiskStore::kMaxWebRiskStoreSize;
 
-WebRiskStore::WebRiskStore() : update_time_(base::TimeDelta()) {
-  file_path_ = GetFilePath();
+WebRiskStore::WebRiskStore(base::FilePath file_path)
+    : file_path_(file_path), update_time_(base::TimeDelta()) {
   ReadFromDisk();
 }
 
@@ -154,14 +147,6 @@ bool WebRiskStore::IsHashPrefixAvailable(const std::string& hash_prefix) {
   }
 
   return false;
-}
-
-const base::FilePath WebRiskStore::GetFilePath() {
-  base::CommandLine* cmd_line = base::CommandLine::ForCurrentProcess();
-  base::FilePath file_path(cmd_line->GetSwitchValuePath(switches::kUserDataDir)
-                               .AppendASCII(kWebRiskStoreFileName));
-  VLOG(2) << __func__ << " file_path= " << file_path.value();
-  return file_path;
 }
 
 }  // namespace webrisk

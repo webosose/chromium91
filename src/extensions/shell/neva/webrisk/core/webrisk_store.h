@@ -37,7 +37,7 @@ class WebRiskStore : public base::RefCounted<WebRiskStore> {
 
   typedef base::OnceCallback<void(bool status)> CheckUrlCallback;
 
-  WebRiskStore();
+  WebRiskStore(base::FilePath file_path);
   virtual ~WebRiskStore();
 
   bool WriteToDisk(const ComputeThreatListDiffResponse& file_format);
@@ -52,7 +52,6 @@ class WebRiskStore : public base::RefCounted<WebRiskStore> {
  private:
   bool ReadFromDisk();
   void FillHashPrefixListFromRawHashes(const std::string& raw_hashes);
-  const base::FilePath GetFilePath();
 
   base::FilePath file_path_;
   std::vector<std::string> hash_prefix_list_;
