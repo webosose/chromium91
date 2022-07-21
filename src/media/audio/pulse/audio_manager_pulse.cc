@@ -34,6 +34,11 @@ constexpr int kDefaultInputBufferSize = 1024;
 constexpr int kDefaultSampleRate = 48000;
 constexpr int kDefaultChannelCount = 2;
 
+#if defined(OS_WEBOS)
+const char kNullSourceInputDriver[] = "module-null-source.c";
+const char kNullSinkOutputDriver[] = "module-null-sink.c";
+#endif
+
 AudioManagerPulse::AudioManagerPulse(std::unique_ptr<AudioThread> audio_thread,
                                      AudioLogFactory* audio_log_factory,
                                      pa_threaded_mainloop* pa_mainloop,
@@ -249,6 +254,17 @@ AudioOutputStream* AudioManagerPulse::MakeOutputStream(
     const std::string& device_id,
     LogCallback log_callback) {
   DCHECK(!device_id.empty());
+
+#if defined(OS_WEBOS)
+  if ((device_id.empty() ||
+       device_id == AudioDeviceDescription::kDefaultDeviceId) &&
+      !params.device_id().empty()) {
+    VLOG(1) << __func__ << " device_id=[" << params.device_id() << "]";
+    return new PulseAudioOutputStream(params, params.device_id(), this,
+                                      std::move(log_callback));
+  }
+#endif
+
   return new PulseAudioOutputStream(params, device_id, this,
                                     std::move(log_callback));
 }
@@ -290,6 +306,12 @@ void AudioManagerPulse::InputDevicesInfoCallback(pa_context* context,
   if (info->monitor_of_sink != PA_INVALID_INDEX)
     return;
 
+#if defined(OS_WEBOS)
+  // Exclude Null sources input devices
+  if (!std::string(info->driver).compare(kNullSourceInputDriver))
+    return;
+#endif
+
   // If the device has ports, but none of them are available, skip it.
   if (info->n_ports > 0) {
     uint32_t port = 0;
@@ -315,6 +337,12 @@ void AudioManagerPulse::OutputDevicesInfoCallback(pa_context* context,
     pa_threaded_mainloop_signal(manager->input_mainloop_, 0);
     return;
   }
+
+#if defined(OS_WEBOS)
+  // Exclude Null sink output devices
+  if (!std::string(info->driver).compare(kNullSinkOutputDriver))
+    return;
+#endif
 
   manager->devices_->push_back(AudioDeviceName(info->description, info->name));
 }

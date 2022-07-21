@@ -20,6 +20,16 @@ const char AudioDeviceDescription::kLoopbackWithMuteDeviceId[] =
 
 // static
 bool AudioDeviceDescription::IsDefaultDevice(const std::string& device_id) {
+#if defined(OS_WEBOS) && defined(USE_PULSEAUDIO)
+  if (!device_id.empty() &&
+      device_id.compare(AudioDeviceDescription::kDefaultDeviceId)) {
+    if ((device_id.size() - 1) > 0) {
+      std::string device_name = device_id.substr(0, device_id.size() - 1);
+      if (device_name == AudioDeviceDescription::kDefaultDeviceId)
+        return true;
+    }
+  }
+#endif
   return device_id.empty() ||
          device_id == AudioDeviceDescription::kDefaultDeviceId;
 }
@@ -74,6 +84,20 @@ std::string AudioDeviceDescription::GetDefaultDeviceName(
   // http://crbug.com/788767
   return GetDefaultDeviceName() + " - " + real_device_name;
 }
+
+#if defined(OS_WEBOS) && defined(USE_PULSEAUDIO)
+std::string AudioDeviceDescription::GetDefaultDeviceId(
+    const std::string& display_id) {
+  if (display_id.empty())
+    return std::string();
+
+  // For display 1 (id = 0) the audio sink device id is "default1"
+  // For display 2 (id = 1) the audio sink device id is "default2"
+  // So, adding 1 to display_id to get desired virtual sink number.
+  int device_number = std::stoi(display_id) + 1;
+  return std::string(kDefaultDeviceId) + std::to_string(device_number);
+}
+#endif
 
 // static
 std::string AudioDeviceDescription::GetCommunicationsDeviceName(

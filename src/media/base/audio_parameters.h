@@ -277,6 +277,11 @@ class MEDIA_SHMEM_EXPORT AudioParameters {
   // Creates reasonable dummy parameters in case no device is available.
   static AudioParameters UnavailableDeviceParams();
 
+#if defined(OS_WEBOS)
+  void set_device_id(const std::string& device_id) { device_id_ = device_id; }
+  std::string device_id() const { return device_id_; }
+#endif
+
  private:
   Format format_;                 // Format of the stream.
   ChannelLayout channel_layout_;  // Order of surround sound channels.
@@ -285,6 +290,10 @@ class MEDIA_SHMEM_EXPORT AudioParameters {
   int sample_rate_;               // Sampling frequency/rate.
   int frames_per_buffer_;         // Number of frames in a buffer.
   int effects_;                   // Bitmask using PlatformEffectsMask.
+
+#if defined(OS_WEBOS)
+  std::string device_id_;
+#endif
 
   // Microphone positions using Cartesian coordinates:
   // x: the horizontal dimension, with positive to the right from the camera's

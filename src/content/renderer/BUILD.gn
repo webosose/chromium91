@@ -402,6 +402,10 @@ target(link_target_type, "renderer") {
     ]
   }
 
+  if (is_webos && use_pulseaudio) {
+    defines += [ "USE_PULSEAUDIO" ]
+  }
+
   if (enable_media_remoting || is_chromecast) {
     deps += [ "//media/mojo/mojom:remoting" ]
 

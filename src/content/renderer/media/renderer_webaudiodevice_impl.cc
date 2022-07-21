@@ -28,6 +28,10 @@
 #include "third_party/blink/public/web/web_local_frame.h"
 #include "third_party/blink/public/web/web_view.h"
 
+#if defined(OS_WEBOS) && defined(USE_PULSEAUDIO)
+#include "media/audio/audio_device_description.h"
+#endif
+
 using blink::WebAudioDevice;
 using blink::WebAudioDeviceFactory;
 using blink::WebAudioLatencyHint;
@@ -187,6 +191,25 @@ void RendererWebAudioDeviceImpl::Start() {
 
   if (sink_)
     return;  // Already started.
+
+#if defined(OS_WEBOS) && defined(USE_PULSEAUDIO)
+  std::string device_id;
+  WebLocalFrame* web_frame = blink::WebLocalFrame::FrameForCurrentContext();
+  if (web_frame) {
+    auto* render_frame = RenderFrameImpl::FromWebFrame(web_frame);
+    if (render_frame) {
+      device_id = media::AudioDeviceDescription::GetDefaultDeviceId(
+          render_frame->GetRendererPreferences().display_id);
+      VLOG(1) << __func__ << " defult device_id=[" << device_id << "]";
+    }
+  }
+
+  if (!device_id.empty()) {
+    sink_ = WebAudioDeviceFactory::NewAudioRendererSink(
+        GetLatencyHintSourceType(latency_hint_.Category()), frame_token_,
+        media::AudioSinkParameters(session_id_, device_id));
+  } else
+#endif
 
   sink_ = WebAudioDeviceFactory::NewAudioRendererSink(
       GetLatencyHintSourceType(latency_hint_.Category()), frame_token_,

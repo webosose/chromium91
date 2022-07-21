@@ -48,6 +48,10 @@
 #include "third_party/blink/renderer/platform/timer.h"
 #include "third_party/blink/renderer/platform/wtf/cross_thread_functional.h"
 
+#if defined(OS_WEBOS) && defined(USE_PULSEAUDIO)
+#include "media/audio/audio_device_description.h"
+#endif
+
 namespace WTF {
 
 template <>
@@ -884,6 +888,12 @@ bool WebMediaPlayerMS::SetSinkId(
   }
 
   auto sink_id_utf8 = sink_id.Utf8();
+#if defined(OS_WEBOS) && defined(USE_PULSEAUDIO)
+  if (!initial_audio_output_device_id_.IsEmpty() &&
+      sink_id_utf8 == media::AudioDeviceDescription::kDefaultDeviceId) {
+    return true;
+  }
+#endif
   audio_renderer_->SwitchOutputDevice(sink_id_utf8, std::move(callback));
   return true;
 }

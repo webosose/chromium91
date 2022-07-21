@@ -349,6 +349,8 @@ AudioOutputStream* AudioManagerBase::MakeAudioOutputStreamProxy(
           // should change dynamically if the system default device changes.
           // See http://crbug.com/750614.
           std::string()
+#elif defined(OS_WEBOS) && defined(USE_PULSEAUDIO)
+          device_id
 #else
           GetDefaultOutputDeviceID()
 #endif
@@ -427,6 +429,12 @@ AudioOutputStream* AudioManagerBase::MakeAudioOutputStreamProxy(
                          CompareByParams(dispatcher_params.get()));
   if (it != output_dispatchers_.end())
     return (*it)->dispatcher->CreateStreamProxy();
+
+#if defined(OS_WEBOS) && defined(USE_PULSEAUDIO)
+  if (!output_device_id.empty() &&
+      AudioDeviceDescription::IsDefaultDevice(output_device_id))
+    output_params.set_device_id(output_device_id);
+#endif
 
   const base::TimeDelta kCloseDelay =
       base::TimeDelta::FromSeconds(kStreamCloseDelaySeconds);

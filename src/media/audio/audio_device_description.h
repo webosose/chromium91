@@ -64,6 +64,10 @@ struct MEDIA_EXPORT AudioDeviceDescription {
   // includes the given |real_device_name|.
   static std::string GetDefaultDeviceName(const std::string& real_device_name);
 
+#if defined(OS_WEBOS) && defined(USE_PULSEAUDIO)
+  static std::string GetDefaultDeviceId(const std::string& display_id);
+#endif
+
   // Returns the localized name of the generic default communications device.
   // This device is not supported on all platforms.
   static std::string GetCommunicationsDeviceName();

@@ -2008,6 +2008,10 @@ source_set("browser") {
     deps += [ "//neva/neva_media_service" ]
   }
 
+  if (is_webos && use_pulseaudio) {
+    defines += [ "USE_PULSEAUDIO" ]
+  }
+
   if (is_mac) {
     sources += [
       "../app_shim_remote_cocoa/web_drag_source_mac.h",
