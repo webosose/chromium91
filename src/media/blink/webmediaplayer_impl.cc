@@ -83,6 +83,10 @@
 #include "media/base/android/media_codec_util.h"
 #endif
 
+#if defined(USE_NEVA_MEDIA)
+#include "media/base/media_switches_neva.h"
+#endif
+
 using blink::WebMediaPlayer;
 using blink::WebString;
 using gpu::gles2::GLES2Interface;
@@ -113,10 +117,23 @@ bool IsBackgroundSuspendEnabled(const WebMediaPlayerImpl* wmpi) {
           switches::kDisableBackgroundMediaSuspend)) {
     return false;
   }
+
+#if defined(USE_NEVA_MEDIA)
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kDisableWebMediaPlayerNeva)) {
+    return true;
+  }
+#endif
   return wmpi->IsBackgroundMediaSuspendEnabled();
 }
 
 bool IsResumeBackgroundVideosEnabled() {
+#if defined(USE_NEVA_MEDIA)
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kDisableWebMediaPlayerNeva)) {
+    return true;
+  }
+#endif
   return base::FeatureList::IsEnabled(kResumeBackgroundVideo);
 }
 
@@ -2915,11 +2932,13 @@ scoped_refptr<VideoFrame> WebMediaPlayerImpl::GetCurrentFrameFromCompositor()
 
 void WebMediaPlayerImpl::UpdatePlayState() {
   DCHECK(main_task_runner_->BelongsToCurrentThread());
-#if defined(USE_NEVA_MEDIA)
-  bool can_auto_suspend = false;
-#else
   bool can_auto_suspend = !disable_pipeline_auto_suspend_;
+#if defined(USE_NEVA_MEDIA)
+  if (!base::CommandLine::ForCurrentProcess()->HasSwitch(
+      switches::kDisableWebMediaPlayerNeva))
+    can_auto_suspend = false;
 #endif
+
   // For streaming videos, we only allow suspending at the very beginning of the
   // video, and only if we know the length of the video. (If we don't know
   // the length, it might be a dynamically generated video, and suspending
@@ -3562,8 +3581,11 @@ void WebMediaPlayerImpl::UpdateBackgroundVideoOptimizationState() {
   // suspend/resume logic. This feature prevents decoding by disabling
   // demuxer stream. But it is not recovered after shown so that pipeline
   // became freezing.
-  return;
-#else
+  if (!base::CommandLine::ForCurrentProcess()->HasSwitch(
+      switches::kDisableWebMediaPlayerNeva))
+    return;
+#endif  // defined(USE_NEVA_MEDIA)
+
   if (IsHidden()) {
     if (ShouldPausePlaybackWhenHidden()) {
       PauseVideoIfNeeded();
@@ -3587,7 +3609,6 @@ void WebMediaPlayerImpl::UpdateBackgroundVideoOptimizationState() {
     is_background_status_change_cancelled_ = true;
     EnableVideoTrackIfNeeded();
   }
-#endif  // defined(USE_NEVA_MEDIA)
 }
 
 void WebMediaPlayerImpl::PauseVideoIfNeeded() {

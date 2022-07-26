@@ -13,7 +13,7 @@ namespace content {
 // Default value for is_background_suspend_enabled is determined statically in
 // Chromium, but some content embedders (e.g. Cast) may need to change it at
 // runtime.
-#if defined(OS_ANDROID)
+#if defined(OS_ANDROID) || !defined(USE_NEVA_MEDIA)
 const bool kIsBackgroundMediaSuspendEnabled = true;
 #else
 const bool kIsBackgroundMediaSuspendEnabled = false;
