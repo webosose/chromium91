@@ -111,6 +111,7 @@
 #include "media/blink/neva/webmediaplayer_neva_factory.h"
 #include "media/blink/neva/webmediaplayer_params_neva.h"
 #include "media/renderers/neva/neva_media_player_renderer_factory.h"
+#include "net/base/mime_util.h"
 #include "third_party/blink/public/web/web_frame_widget.h"
 #endif
 
@@ -310,6 +311,34 @@ std::unique_ptr<blink::WebVideoFrameSubmitter> CreateSubmitter(
       settings, use_sync_primitives);
 }
 
+#if defined(USE_NEVA_MEDIA)
+const char kUdpScheme[] = "udp";
+const char kRtpScheme[] = "rtp";
+const char kRtspScheme[] = "rtsp";
+const char kHLS[] = "m3u8";
+const char kWebOSCameraMimeType[] = "service/webos-camera";
+
+bool IsNevaCustomPlayback(const GURL& url, const std::string& mime_type) {
+  // Use Neva path for App which uses WebOS camera service
+  if (net::MatchesMimeType(kWebOSCameraMimeType, mime_type))
+    return true;
+
+  // Use Neva path for RTP/UDP/RTSP content
+  if (url.SchemeIs(kUdpScheme) || url.SchemeIs(kRtpScheme) ||
+      url.SchemeIs(kRtspScheme)) {
+    return true;
+  }
+
+  // Use Neva path for HLS content
+  if ((url.SchemeIsHTTPOrHTTPS() || url.SchemeIsFile()) &&
+      url.spec().find(kHLS) != std::string::npos) {
+    return true;
+  }
+
+  return false;
+}
+#endif
+
 }  // namespace
 
 namespace content {
@@ -441,9 +470,14 @@ blink::WebMediaPlayer* MediaFactory::CreateMediaPlayer(
   base::WeakPtr<media::MediaObserver> media_observer;
 
 #if defined(USE_NEVA_MEDIA)
-  bool use_neva_media = false;
-  use_neva_media = !base::CommandLine::ForCurrentProcess()->HasSwitch(
+  bool use_neva_media = !base::CommandLine::ForCurrentProcess()->HasSwitch(
       switches::kDisableWebMediaPlayerNeva);
+
+  if (!use_neva_media) {
+    use_neva_media = IsNevaCustomPlayback(url,
+        client->ContentMIMEType().Latin1());
+  }
+
   if (client->ContentTypeDecoder() == "sw")
     use_neva_media = false;
 #endif
