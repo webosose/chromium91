@@ -194,20 +194,6 @@ bool ShellAppDelegate::CheckMediaAccessPermission(
     const GURL& security_origin,
     blink::mojom::MediaStreamType type,
     const Extension* extension) {
-#if defined(USE_NEVA_APPRUNTIME)
-  if (type == blink::mojom::MediaStreamType::DEVICE_AUDIO_CAPTURE ||
-      type == blink::mojom::MediaStreamType::DEVICE_VIDEO_CAPTURE) {
-    // VerifyMediaAccessPermission() will crash if there is
-    // no permission for audio capture / video capture.
-    // Let's make an error log and return false instead.
-    // TODO(alexander.trofimov@lge.com): Remove this patch
-    // right after corresponding features are supported
-    // and crash removed from VerifyMediaAccessPermission().
-    LOG(ERROR) << "Audio capture/video capture request but "
-               << "this feature is not supported yet.";
-    return false;
-  }
-#endif
   media_capture_util::VerifyMediaAccessPermission(type, extension);
   return true;
 }
