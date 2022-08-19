@@ -246,6 +246,10 @@ void WebViewBase::SetUseUnlimitedMediaPolicy(bool enabled) {
   webview_->SetUseUnlimitedMediaPolicy(enabled);
 }
 
+void WebViewBase::SetEnableBackgroundRun(bool enabled) {
+  webview_->SetEnableBackgroundRun(enabled);
+}
+
 void WebViewBase::SetActiveOnNonBlankPaint(bool active) {
   webview_->SetActiveOnNonBlankPaint(active);
 }

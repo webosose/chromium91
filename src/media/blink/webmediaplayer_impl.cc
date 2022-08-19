@@ -118,12 +118,6 @@ bool IsBackgroundSuspendEnabled(const WebMediaPlayerImpl* wmpi) {
     return false;
   }
 
-#if defined(USE_NEVA_MEDIA)
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kDisableWebMediaPlayerNeva)) {
-    return true;
-  }
-#endif
   return wmpi->IsBackgroundMediaSuspendEnabled();
 }
 
@@ -3490,6 +3484,18 @@ void WebMediaPlayerImpl::UpdateFrameIfStale() {
 base::WeakPtr<blink::WebMediaPlayer> WebMediaPlayerImpl::AsWeakPtr() {
   return weak_this_;
 }
+
+#if defined(USE_NEVA_MEDIA)
+bool WebMediaPlayerImpl::IsBackgroundMediaSuspendEnabled() const {
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kDisableWebMediaPlayerNeva)) {
+    return is_background_suspend_enabled_ &&
+           !is_background_video_playback_enabled_;
+  }
+
+  return is_background_suspend_enabled_;
+}
+#endif
 
 bool WebMediaPlayerImpl::ShouldPausePlaybackWhenHidden() const {
   // Audio only stream is allowed to play when in background.

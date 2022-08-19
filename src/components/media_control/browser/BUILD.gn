@@ -15,4 +15,11 @@ static_library("browser") {
     "//content/public/browser",
     "//third_party/blink/public/common",
   ]
+
+  if (is_webos) {
+    sources += [
+      "neva/media_suspender.cc",
+      "neva/media_suspender.h"
+    ]
+  }
 }
