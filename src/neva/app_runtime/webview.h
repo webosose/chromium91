@@ -32,10 +32,6 @@ namespace content {
 class WebContents;
 }  // namespace content
 
-namespace media_control {
-class MediaSuspender;
-}
-
 namespace blink {
 namespace web_pref {
 struct WebPreferences;
@@ -309,8 +305,6 @@ class WebView : public content::WebContentsDelegate,
   std::unique_ptr<WebAppInjectionManager> injection_manager_;
   std::unique_ptr<AppRuntimeWebViewHostImpl> webview_host_impl_;
   std::unique_ptr<AppRuntimeWebViewControllerImpl> webview_controller_impl_;
-
-  std::unique_ptr<media_control::MediaSuspender> media_suspender_;
 
   bool should_suppress_dialogs_ = false;
   bool active_on_non_blank_paint_ = false;

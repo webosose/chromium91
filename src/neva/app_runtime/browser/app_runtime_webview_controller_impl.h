@@ -21,10 +21,12 @@
 #include "neva/app_runtime/public/mojom/app_runtime_webview_controller.mojom.h"
 
 namespace content {
-
 class WebContents;
-
 }  // namespace content
+
+namespace media_control {
+class MediaSuspender;
+}
 
 namespace neva_app_runtime {
 
@@ -37,6 +39,10 @@ class AppRuntimeWebViewControllerImpl : public mojom::AppRuntimeWebViewControlle
 
   void SetDelegate(WebViewControllerDelegate* delegate);
 
+  // Sets if the web contents is allowed to suspend video playback
+  // when in background or not.
+  void SetBackgroundVideoPlaybackEnabled(bool enabled);
+
   // using CallFunctionCallback = base::OnceCallback<void(const std::string&)>;
   void CallFunction(const std::string& name,
                     const std::vector<std::string>& args,
@@ -47,6 +53,8 @@ class AppRuntimeWebViewControllerImpl : public mojom::AppRuntimeWebViewControlle
  private:
   content::WebContentsFrameReceiverSet<mojom::AppRuntimeWebViewController> receivers_;
   WebViewControllerDelegate* webview_controller_delegate_ = nullptr;
+
+  std::unique_ptr<media_control::MediaSuspender> media_suspender_;
 };
 
 }  // namespace neva_app_runtime

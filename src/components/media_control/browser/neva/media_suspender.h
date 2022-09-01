@@ -22,8 +22,8 @@
 
 namespace media_control {
 
-// This class implements a suspend media mode for web applications. Media is
-// suspended by default.
+// This class implements a suspend video mode for web applications.
+// Video in background is enabled by default.
 class MediaSuspender : public content::WebContentsObserver {
  public:
   // Observes WebContents.
@@ -34,11 +34,12 @@ class MediaSuspender : public content::WebContentsObserver {
   MediaSuspender(const MediaSuspender&) = delete;
   MediaSuspender& operator=(const MediaSuspender&) = delete;
 
-  // Sets if the web contents is allowed to suspend media play or not.
-  void SetBackgroundMediaPlaybackEnabled(bool enabled);
+  // Sets if the web contents is allowed to suspend video playback
+  // when app is in background or not.
+  void SetBackgroundVideoPlaybackEnabled(bool enabled);
 
-  bool background_media_playback_enabled() const {
-    return background_media_playback_enabled_;
+  bool background_video_playback_enabled() const {
+    return is_background_video_playback_enabled_;
   }
 
  private:
@@ -46,15 +47,13 @@ class MediaSuspender : public content::WebContentsObserver {
   void RenderFrameCreated(content::RenderFrameHost* render_frame_host) final;
   void RenderViewReady() final;
 
-  // Blocks or unblocks the render process from loading new media
-  // according to |media_loading_blocked_|.
-  void UpdateBackgroundMediaPlaybackEnabledState();
-  void UpdateRenderFrameBackgroundMediaPlaybackEnabledState(
+  // Blocks or unblocks the render process from playing video in background
+  void UpdateBackgroundVideoPlaybackEnabledState();
+  void UpdateRenderFrameBackgroundVideoPlaybackEnabledState(
       content::RenderFrameHost* render_frame_host);
 
-  // Whether or not media should be suspended. This value cache's the last
-  // call to SetSuspendBackgroundMediaEnabled. Is false by default.
-  bool background_media_playback_enabled_ = true;
+  // While in background video playback should be disabled by default
+  bool is_background_video_playback_enabled_ = false;
 };
 
 }  // namespace media_control

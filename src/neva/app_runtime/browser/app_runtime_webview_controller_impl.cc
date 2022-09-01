@@ -14,6 +14,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include "components/media_control/browser/neva/media_suspender.h"
 #include "neva/app_runtime/browser/app_runtime_webview_controller_impl.h"
 #include "neva/app_runtime/public/webview_controller_delegate.h"
 
@@ -22,6 +23,8 @@ namespace neva_app_runtime {
 AppRuntimeWebViewControllerImpl::AppRuntimeWebViewControllerImpl(
     content::WebContents* web_contents)
   : receivers_(web_contents, this) {
+  media_suspender_ =
+      std::make_unique<media_control::MediaSuspender>(web_contents);
 }
 
 AppRuntimeWebViewControllerImpl::~AppRuntimeWebViewControllerImpl() {
@@ -30,6 +33,12 @@ AppRuntimeWebViewControllerImpl::~AppRuntimeWebViewControllerImpl() {
 void AppRuntimeWebViewControllerImpl::SetDelegate(
     WebViewControllerDelegate* delegate) {
   webview_controller_delegate_ = delegate;
+}
+
+void AppRuntimeWebViewControllerImpl::SetBackgroundVideoPlaybackEnabled(
+    bool enabled) {
+  if (media_suspender_)
+    media_suspender_->SetBackgroundVideoPlaybackEnabled(enabled);
 }
 
 void AppRuntimeWebViewControllerImpl::CallFunction(

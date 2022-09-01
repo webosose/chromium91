@@ -18,7 +18,6 @@
 
 #include "base/command_line.h"
 #include "base/strings/string_number_conversions.h"
-#include "components/media_control/renderer/media_playback_options.h"
 #include "components/watchdog/switches.h"
 #include "content/public/common/url_constants.h"
 #include "content/public/renderer/render_frame_observer.h"
@@ -99,8 +98,6 @@ void AppRuntimeContentRendererClient::RenderFrameCreated(
   if (render_frame->IsMainFrame()) {
     new AppRuntimePageLoadTimingRenderFrameObserver(render_frame);
   }
-
-  new media_control::MediaPlaybackOptions(render_frame);
 }
 
 bool AppRuntimeContentRendererClient::IsAccessAllowedForURL(

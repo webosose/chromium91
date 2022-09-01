@@ -2929,7 +2929,7 @@ void WebMediaPlayerImpl::UpdatePlayState() {
   bool can_auto_suspend = !disable_pipeline_auto_suspend_;
 #if defined(USE_NEVA_MEDIA)
   if (!base::CommandLine::ForCurrentProcess()->HasSwitch(
-      switches::kDisableWebMediaPlayerNeva))
+          switches::kDisableWebMediaPlayerNeva))
     can_auto_suspend = false;
 #endif
 
@@ -3322,6 +3322,14 @@ void WebMediaPlayerImpl::ScheduleIdlePauseTimer() {
     return;
 #endif
 
+#if defined(USE_NEVA_MEDIA)
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kDisableWebMediaPlayerNeva) && IsHidden()) {
+    // In webOS resumeing playback whiile in background is not allowed
+    return;
+  }
+#endif
+
   // Idle timeout chosen arbitrarily.
   background_pause_timer_.Start(FROM_HERE, base::TimeDelta::FromSeconds(5),
                                 client_,
@@ -3489,10 +3497,8 @@ base::WeakPtr<blink::WebMediaPlayer> WebMediaPlayerImpl::AsWeakPtr() {
 bool WebMediaPlayerImpl::IsBackgroundMediaSuspendEnabled() const {
   if (base::CommandLine::ForCurrentProcess()->HasSwitch(
           switches::kDisableWebMediaPlayerNeva)) {
-    return is_background_suspend_enabled_ &&
-           !is_background_video_playback_enabled_;
+    return !is_background_video_playback_enabled_;
   }
-
   return is_background_suspend_enabled_;
 }
 #endif
@@ -3588,7 +3594,7 @@ void WebMediaPlayerImpl::UpdateBackgroundVideoOptimizationState() {
   // demuxer stream. But it is not recovered after shown so that pipeline
   // became freezing.
   if (!base::CommandLine::ForCurrentProcess()->HasSwitch(
-      switches::kDisableWebMediaPlayerNeva))
+          switches::kDisableWebMediaPlayerNeva))
     return;
 #endif  // defined(USE_NEVA_MEDIA)
 

@@ -28,35 +28,35 @@ MediaSuspender::MediaSuspender(content::WebContents* web_contents) {
 
 MediaSuspender::~MediaSuspender() {}
 
-void MediaSuspender::SetBackgroundMediaPlaybackEnabled(bool enabled) {
-  if (background_media_playback_enabled_ == enabled)
+void MediaSuspender::SetBackgroundVideoPlaybackEnabled(bool enabled) {
+  if (is_background_video_playback_enabled_ == enabled)
     return;
 
-  background_media_playback_enabled_ = enabled;
-  UpdateBackgroundMediaPlaybackEnabledState();
+  is_background_video_playback_enabled_ = enabled;
+  UpdateBackgroundVideoPlaybackEnabledState();
 }
 
 void MediaSuspender::RenderFrameCreated(
     content::RenderFrameHost* render_frame_host) {
-  UpdateRenderFrameBackgroundMediaPlaybackEnabledState(render_frame_host);
+  UpdateRenderFrameBackgroundVideoPlaybackEnabledState(render_frame_host);
 }
 
 void MediaSuspender::RenderViewReady() {
-  UpdateBackgroundMediaPlaybackEnabledState();
+  UpdateBackgroundVideoPlaybackEnabledState();
 }
 
-void MediaSuspender::UpdateBackgroundMediaPlaybackEnabledState() {
+void MediaSuspender::UpdateBackgroundVideoPlaybackEnabledState() {
   if (!web_contents())
     return;
 
   const std::vector<content::RenderFrameHost*> frames =
       web_contents()->GetAllFrames();
   for (content::RenderFrameHost* frame : frames) {
-    UpdateRenderFrameBackgroundMediaPlaybackEnabledState(frame);
+    UpdateRenderFrameBackgroundVideoPlaybackEnabledState(frame);
   }
 }
 
-void MediaSuspender::UpdateRenderFrameBackgroundMediaPlaybackEnabledState(
+void MediaSuspender::UpdateRenderFrameBackgroundVideoPlaybackEnabledState(
     content::RenderFrameHost* render_frame_host) {
   DCHECK(render_frame_host);
   mojo::AssociatedRemote<components::media_control::mojom::MediaPlaybackOptions>
@@ -65,7 +65,7 @@ void MediaSuspender::UpdateRenderFrameBackgroundMediaPlaybackEnabledState(
       &media_playback_options);
 
   media_playback_options->SetBackgroundVideoPlaybackEnabled(
-      background_media_playback_enabled_);
+      is_background_video_playback_enabled_);
 }
 
 }  // namespace media_control

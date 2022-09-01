@@ -204,8 +204,6 @@ void WebView::CreateWebContents() {
   content::WebContents::CreateParams params(browser_context, nullptr);
   web_contents_ = content::WebContents::Create(params);
   injection_manager_ = std::make_unique<WebAppInjectionManager>();
-  media_suspender_ =
-      std::make_unique<media_control::MediaSuspender>(web_contents_.get());
 }
 
 content::WebContents* WebView::GetWebContents() {
@@ -668,7 +666,7 @@ void WebView::SetEnableBackgroundRun(bool enabled) {
   }
 #endif
 
-  media_suspender_->SetBackgroundMediaPlaybackEnabled(enabled);
+  webview_controller_impl_->SetBackgroundVideoPlaybackEnabled(enabled);
 }
 
 void WebView::UpdatePreferencesAttributeForPrefs(
